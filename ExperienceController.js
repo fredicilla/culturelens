@@ -39,8 +39,13 @@ class ExperienceController {
     }
 
     applyTheme(regionCode) {
+        // Prefer ThemeManager for full 5-region theming (glass-card, patterns, overlays)
+        if (window.ThemeManager && window.ThemeManager.applyRegionTheme) {
+            window.ThemeManager.applyRegionTheme(regionCode);
+            return;
+        }
+        // Fallback: set CSS custom properties directly for backward compat
         const root = document.documentElement;
-        // e.g. regionCode = 'najd', 'aseer', 'hijaz'
         if(regionCode) {
              root.style.setProperty('--region-bg', `var(--${regionCode}-bg)`);
              root.style.setProperty('--region-accent', `var(--${regionCode}-accent)`);

@@ -1,12 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>Najdi Qahwa — CultureLens</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="regional-patterns.css">
 <style>
-body { background:var(--green); }
+body { background: var(--region-bg, var(--green)); }
 
 /* ── PHASE SYSTEM ── */
 .phase { display:none; min-height:100vh; padding:80px 20px 40px; flex-direction:column; }
@@ -114,7 +115,7 @@ body { background:var(--green); }
   max-width:420px; margin-left:auto; margin-right:auto;
 }
 .game-title {
-  font-family:'Playfair Display',Georgia,serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-size:24px; font-weight:700; color:var(--white); margin-bottom:4px;
 }
 .game-subtitle { font-size:13px; color:var(--text-light); }
@@ -207,7 +208,7 @@ body { background:var(--green); }
   box-shadow:0 0 40px rgba(201,168,76,0.3);
 }
 .score-num {
-  font-family:'Playfair Display',Georgia,serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-size:40px; font-weight:700; color:var(--gold);
 }
 .score-max { font-size:14px; color:var(--text-light); }
@@ -327,7 +328,7 @@ body { background:var(--green); }
     <div class="story-panel" id="panel-4">
       <div class="narrator-box" style="text-align:center">
         <div style="font-size:36px;margin-bottom:12px"><img src="dallah.png" alt="Dallah" class="emoji-img"></div>
-        <div style="font-family:'Playfair Display',Georgia,serif;font-size:20px;color:var(--gold);margin-bottom:8px" class="translatable" data-en="Now you are the host" data-ar="الحين أنت المضيف">
+        <div style="font-size:20px;color:var(--gold);margin-bottom:8px" class="translatable" data-en="Now you are the host" data-ar="الحين أنت المضيف">
           Now you are the host
         </div>
         <div style="font-size:13px;color:var(--cream);line-height:1.7" class="translatable" data-en="Four guests have arrived at your majlis. Each has a different status. Serve them correctly — in the right order, with the right amount — and earn their respect." data-ar="أربعة ضيوف لفوا بمجلسك وكل واحد له مقامه. صب لهم صح — بالترتيب والكمية المطلوبة — وبيض الوجه.">
@@ -410,7 +411,7 @@ body { background:var(--green); }
 <!-- ═══════════════════════════════════════ -->
 <section class="phase" id="phase-score">
   <div class="score-screen">
-    <div style="font-family:'Playfair Display',Georgia,serif;font-size:14px;color:var(--text-light);margin-bottom:16px;letter-spacing:1px" class="translatable" data-en="CEREMONY COMPLETE" data-ar="المراسم انتهت">CEREMONY COMPLETE</div>
+    <div style="font-size:14px;color:var(--text-light);margin-bottom:16px;letter-spacing:1px" class="translatable" data-en="CEREMONY COMPLETE" data-ar="المراسم انتهت">CEREMONY COMPLETE</div>
     <div class="score-circle">
       <div class="score-num" id="final-score">0</div>
       <div class="score-max translatable" data-en="out of 4" data-ar="من ٤">out of 4</div>
@@ -641,6 +642,7 @@ function showFeedback(emoji, label, sub) {
 }
 </script>
 <script src="language.js"></script>
+<script src="ThemeManager.js"></script>
 </body>
 </html>
 
