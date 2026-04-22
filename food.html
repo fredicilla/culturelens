@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <title>Food & Drinks — CultureLens</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header class="cl-header">
+    <a href="index.html" class="back-btn">‹</a>
+    <div class="logo translatable" data-en="<img src='logo.png' class='logo-img'> Culture<span>Lens</span>" data-ar="<img src='logo.png' class='logo-img'> عدسة <span>الثقافة</span>" data-html="true"><img src="logo.png" class="logo-img"> Culture<span>Lens</span></div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="font-size:10px;color:var(--text-light);text-align:right" class="translatable" data-en="<img src='dallah.png' alt='Dallah' class='emoji-img'> Food & Drinks" data-ar="<img src='dallah.png' alt='Dallah' class='emoji-img'> الأكل والشرب" data-html="true">
+        <img src="dallah.png" alt="Dallah" class="emoji-img"> Food & Drinks
+      </div>
+      <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">🇸🇦 العربية</span></button>
+    </div>
+  </header>
+
+  <main class="page" style="padding-top: 80px; padding-bottom: 80px;">
+    <div class="hub-page-header">
+      <div class="hub-title translatable" data-en="Food & Drinks" data-ar="الأكل والشرب">الأكل والمشروبات</div>
+      <div class="hub-subtitle translatable" data-en="Food & Drinks — Hospitality & Social Hierarchy" data-ar="الأكل والشرب — الضيافة والاحترام بين الناس">Food & Drinks — Hospitality & Social Hierarchy</div>
+    </div>
+
+    <div class="hub-container">
+
+      <!-- Experience 1: Available -->
+      <a href="qahwa.html" class="hub-card">
+        <div class="hub-thumb">
+          <img src="dallah.png" alt="Dallah" class="emoji-img">
+          <div class="hub-status status-available translatable" data-en="Available" data-ar="متاح">Available</div>
+        </div>
+        <div class="hub-card-body">
+          <div class="hub-card-title translatable" data-en="Najdi Qahwa Ceremony" data-ar="مجلس القهوة النجدية">Najdi Qahwa Ceremony</div>
+          <div class="hub-card-ar">مراسم القهوة النجدية</div>
+          <div class="hub-card-desc translatable" data-en="Serve coffee with proper etiquette in a traditional Najdi Majlis. Master the order of service." data-ar="قدم القهوة بأصولها في المجلس النجدي. تعلم ترتيب الصبة صح.">Serve coffee with proper etiquette in a traditional Najdi Majlis. Master the order
+            of service.</div>
+          <div class="hub-card-meta translatable" data-en="⏳ 3 min experience" data-ar="⏳ ٣ دقايق تجربة">⏳ 3 min experience</div>
+        </div>
+      </a>
+
+      <!-- Experience 1b: AR Qahwa -->
+      <a href="ar-qahwa.html" class="hub-card">
+        <div class="hub-thumb">
+          📸
+          <div class="hub-status status-available" style="background:rgba(100,60,180,0.85)">
+            <span class="translatable" data-en="AR Experience" data-ar="تجربة واقع معزز">AR Experience</span>
+          </div>
+        </div>
+        <div class="hub-card-body">
+          <div class="hub-card-title translatable" data-en="How to Make Qahwa — AR" data-ar="طريقة القهوة — واقع معزز">How to Make Qahwa — AR</div>
+          <div class="hub-card-ar">تعلم تسوي القهوة بالواقع المعزز</div>
+          <div class="hub-card-desc translatable" data-en="Learn step-by-step how to brew authentic Najdi coffee. Place the dallah on your real table using AR." data-ar="تعلم خطوة بخطوة كيف تسوي قهوة نجدية أصيلة. حط الدلة على طاولتك بالواقع المعزز.">Learn step-by-step how to brew authentic Najdi coffee. Place the dallah on your real table using AR.</div>
+          <div class="hub-card-meta translatable" data-en="📸 6 steps • AR enabled" data-ar="📸 ٦ خطوات • واقع معزز">📸 6 steps • AR enabled</div>
+        </div>
+      </a>
+
+      <!-- Experience 2: Locked -->
+      <a href="#" class="hub-card locked" onclick="showToast(event)">
+        <div class="hub-thumb">
+          🍛
+          <div class="hub-status status-locked translatable" data-en="Coming Soon" data-ar="قريباً">Coming Soon</div>
+          <div class="lock-icon">🔒</div>
+        </div>
+        <div class="hub-card-body">
+          <div class="hub-card-title translatable" data-en="Al-Kabsa Feast" data-ar="وليمة الكبسة">Al-Kabsa Feast</div>
+          <div class="hub-card-ar">وليمة الكبسة</div>
+          <div class="hub-card-desc translatable" data-en="Experience the communal joy of a traditional Al-Kabsa gathering. Learn the unspoken rules." data-ar="عيش جو الجمعة على الكبسة، وتعلم الأصول اللي ما تنقال.">Experience the communal joy of a traditional Al-Kabsa gathering. Learn the unspoken
+            rules.</div>
+          <div class="hub-card-meta translatable" data-en="⏳ 5 min experience" data-ar="⏳ ٥ دقايق تجربة">⏳ 5 min experience</div>
+        </div>
+      </a>
+
+      <!-- Experience 3: Locked -->
+      <a href="#" class="hub-card locked" onclick="showToast(event)">
+        <div class="hub-thumb">
+          🌴
+          <div class="hub-status status-locked translatable" data-en="Coming Soon" data-ar="قريباً">Coming Soon</div>
+          <div class="lock-icon">🔒</div>
+        </div>
+        <div class="hub-card-body">
+          <div class="hub-card-title translatable" data-en="Tamr & Coffee Pairing" data-ar="تمرة الدلة">Tamr & Coffee Pairing</div>
+          <div class="hub-card-ar">تمرة الدلة</div>
+          <div class="hub-card-desc translatable" data-en="Explore how different dates complement varying blends of Saudi coffee across regions." data-ar="اكتشف كيف التمر يوزن طعم القهوة باختلاف مناطق المملكة.">Explore how different dates complement varying blends of Saudi coffee across
+            regions.</div>
+          <div class="hub-card-meta translatable" data-en="⏳ 2 min experience" data-ar="⏳ دقيقتين تجربة">⏳ 2 min experience</div>
+        </div>
+      </a>
+
+    </div>
+  </main>
+
+  <button class="scan-btn-floating" onclick="alert('Camera Scan mode coming soon!')">📷</button>
+
+  <div class="toast translatable" id="hub-toast" data-en="Coming in Phase 2" data-ar="قريباً في المرحلة الثانية">Coming in Phase 2</div>
+
+  <div class="cl-footer">
+    هاكاثون نورة 2026 | CultureLens
+  </div>
+
+  <script>
+    function showToast(e) {
+      e.preventDefault();
+      const toast = document.getElementById('hub-toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+  </script>
+  <script src="language.js"></script>
+</body>
+
+</html>
+
+
+

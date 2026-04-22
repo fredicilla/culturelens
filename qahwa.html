@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Najdi Qahwa — CultureLens</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body { background:var(--green); }
+
+/* ── PHASE SYSTEM ── */
+.phase { display:none; min-height:100vh; padding:80px 20px 40px; flex-direction:column; }
+.phase.active { display:flex; }
+
+/* ── PHASE 1: STORY ── */
+.majlis-scene {
+  position:relative; width:100%; max-width:420px;
+  margin:0 auto 24px;
+  background:linear-gradient(160deg,#1a0e08,#2d1a0d);
+  border-radius:24px; overflow:hidden; padding:0 0 24px;
+  border:1px solid rgba(201,168,76,0.2);
+  box-shadow:0 8px 40px rgba(0,0,0,0.5);
+}
+
+/* ceiling gradient */
+.majlis-ceiling {
+  height:8px;
+  background:linear-gradient(90deg,#8B4513,#C4A35A,#8B4513);
+}
+
+/* carpet floor */
+.carpet {
+  width:100%; height:120px;
+  background:repeating-linear-gradient(
+    90deg,
+    #8B1A1A 0px, #8B1A1A 12px,
+    #A0522D 12px, #A0522D 24px,
+    #8B1A1A 24px, #8B1A1A 36px,
+    #6B0F0F 36px, #6B0F0F 48px
+  );
+  position:relative; overflow:hidden; margin:0 16px; border-radius:0 0 8px 8px;
+  border:2px solid rgba(139,69,19,0.5);
+}
+.carpet::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(to bottom,rgba(0,0,0,0.4),transparent);
+}
+
+/* dallah */
+.dallah-wrap {
+  display:flex; justify-content:center; margin:-30px 0 0;
+  position:relative; z-index:2;
+}
+.dallah {
+  font-size:72px;
+  animation:float 3s ease-in-out infinite;
+  filter:drop-shadow(0 8px 20px rgba(201,168,76,0.4));
+  cursor:pointer;
+}
+
+/* incense smoke */
+.incense-wrap {
+  position:absolute; top:20px; right:30px;
+}
+.smoke-particle {
+  width:6px; height:6px; border-radius:50%;
+  background:rgba(200,200,180,0.7);
+  position:absolute; bottom:0;
+  animation:smoke 2.5s ease-out infinite;
+}
+.smoke-particle:nth-child(2) { animation-delay:0.8s; left:8px; }
+.smoke-particle:nth-child(3) { animation-delay:1.6s; left:4px; }
+
+/* scene header */
+.scene-header {
+  padding:16px 20px 0;
+  display:flex; align-items:center; gap:12px;
+}
+.region-tag {
+  padding:4px 12px; border-radius:50px;
+  background:rgba(201,168,76,0.15); border:1px solid rgba(201,168,76,0.4);
+  font-size:11px; color:var(--gold); font-weight:600;
+}
+
+/* story panels */
+.story-panels { padding:0 20px; max-width:420px; margin:0 auto; width:100%; }
+.story-panel {
+  display:none;
+  animation:fadeUp 0.5s ease;
+}
+.story-panel.active { display:block; }
+
+.panel-step {
+  display:flex; align-items:center; gap:8px;
+  margin-bottom:12px;
+}
+.step-dot {
+  width:28px; height:28px; border-radius:50%; flex-shrink:0;
+  background:var(--gold); color:var(--green);
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:700;
+}
+.step-label { font-size:12px; color:var(--gold); font-weight:600; }
+
+.panel-continue {
+  margin-top:16px; text-align:center;
+  font-size:12px; color:var(--text-light);
+  animation:pulse 2s ease-in-out infinite;
+}
+
+/* ── PHASE 2: MINI GAME ── */
+.game-header {
+  text-align:center; margin-bottom:24px;
+  max-width:420px; margin-left:auto; margin-right:auto;
+}
+.game-title {
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:24px; font-weight:700; color:var(--white); margin-bottom:4px;
+}
+.game-subtitle { font-size:13px; color:var(--text-light); }
+
+/* guest queue */
+.guest-queue {
+  display:flex; gap:10px; justify-content:center;
+  margin-bottom:20px; flex-wrap:wrap; max-width:420px;
+  margin-left:auto; margin-right:auto;
+}
+.guest-card {
+  background:var(--card-dark);
+  border:2px solid rgba(201,168,76,0.15);
+  border-radius:16px; padding:12px 14px; text-align:center;
+  width:90px; cursor:pointer; transition:all 0.25s;
+  flex-shrink:0;
+}
+.guest-card.current {
+  border-color:var(--gold);
+  box-shadow:0 0 20px rgba(201,168,76,0.4);
+  animation:glow 1.5s ease-in-out infinite;
+}
+.guest-card.done { opacity:0.4; border-color:rgba(168,200,176,0.3); }
+.guest-emoji { font-size:28px; }
+.guest-name { font-size:10px; color:var(--text-light); margin-top:4px; }
+.guest-rank { font-size:9px; color:var(--gold); font-weight:600; }
+
+/* pour meter */
+.pour-section {
+  max-width:420px; margin:0 auto 20px; width:100%;
+  background:var(--card-dark); border-radius:20px; padding:20px;
+  border:1px solid rgba(201,168,76,0.2);
+}
+.pour-label {
+  font-size:13px; color:var(--text-light); margin-bottom:12px; text-align:center;
+}
+.cup-visual {
+  width:80px; height:100px; margin:0 auto 16px;
+  border:3px solid var(--gold); border-top:none;
+  border-radius:0 0 20px 20px; position:relative; overflow:hidden;
+  cursor:pointer; background:rgba(18,43,30,0.5);
+  transition:transform 0.1s;
+}
+.cup-visual:active { transform:scale(0.95); }
+.coffee-fill {
+  position:absolute; bottom:0; left:0; right:0;
+  background:linear-gradient(to top,#4a2c0a,#6b3f0f);
+  transition:height 0.3s ease; border-radius:0 0 17px 17px;
+}
+.cup-quarter-line {
+  position:absolute; left:0; right:0;
+  height:2px; background:rgba(201,168,76,0.5);
+  bottom:25%; /* ¼ mark */
+}
+.pour-instructions {
+  text-align:center; font-size:12px; color:var(--text-light);
+  line-height:1.6;
+}
+.pour-btn {
+  width:100%; padding:14px; margin-top:12px;
+  background:rgba(201,168,76,0.15); border:1.5px solid var(--gold);
+  border-radius:12px; color:var(--gold); font-size:15px; font-weight:700;
+  cursor:pointer; transition:all 0.2s;
+}
+.pour-btn:hover { background:rgba(201,168,76,0.3); }
+
+/* rule reveal */
+.rule-reveal {
+  max-width:420px; margin:0 auto 16px; width:100%;
+}
+.rule-card {
+  background:var(--card-dark); border-radius:14px; padding:14px 16px;
+  border-left:3px solid var(--gold); margin-bottom:10px;
+  animation:fadeUp 0.4s ease;
+  display:flex; align-items:flex-start; gap:12px;
+}
+.rule-icon { font-size:20px; flex-shrink:0; }
+.rule-text { font-size:13px; color:var(--cream); line-height:1.6; }
+.rule-ar { font-size:11px; color:var(--gold); direction:rtl; margin-top:3px; }
+
+/* score screen */
+.score-screen {
+  max-width:420px; margin:0 auto; width:100%; text-align:center;
+}
+.score-circle {
+  width:120px; height:120px; border-radius:50%;
+  border:4px solid var(--gold); margin:0 auto 20px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:var(--card-dark);
+  box-shadow:0 0 40px rgba(201,168,76,0.3);
+}
+.score-num {
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:40px; font-weight:700; color:var(--gold);
+}
+.score-max { font-size:14px; color:var(--text-light); }
+.fact-box {
+  background:var(--card-dark); border-radius:16px; padding:20px;
+  border:1px solid rgba(201,168,76,0.2); margin:20px 0; text-align:left;
+}
+.fact-label {
+  font-size:10px; font-weight:700; letter-spacing:1.5px;
+  color:var(--gold); text-transform:uppercase; margin-bottom:8px;
+}
+.fact-text { font-size:13px; color:var(--cream); line-height:1.7; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="cl-header">
+  <a href="index.html" class="back-btn">‹</a>
+  <div class="logo translatable" data-en="<img src='logo.png' class='logo-img'> Culture<span>Lens</span>" data-ar="<img src='logo.png' class='logo-img'> عدسة <span>الثقافة</span>" data-html="true"><img src="logo.png" class="logo-img"> Culture<span>Lens</span></div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="region-tag translatable" style="font-size:10px" data-en="<img src='dallah.png' alt='Dallah' class='emoji-img'> Qahwa" data-ar="<img src='dallah.png' alt='Dallah' class='emoji-img'> قهوة" data-html="true"><img src="dallah.png" alt="Dallah" class="emoji-img"> Qahwa</div>
+    <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">🇸🇦 العربية</span></button>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- PHASE 1 — IMMERSIVE STORY             -->
+<!-- ═══════════════════════════════════════ -->
+<section class="phase active" id="phase-story">
+
+  <!-- THE MAJLIS SCENE -->
+  <div class="majlis-scene" style="max-width:420px;margin:0 auto 20px;width:100%">
+    <div class="majlis-ceiling"></div>
+    <div class="scene-header">
+      <div class="region-tag translatable" data-en="🏜️ Najd Region — نجد" data-ar="🏜️ منطقة نجد">🏜️ Najd Region — نجد</div>
+    </div>
+    <div style="padding:0 16px;margin-top:8px">
+      <div class="carpet">
+        <div class="incense-wrap">
+          <div class="smoke-particle"></div>
+          <div class="smoke-particle"></div>
+          <div class="smoke-particle"></div>
+        </div>
+      </div>
+    </div>
+    <div class="dallah-wrap">
+      <div class="dallah" id="dallah-tap" title="Tap me!"><img src="dallah.png" alt="Dallah" class="emoji-img"></div>
+    </div>
+    <div style="text-align:center;padding:8px 20px 0">
+      <div style="font-size:10px;color:var(--gold);animation:pulse 2s infinite" class="translatable" data-en="✦ Tap the Dallah to begin ✦" data-ar="✦ اضغط الدلة عشان تبدأ ✦">
+        ✦ Tap the Dallah to begin ✦
+      </div>
+    </div>
+  </div>
+
+  <!-- STORY PANELS -->
+  <div class="story-panels">
+
+    <!-- Panel 0: Intro -->
+    <div class="story-panel active" id="panel-0">
+      <div class="narrator-box">
+        <div class="panel-step">
+          <div class="step-dot"><img src="dallah.png" alt="Dallah" class="emoji-img"></div>
+          <div class="step-label translatable" data-en="The Majlis — المجلس" data-ar="المجلس">The Majlis — المجلس</div>
+        </div>
+        <p class="translatable" data-en="You step into a traditional <strong style='color:var(--gold)'>Najdi majlis</strong> in Riyadh. The room is carpeted, low-lit, and fragrant with oud incense. Men sit cross-legged in a circle. Before you say a single word, a host approaches with a gleaming dallah." data-ar="دخلت <strong style='color:var(--gold)'>مجلس نجدي</strong> بالرياض. ريحة العود مالية المكان، والكل جالس دائرية. قبل حتى ما تتكلم، المضيف جايك والدلة تلمع بيده." data-html="true">You step into a traditional <strong style="color:var(--gold)">Najdi majlis</strong> in Riyadh. The room is carpeted, low-lit, and fragrant with oud incense. Men sit cross-legged in a circle. Before you say a single word, a host approaches with a gleaming dallah.</p>
+        <p style="margin-top:10px;color:var(--text-light);font-size:13px" class="translatable" data-en="In Najd, <em>silence is a guest</em>. The coffee speaks first." data-ar="في نجد، الصمت ضيف. والقهوة هي اللي تتكلم أول." data-html="true">In Najd, <em>silence is a guest</em>. The coffee speaks first.</p>
+      </div>
+      <div class="panel-continue translatable" data-en="Tap anywhere to continue ▾" data-ar="اضغط للمتابعة ▾">Tap anywhere to continue ▾</div>
+    </div>
+
+    <!-- Panel 1 -->
+    <div class="story-panel" id="panel-1">
+      <div class="narrator-box">
+        <div class="panel-step">
+          <div class="step-dot">1</div>
+          <div class="step-label translatable" data-en="The Dallah — الدلة" data-ar="الدلة">The Dallah — الدلة</div>
+        </div>
+        <p class="translatable" data-en="The <strong style='color:var(--gold)'>dallah</strong> is not just a coffee pot — it is an ancient social signal. In Najdi culture, the type of dallah, its size, and how it is held all communicate the host's status and intention before coffee is even poured." data-ar="<strong style='color:var(--gold)'>الدلة</strong> مو بس إبريق قهوة، هي لغة قديمة. بنجد، نوع الدلة وحجمها ومسكتها، كلها توصل رسائل عن قدر المضيف ونيته قبل صبة الفنجان." data-html="true">The <strong style="color:var(--gold)">dallah</strong> is not just a coffee pot — it is an ancient social signal. In Najdi culture, the type of dallah, its size, and how it is held all communicate the host's status and intention before coffee is even poured.</p>
+        <p style="margin-top:10px;color:var(--text-light);font-size:13px" class="translatable" data-en="A gold-trimmed dallah means you are an honored guest. A plain one means you are family — equally respected, but differently." data-ar="دلة مذهبة يعني أنت ضيف غالي. دلة سادة يعني أنت من أهل البيت." data-html="true">A gold-trimmed dallah means you are an honored guest. A plain one means you are family — equally respected, but differently.</p>
+      </div>
+      <div class="panel-continue translatable" data-en="Tap to continue ▾" data-ar="اضغط للمتابعة ▾">Tap to continue ▾</div>
+    </div>
+
+    <!-- Panel 2 -->
+    <div class="story-panel" id="panel-2">
+      <div class="narrator-box">
+        <div class="panel-step">
+          <div class="step-dot">2</div>
+          <div class="step-label translatable" data-en="The Order — الترتيب" data-ar="الترتيب">The Order — الترتيب</div>
+        </div>
+        <p class="translatable" data-en="Before any guest drinks, the host must know the <strong style='color:var(--gold)'>order of service</strong>. In a Najdi majlis, coffee always flows from the eldest to the youngest. Skipping an elder — even by accident — is a social insult that echoes through families for years." data-ar="قبل يشرب أي ضيف، لازم المضيف يعلم <strong style='color:var(--gold)'>ترتيب الصبة</strong>. بالمجلس النجدي القهوة دايم تبدا من الكبير للكبير. لو تفطمر كبير بالسن — حتى بالغلط — تعتبر عيبة كبيرة ما تنتسى." data-html="true">Before any guest drinks, the host must know the <strong style="color:var(--gold)">order of service</strong>. In a Najdi majlis, coffee always flows from the eldest to the youngest. Skipping an elder — even by accident — is a social insult that echoes through families for years.</p>
+        <div style="margin-top:12px;background:rgba(201,168,76,0.08);border-radius:10px;padding:12px;direction:rtl;text-align:right">
+          <div style="font-size:11px;color:var(--gold);margin-bottom:4px">قاعدة ذهبية</div>
+          <div style="font-size:13px;color:var(--cream)">"الكبير أولاً — ثم الضيف الأعز — ثم البقية"</div>
+          <div style="font-size:11px;color:var(--text-light);margin-top:4px" class="translatable" data-en="The eldest first — then the honored guest — then the rest" data-ar='"الكبير قبل الصغير"'>The eldest first — then the honored guest — then the rest</div>
+        </div>
+      </div>
+      <div class="panel-continue translatable" data-en="Tap to continue ▾" data-ar="اضغط للمتابعة ▾">Tap to continue ▾</div>
+    </div>
+
+    <!-- Panel 3 -->
+    <div class="story-panel" id="panel-3">
+      <div class="narrator-box">
+        <div class="panel-step">
+          <div class="step-dot">3</div>
+          <div class="step-label translatable" data-en="The Pour — الصب" data-ar="الصب">The Pour — الصب</div>
+        </div>
+        <p class="translatable" data-en="Coffee is poured with <strong style='color:var(--gold)'>the left hand holding the dallah</strong> and the right hand offering the cup. The cup — called a <em>finjan</em> — is always small. And it is never filled more than a quarter." data-ar="القهوة تنصب و<strong style='color:var(--gold)'>الدلة باليسار</strong> والفنجان ينعطى باليمين. الدايم إن الفنجان ما ينملى إلا ربعه كرم." data-html="true">Coffee is poured with <strong style="color:var(--gold)">the left hand holding the dallah</strong> and the right hand offering the cup. The cup — called a <em>finjan</em> — is always small. And it is never filled more than a quarter.</p>
+        <p style="margin-top:10px;color:var(--text-light);font-size:13px" class="translatable" data-en='A full cup says: <em>"I want you to leave quickly."</em><br>A quarter cup says: <em>"Stay as long as you wish."</em>' data-ar='فنجان مليان يقولك: <em>"توكل على الله."</em><br>فنجان ربع مليان يقولك: <em>"حياك الله، خذ راحتك."</em>' data-html="true">A full cup says: <em>"I want you to leave quickly."</em><br>A quarter cup says: <em>"Stay as long as you wish."</em></p>
+      </div>
+      <div class="panel-continue translatable" data-en="Tap to continue ▾" data-ar="اضغط للمتابعة ▾">Tap to continue ▾</div>
+    </div>
+
+    <!-- Panel 4 — Transition to game -->
+    <div class="story-panel" id="panel-4">
+      <div class="narrator-box" style="text-align:center">
+        <div style="font-size:36px;margin-bottom:12px"><img src="dallah.png" alt="Dallah" class="emoji-img"></div>
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:20px;color:var(--gold);margin-bottom:8px" class="translatable" data-en="Now you are the host" data-ar="الحين أنت المضيف">
+          Now you are the host
+        </div>
+        <div style="font-size:13px;color:var(--cream);line-height:1.7" class="translatable" data-en="Four guests have arrived at your majlis. Each has a different status. Serve them correctly — in the right order, with the right amount — and earn their respect." data-ar="أربعة ضيوف لفوا بمجلسك وكل واحد له مقامه. صب لهم صح — بالترتيب والكمية المطلوبة — وبيض الوجه.">
+          Four guests have arrived at your majlis. Each has a different status. Serve them correctly — in the right order, with the right amount — and earn their respect.
+        </div>
+        <div style="margin-top:16px;font-size:12px;color:var(--text-light)" class="translatable" data-en="One wrong pour and the whole room notices." data-ar="صبة وحدة غلط تلقى المجلس كله يناظرك!">
+          One wrong pour and the whole room notices.
+        </div>
+      </div>
+      <div style="margin-top:20px">
+        <button class="btn-gold translatable" onclick="startGame()" data-en="Begin the Ceremony <img src='dallah.png' alt='Dallah' class='emoji-img'>" data-ar="ابدأ المراسم <img src='dallah.png' alt='Dallah' class='emoji-img'>" data-html="true">Begin the Ceremony <img src="dallah.png" alt="Dallah" class="emoji-img"></button>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- PHASE 2 — MINI GAME                   -->
+<!-- ═══════════════════════════════════════ -->
+<section class="phase" id="phase-game">
+
+  <div class="game-header">
+    <div class="game-title translatable" data-en="Serve with Honor" data-ar="اخدم بشرف">Serve with Honor</div>
+    <div class="game-subtitle translatable" data-en="اخدم بشرف — Serve the guests in the correct order" data-ar="اخدم بشرف — صب للضيوف بالترتيب الصح">اخدم بشرف — Serve the guests in the correct order</div>
+    <div style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:12px">
+      <div class="score-badge" id="score-display">⭐ 0 / 4</div>
+      <div class="progress-bar" style="width:140px;height:6px">
+        <div class="progress-fill" id="game-progress" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GUESTS -->
+  <div class="guest-queue" id="guest-queue">
+    <div class="guest-card" id="guest-0" onclick="selectGuest(0)">
+      <div class="guest-emoji">👴</div>
+      <div class="guest-name translatable" data-en="Sheikh Ali" data-ar="الشيخ علي">Sheikh Ali</div>
+      <div class="guest-rank translatable" data-en="Elder — ٨٠ سنة" data-ar="كبير السن — ٨٠ سنة">Elder — ٨٠ سنة</div>
+    </div>
+    <div class="guest-card" id="guest-1" onclick="selectGuest(1)">
+      <div class="guest-emoji">🧔</div>
+      <div class="guest-name translatable" data-en="Abu Khalid" data-ar="أبو خالد">Abu Khalid</div>
+      <div class="guest-rank translatable" data-en="Honored Guest" data-ar="الضيف الأعز">Honored Guest</div>
+    </div>
+    <div class="guest-card" id="guest-2" onclick="selectGuest(2)">
+      <div class="guest-emoji">👨</div>
+      <div class="guest-name translatable" data-en="Fahad" data-ar="فهد">Fahad</div>
+      <div class="guest-rank translatable" data-en="Host's Brother" data-ar="أخو المضيف">Host's Brother</div>
+    </div>
+    <div class="guest-card" id="guest-3" onclick="selectGuest(3)">
+      <div class="guest-emoji">🧒</div>
+      <div class="guest-name translatable" data-en="Young Omar" data-ar="عمر الصغير">Young Omar</div>
+      <div class="guest-rank translatable" data-en="Youth — ١٨ سنة" data-ar="شاب — ١٨ سنة">Youth — ١٨ سنة</div>
+    </div>
+  </div>
+
+  <!-- POUR SECTION -->
+  <div class="pour-section" id="pour-section" style="display:none">
+    <div class="pour-label" id="pour-label">Tap the cup to pour <img src="dallah.png" alt="Dallah" class="emoji-img"></div>
+    <div class="cup-visual" id="cup" onclick="pourCoffee()">
+      <div class="coffee-fill" id="coffee-fill" style="height:0%"></div>
+      <div class="cup-quarter-line"></div>
+    </div>
+    <div class="pour-instructions translatable" data-en="Stop at the <strong style='color:var(--gold)'>gold line (¼)</strong> — never fill more.<br>When done, tap <strong style='color:var(--gold)'>Serve</strong> to pour." data-ar="وقف عند <strong style='color:var(--gold)'>الخط الذهبي (الربع)</strong> — لا تزيد أبداً.<br>إذا خلصت، اضغط <strong style='color:var(--gold)'>قدم</strong> عشان تصب." data-html="true">
+      Stop at the <strong style="color:var(--gold)">gold line (¼)</strong> — never fill more.<br>
+      When done, tap <strong style="color:var(--gold)">Serve</strong> to pour.
+    </div>
+    <button class="pour-btn translatable" onclick="serveGuest()" data-en="Serve Guest ↗" data-ar="صب للضيف ↗">Serve Guest ↗</button>
+  </div>
+
+  <!-- RULES revealed as game progresses -->
+  <div class="rule-reveal" id="rule-reveal"></div>
+
+</section>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- PHASE 3 — SCORE                       -->
+<!-- ═══════════════════════════════════════ -->
+<section class="phase" id="phase-score">
+  <div class="score-screen">
+    <div style="font-family:'Playfair Display',Georgia,serif;font-size:14px;color:var(--text-light);margin-bottom:16px;letter-spacing:1px" class="translatable" data-en="CEREMONY COMPLETE" data-ar="المراسم انتهت">CEREMONY COMPLETE</div>
+    <div class="score-circle">
+      <div class="score-num" id="final-score">0</div>
+      <div class="score-max translatable" data-en="out of 4" data-ar="من ٤">out of 4</div>
+    </div>
+    <div id="score-message" style="font-size:16px;margin-bottom:20px;color:var(--cream)"></div>
+    <div class="fact-box">
+      <div class="fact-label translatable" data-en="<img src='mudhouse.png' alt='Mudhouse' class='emoji-img'> Cultural Insight Unlocked" data-ar="<img src='mudhouse.png' alt='Mudhouse' class='emoji-img'> معلومة ثقافية انفتحت" data-html="true"><img src="mudhouse.png" alt="Mudhouse" class="emoji-img"> Cultural Insight Unlocked</div>
+      <div class="fact-text translatable" data-en="The Qahwa ceremony is more than coffee — it is a complete social language. In Najdi culture, a host who serves correctly signals wisdom, patience, and respect for hierarchy. The dallah is passed from elder to elder for generations, carrying with it the unspoken rules of a civilization built on hospitality." data-ar="القهوة مو بس مشروب! هي لغة كاملة بمجالسنا. المضيف اللي يصب صح يثبت إنه فاهم السلوم ويقدر الكبار. الدلة تنتقل من جيل لجيل وهي شايلة معها أصول الكرم.">
+        The Qahwa ceremony is more than coffee — it is a complete social language. In Najdi culture, a host who serves correctly signals wisdom, patience, and respect for hierarchy. The dallah is passed from elder to elder for generations, carrying with it the unspoken rules of a civilization built on hospitality.
+      </div>
+      <div style="margin-top:12px;direction:rtl;text-align:right;font-size:12px;color:var(--gold)">"الكرم أساس العروبة"</div>
+      <div style="font-size:11px;color:var(--text-light);margin-top:2px" class="translatable" data-en='"Generosity is the foundation of Arab identity"' data-ar='"الكرم أساس أخلاقنا"'>"Generosity is the foundation of Arab identity"</div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:8px">
+      <button class="btn-outline translatable" onclick="resetGame()" style="flex:1" data-en="Play Again" data-ar="العب مرة ثانية">Play Again</button>
+      <a href="index.html" class="btn-gold translatable" style="flex:1;text-decoration:none" data-en="← Back Home" data-ar="← الرئيسية">← Back Home</a>
+    </div>
+  </div>
+  <div class="cl-footer">هاكاثون نورة 2026 | CultureLens</div>
+</section>
+
+<!-- FEEDBACK POPUP -->
+<div class="feedback-popup" id="feedback">
+  <div class="feedback-emoji" id="fb-emoji"></div>
+  <div class="feedback-label" id="fb-label"></div>
+  <div class="feedback-sub" id="fb-sub"></div>
+</div>
+
+<script>
+// ── STORY PHASE ──
+let currentPanel = 0;
+const totalPanels = 5;
+
+document.getElementById('dallah-tap').addEventListener('click', nextPanel);
+document.addEventListener('click', function(e) {
+  if (document.getElementById('phase-story').classList.contains('active')) {
+    if (!e.target.closest('.btn-gold')) nextPanel();
+  }
+});
+
+function nextPanel() {
+  const panels = document.querySelectorAll('.story-panel');
+  if (currentPanel < totalPanels - 1) {
+    panels[currentPanel].classList.remove('active');
+    currentPanel++;
+    panels[currentPanel].classList.add('active');
+    playTick();
+  }
+}
+
+// ── GAME PHASE ──
+const correctOrder = [0,1,2,3]; // Sheikh Ali first, then Abu Khalid, etc.
+let gameOrder = [];
+let currentTurn = 0;
+let score = 0;
+let pourLevel = 0;
+let selectedGuest = -1;
+let isPouringInterval = null;
+
+function startGame() {
+  document.getElementById('phase-story').classList.remove('active');
+  document.getElementById('phase-game').classList.add('active');
+  document.querySelectorAll('.guest-card')[0].classList.add('current');
+}
+
+function selectGuest(idx) {
+  if (gameOrder.includes(idx)) return;
+  selectedGuest = idx;
+  pourLevel = 0;
+  document.getElementById('coffee-fill').style.height = '0%';
+  document.getElementById('pour-section').style.display = 'block';
+  const isAr = window.currentLang === 'ar';
+  document.getElementById('pour-label').innerHTML = isAr ?
+    (['الشيخ علي','أبو خالد','فهد','عمر الصغير'][idx] + ' — اضغط عشان تصب <img src="dallah.png" alt="Dallah" class="emoji-img">')
+    : (['Sheikh Ali','Abu Khalid','Fahad','Young Omar'][idx] + ' — tap to pour <img src="dallah.png" alt="Dallah" class="emoji-img">');
+  // highlight
+  document.querySelectorAll('.guest-card').forEach((c,i) => {
+    c.classList.toggle('current', i === idx && !gameOrder.includes(i));
+  });
+}
+
+function pourCoffee() {
+  if (pourLevel >= 100) return;
+  pourLevel = Math.min(pourLevel + 12, 100);
+  document.getElementById('coffee-fill').style.height = pourLevel + '%';
+  playPour();
+}
+
+function serveGuest() {
+  if (selectedGuest < 0) return;
+  const expectedIdx = correctOrder[currentTurn];
+  const isCorrectGuest = selectedGuest === expectedIdx;
+  const isCorrectAmount = pourLevel >= 18 && pourLevel <= 35; // ~¼ cup
+
+  const isAr = window.currentLang === 'ar';
+  if (isCorrectGuest && isCorrectAmount) {
+    showFeedback('✅', isAr?'صح! / ممتاز!':'Perfect!', isAr?'الضيف الصح بالكمية الصح — مبروك!':'Correct guest, correct amount — مبروك!');
+    score++;
+    gameOrder.push(selectedGuest);
+    document.querySelectorAll('.guest-card')[selectedGuest].classList.remove('current');
+    document.querySelectorAll('.guest-card')[selectedGuest].classList.add('done');
+    addRule(currentTurn);
+    currentTurn++;
+    updateScore();
+    playSuccess();
+    if (currentTurn === 4) setTimeout(endGame, 1400);
+  } else if (!isCorrectGuest) {
+    const rolesEn = ['elder','honored guest','brother','youngest'];
+    const rolesAr = ['الكبير','الضيف الأعز','الأخ','الصغير'];
+    showFeedback('❌', isAr?'غلط الترتيب!':'Wrong Order!', isAr?('لازم تصب للـ ' + rolesAr[expectedIdx] + ' أول'):('The ' + rolesEn[expectedIdx] + ' must be served first'));
+    playFail();
+  } else if (pourLevel < 18) {
+    showFeedback('😬', isAr?'قليل! زود شوي':'Too Little!', isAr?'صب للخط الذهبي — بس ربع الفنجان':'Pour up to the gold line — ¼ of the cup');
+    playFail();
+  } else {
+    showFeedback('😬', isAr?'كثير! قلل شوي':'Too Much!', isAr?'الفنجان المليان يعني "اطلع بره" — صب الربع بس':'A full cup means "please leave" — pour only ¼');
+    playFail();
+    score = Math.max(0, score - 0); // no penalty, just feedback
+  }
+  pourLevel = 0;
+  document.getElementById('coffee-fill').style.height = '0%';
+  document.getElementById('pour-section').style.display = 'none';
+  selectedGuest = -1;
+}
+
+const rules = [
+  {icon:'👴', text:'Serve the eldest guest first — always, without exception.', ar:'الكبير أولاً دائماً'},
+  {icon:'🤝', text:'The honored guest (Abu Khalid) is served before family members.', ar:'الضيف قبل الأخ'},
+  {icon:'<img src="dallah.png" alt="Dallah" class="emoji-img">', text:'Hold the dallah in the left hand, offer the cup with the right.', ar:'الدلة يسرى، الفنجان يمنى'},
+  {icon:'🤲', text:'When the guest tilts the cup side to side, it means "enough" — stop refilling.', ar:'التحريك = كفى'},
+];
+
+function addRule(idx) {
+  if (idx >= rules.length) return;
+  const r = rules[idx];
+  const div = document.createElement('div');
+  div.className = 'rule-card';
+  const text = window.currentLang === 'ar' ? r.ar : r.text;
+  div.innerHTML = `<div class="rule-icon">${r.icon}</div>
+    <div><div class="rule-text">${text}</div></div>`;
+  document.getElementById('rule-reveal').appendChild(div);
+}
+
+function updateScore() {
+  document.getElementById('score-display').textContent = `⭐ ${score} / 4`;
+  document.getElementById('game-progress').style.width = (score/4*100) + '%';
+}
+
+function endGame() {
+  document.getElementById('phase-game').classList.remove('active');
+  document.getElementById('phase-score').classList.add('active');
+  document.getElementById('final-score').textContent = score;
+  const isAr = window.currentLang === 'ar';
+  const msgsEn = ['Keep practicing!','Getting better!','Well done, host!','Master of the Majlis! 🏆'];
+  const msgsAr = ['يبيلك تدريب!','زين، أحسن!','كفو يا راعي المجلس!','الجد يعطيك العافية 🏆'];
+  document.getElementById('score-message').textContent = isAr ? msgsAr[Math.min(score,3)] : msgsEn[Math.min(score,3)];
+}
+
+function resetGame() {
+  gameOrder=[]; currentTurn=0; score=0; selectedGuest=-1; pourLevel=0;
+  document.querySelectorAll('.guest-card').forEach(c=>{ c.classList.remove('current','done'); });
+  document.getElementById('rule-reveal').innerHTML='';
+  document.getElementById('pour-section').style.display='none';
+  updateScore();
+  document.getElementById('phase-score').classList.remove('active');
+  document.getElementById('phase-game').classList.add('active');
+  document.querySelectorAll('.guest-card')[0].classList.add('current');
+}
+
+// ── AUDIO ──
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let ctx;
+function getCtx() { if(!ctx) ctx=new AudioCtx(); return ctx; }
+
+function playTick() {
+  try {
+    const c=getCtx(), o=c.createOscillator(), g=c.createGain();
+    o.connect(g); g.connect(c.destination);
+    o.frequency.value=800; o.type='sine';
+    g.gain.setValueAtTime(0.15,c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.1);
+    o.start(); o.stop(c.currentTime+0.1);
+  } catch(e){}
+}
+function playPour() {
+  try {
+    const c=getCtx(), o=c.createOscillator(), g=c.createGain();
+    o.connect(g); g.connect(c.destination);
+    o.frequency.value=200+Math.random()*100; o.type='sawtooth';
+    g.gain.setValueAtTime(0.05,c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.12);
+    o.start(); o.stop(c.currentTime+0.12);
+  } catch(e){}
+}
+function playSuccess() {
+  try {
+    const c=getCtx();
+    [523,659,784].forEach((f,i)=>{
+      const o=c.createOscillator(), g=c.createGain();
+      o.connect(g); g.connect(c.destination);
+      o.frequency.value=f; o.type='sine';
+      const t=c.currentTime+i*0.15;
+      g.gain.setValueAtTime(0.2,t);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.4);
+      o.start(t); o.stop(t+0.4);
+    });
+  } catch(e){}
+}
+function playFail() {
+  try {
+    const c=getCtx(), o=c.createOscillator(), g=c.createGain();
+    o.connect(g); g.connect(c.destination);
+    o.frequency.value=220; o.type='sawtooth';
+    g.gain.setValueAtTime(0.15,c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.4);
+    o.start(); o.stop(c.currentTime+0.4);
+  } catch(e){}
+}
+
+// ── FEEDBACK POPUP ──
+function showFeedback(emoji, label, sub) {
+  const el=document.getElementById('feedback');
+  document.getElementById('fb-emoji').textContent=emoji;
+  document.getElementById('fb-label').textContent=label;
+  document.getElementById('fb-sub').textContent=sub;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 1800);
+}
+</script>
+<script src="language.js"></script>
+</body>
+</html>
+
+
+

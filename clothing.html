@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Fabrics & Clothing — CultureLens</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="cl-header">
+    <a href="index.html" class="back-btn">‹</a>
+    <div class="logo translatable" data-en="<img src='logo.png' class='logo-img'> Culture<span>Lens</span>" data-ar="<img src='logo.png' class='logo-img'> عدسة <span>الثقافة</span>" data-html="true"><img src="logo.png" class="logo-img"> Culture<span>Lens</span></div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="font-size:10px;color:var(--text-light);text-align:right" class="translatable" data-en="🧵 Fabrics & Clothing" data-ar="🧵 الأزياء والثياب" data-html="true">🧵 Fabrics & Clothing</div>
+      <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">🇸🇦 العربية</span></button>
+    </div>
+  </header>
+
+<main class="page" style="padding-top: 80px; padding-bottom: 80px;">
+  <div class="hub-page-header">
+    <div class="hub-title translatable" data-en="Fabrics & Clothing" data-ar="الأزياء والثياب">الأزياء والأقمشة</div>
+    <div class="hub-subtitle translatable" data-en="Fabrics & Clothing — Identity & Expression" data-ar="الأزياء والثياب — الهوية والمنطقة">Fabrics & Clothing — Identity & Expression</div>
+  </div>
+
+  <div class="hub-container">
+    
+    <!-- Experience 1: Available -->
+    <a href="ghutrah.html" class="hub-card">
+      <div class="hub-thumb">
+        🧵
+        <div class="hub-status status-available translatable" data-en="Available" data-ar="متاح">Available</div>
+      </div>
+      <div class="hub-card-body">
+        <div class="hub-card-title translatable" data-en="The Iqal & Ghutrah Identity" data-ar="العقال والغترة—هويتنا">The Iqal & Ghutrah Identity</div>
+        <div class="hub-card-ar">هوية العقال والغترة</div>
+        <div class="hub-card-desc translatable" data-en="Dress for different occasions and learn how clothing choices reflect status and respect in Saudi culture." data-ar="اللبس يختلف حسب المناسبة، تعلم كيف تلبس صح وتعكس احترامك لثقافتك.">Dress for different occasions and learn how clothing choices reflect status and respect in Saudi culture.</div>
+        <div class="hub-card-meta translatable" data-en="⏳ 3 min experience" data-ar="⏳ ٣ دقايق تجربة">⏳ 3 min experience</div>
+      </div>
+    </a>
+
+    <!-- Experience 2: Locked -->
+    <a href="#" class="hub-card locked" onclick="showToast(event)">
+      <div class="hub-thumb">
+        👗
+        <div class="hub-status status-locked translatable" data-en="Coming Soon" data-ar="قريباً">Coming Soon</div>
+        <div class="lock-icon">🔒</div>
+      </div>
+      <div class="hub-card-body">
+        <div class="hub-card-title translatable" data-en="Asir Dress Embroidery" data-ar="تطريز الثوب العسيري">Asir Dress Embroidery</div>
+        <div class="hub-card-ar">تطريز الثوب العسيري</div>
+        <div class="hub-card-desc translatable" data-en="Discover the colorful and intricate embroidery of the southern Asir region and what the patterns mean." data-ar="اكتشف روعة نقش العسيري وتفاصيله ومعاني الألوان في الجنوب.">Discover the colorful and intricate embroidery of the southern Asir region and what the patterns mean.</div>
+        <div class="hub-card-meta translatable" data-en="⏳ 4 min experience" data-ar="⏳ ٤ دقايق تجربة">⏳ 4 min experience</div>
+      </div>
+    </a>
+
+    <!-- Experience 3: Locked -->
+    <a href="#" class="hub-card locked" onclick="showToast(event)">
+      <div class="hub-thumb">
+        🧥
+        <div class="hub-status status-locked translatable" data-en="Coming Soon" data-ar="قريباً">Coming Soon</div>
+        <div class="lock-icon">🔒</div>
+      </div>
+      <div class="hub-card-body">
+        <div class="hub-card-title translatable" data-en="Abaya Cuts Across Regions" data-ar="قصات عباية المناطق">Abaya Cuts Across Regions</div>
+        <div class="hub-card-ar">قصات العباءة</div>
+        <div class="hub-card-desc translatable" data-en="Trace the evolution of the Abaya from traditional regional cuts to modern expressive designs." data-ar="تعرف على تطور العباية من القديم للموديلات الحديثة في المملكة.">Trace the evolution of the Abaya from traditional regional cuts to modern expressive designs.</div>
+        <div class="hub-card-meta translatable" data-en="⏳ 3 min experience" data-ar="⏳ ٣ دقايق تجربة">⏳ 3 min experience</div>
+      </div>
+    </a>
+
+  </div>
+</main>
+
+<button class="scan-btn-floating" onclick="alert('Camera Scan mode coming soon!')">📷</button>
+
+<div class="toast translatable" id="hub-toast" data-en="Coming in Phase 2" data-ar="قريباً في المرحلة الثانية">Coming in Phase 2</div>
+
+<div class="cl-footer">
+  هاكاثون نورة 2026 | CultureLens
+</div>
+
+<script>
+function showToast(e) {
+  e.preventDefault();
+  const toast = document.getElementById('hub-toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+</script>
+<script src="language.js"></script>
+</body>
+</html>
+
+
+

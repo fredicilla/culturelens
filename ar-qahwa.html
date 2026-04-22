@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <title>AR Qahwa — CultureLens</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="regional-patterns.css">
+
+  <!-- Model Viewer -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+
+  <style>
+    body {
+      background: var(--region-bg, var(--green));
+      overflow-x: hidden;
+    }
+
+    /* ── AR VIEWER ── */
+    .ar-viewer-container {
+      max-width: 420px;
+      width: 100%;
+      margin: 0 auto 16px;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid rgba(201, 168, 76, 0.2);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+      background: linear-gradient(160deg, #0e1a28, #1a2d45);
+      position: relative;
+    }
+
+    model-viewer {
+      width: 100%;
+      height: 360px;
+      --poster-color: transparent;
+    }
+
+    model-viewer::part(default-ar-button) {
+      display: none;
+    }
+
+    .ar-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(201, 168, 76, 0.15);
+      border: 1px solid rgba(201, 168, 76, 0.4);
+      border-radius: 50px;
+      padding: 6px 14px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 1px;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+    }
+
+    .ar-btn-custom {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      background: var(--gold);
+      color: var(--green);
+      border: none;
+      border-radius: 50px;
+      padding: 10px 20px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 16px rgba(201, 168, 76, 0.4);
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+
+    .ar-btn-custom:hover {
+      transform: scale(1.05);
+    }
+
+    /* ── STEP TRACKER ── */
+    .step-tracker {
+      max-width: 420px;
+      width: 100%;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .step-pip {
+      width: 32px;
+      height: 4px;
+      border-radius: 4px;
+      background: rgba(201, 168, 76, 0.2);
+      transition: all 0.4s ease;
+    }
+
+    .step-pip.active {
+      background: var(--gold);
+      box-shadow: 0 0 8px rgba(201, 168, 76, 0.5);
+    }
+
+    .step-pip.done {
+      background: rgba(201, 168, 76, 0.6);
+    }
+
+    /* ── STEP CARD ── */
+    .step-card {
+      max-width: 420px;
+      width: 100%;
+      margin: 0 auto 16px;
+      background: var(--card-dark);
+      border: 1px solid rgba(201, 168, 76, 0.15);
+      border-left: 4px solid var(--gold);
+      border-radius: 16px;
+      padding: 20px;
+      animation: fadeUp 0.5s ease;
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .step-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+
+    .step-title-ar {
+      font-size: 16px;
+      color: var(--gold-lt);
+      direction: rtl;
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+
+    .step-desc {
+      font-size: 13px;
+      color: var(--cream);
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .step-tip {
+      background: rgba(201, 168, 76, 0.08);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--text-light);
+      line-height: 1.6;
+    }
+
+    .step-tip strong {
+      color: var(--gold);
+    }
+
+    /* ── NAVIGATION ── */
+    .step-nav {
+      max-width: 420px;
+      width: 100%;
+      margin: 0 auto 20px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .step-nav button {
+      flex: 1;
+      padding: 14px;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+    }
+
+    .btn-prev {
+      background: var(--card-dark);
+      border: 1px solid rgba(201, 168, 76, 0.3) !important;
+      color: var(--gold);
+    }
+
+    .btn-prev:hover {
+      background: rgba(201, 168, 76, 0.1);
+    }
+
+    .btn-next {
+      background: linear-gradient(135deg, var(--gold), var(--gold-lt));
+      color: var(--green);
+    }
+
+    .btn-next:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(201, 168, 76, 0.4);
+    }
+
+    /* ── INGREDIENT LIST ── */
+    .ingredient-list {
+      max-width: 420px;
+      width: 100%;
+      margin: 0 auto 16px;
+      background: var(--card-dark);
+      border: 1px solid rgba(201, 168, 76, 0.15);
+      border-radius: 16px;
+      padding: 16px 20px;
+    }
+
+    .ingredient-list-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+
+    .ingredient-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(201, 168, 76, 0.08);
+      transition: all 0.3s;
+    }
+
+    .ingredient-row:last-child {
+      border-bottom: none;
+    }
+
+    .ingredient-row.highlight {
+      background: rgba(201, 168, 76, 0.08);
+      border-radius: 8px;
+      padding: 8px;
+      margin: 0 -8px;
+    }
+
+    .ingredient-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .ingredient-name {
+      font-size: 13px;
+      color: var(--cream);
+      flex: 1;
+    }
+
+    .ingredient-ar {
+      font-size: 12px;
+      color: var(--gold-lt);
+      direction: rtl;
+    }
+
+    .ingredient-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid rgba(201, 168, 76, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--gold);
+      transition: all 0.3s;
+    }
+
+    .ingredient-check.done {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--green);
+    }
+
+    /* ── COMPLETION ── */
+    .completion-card {
+      max-width: 420px;
+      width: 100%;
+      margin: 0 auto 16px;
+      background: var(--card-dark);
+      border: 1px solid rgba(201, 168, 76, 0.3);
+      border-radius: 20px;
+      padding: 32px 20px;
+      text-align: center;
+      display: none;
+      animation: fadeUp 0.5s ease;
+    }
+
+    .completion-card.show {
+      display: block;
+    }
+
+    .completion-emoji {
+      font-size: 56px;
+      margin-bottom: 12px;
+    }
+
+    .completion-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 24px;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    .completion-text {
+      font-size: 14px;
+      color: var(--cream);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    html[dir="rtl"] .step-card {
+      border-left: 1px solid rgba(201, 168, 76, 0.15);
+      border-right: 4px solid var(--gold);
+      text-align: right;
+    }
+
+    html[dir="rtl"] .ingredient-list {
+      text-align: right;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="cl-header">
+    <a href="food.html" class="back-btn">‹</a>
+    <div class="logo translatable" data-en="<img src='logo.png' class='logo-img'> Culture<span>Lens</span>" data-ar="<img src='logo.png' class='logo-img'> عدسة <span>الثقافة</span>" data-html="true"><img src="logo.png" class="logo-img"> Culture<span>Lens</span></div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="font-size:10px;color:var(--text-light)" class="translatable"
+        data-en="<img src='dallah.png' alt='Dallah' class='emoji-img'> AR Qahwa"
+        data-ar="<img src='dallah.png' alt='Dallah' class='emoji-img'> القهوة بالواقع المعزز" data-html="true"><img
+          src="dallah.png" alt="Dallah" class="emoji-img"> AR Qahwa</div>
+      <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">🇸🇦 العربية</span></button>
+    </div>
+  </header>
+
+  <main class="page" style="padding-top:80px;padding-bottom:40px;">
+
+    <!-- AR 3D VIEWER -->
+    <div class="ar-viewer-container">
+      <div class="ar-badge translatable" data-en="✦ AUGMENTED REALITY" data-ar="✦ واقع معزز">✦ AUGMENTED REALITY</div>
+
+      <model-viewer id="ar-model" src="saudi_dallah.glb" ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed"
+        ar-placement="floor" scale="0.001 0.001 0.001" camera-controls touch-action="pan-y" auto-rotate bounds="tight"
+        interpolation-decay="200" poster="dallah.png" alt="Saudi Coffee AR Experience" shadow-intensity="1"
+        environment-image="neutral" exposure="1.2">
+      </model-viewer>
+
+      <button class="ar-btn-custom" id="ar-launch-btn" onclick="launchAR()">
+        📸 <span class="translatable" data-en="View on your table" data-ar="شوفها على طاولتك">View on your table</span>
+      </button>
+    </div>
+
+    <!-- STEP TRACKER -->
+    <div class="step-tracker" id="step-tracker">
+      <div class="step-pip active" data-step="0"></div>
+      <div class="step-pip" data-step="1"></div>
+      <div class="step-pip" data-step="2"></div>
+      <div class="step-pip" data-step="3"></div>
+      <div class="step-pip" data-step="4"></div>
+      <div class="step-pip" data-step="5"></div>
+    </div>
+
+    <!-- STEP CONTENT (dynamically updated) -->
+    <div class="step-card" id="step-card">
+      <div class="step-number" id="step-num">1</div>
+      <div class="step-title" id="step-title">Boil fresh water</div>
+      <div class="step-title-ar" id="step-title-ar">غلّي الماي</div>
+      <div class="step-desc" id="step-desc">
+        Pour 3 cups of fresh, filtered water into a clean dallah. Place it over medium heat and bring it to a rolling
+        boil. The quality of the water matters — Najdi hosts always use the purest water available.
+      </div>
+      <div class="step-tip" id="step-tip">
+        <strong>💡 Cultural Note:</strong> The dallah is never washed with soap — only rinsed with hot water. The
+        residue from years of brewing adds depth to the flavor.
+      </div>
+    </div>
+
+    <!-- INGREDIENT LIST -->
+    <div class="ingredient-list">
+      <div class="ingredient-list-title translatable" data-en="✦ INGREDIENTS" data-ar="✦ المقادير">✦ INGREDIENTS</div>
+      <div class="ingredient-row" id="ing-0">
+        <div class="ingredient-icon"></div>
+        <div class="ingredient-name translatable" data-en="3 cups water" data-ar="٣ كاسات ماي">3 cups water</div>
+        <div class="ingredient-ar">ماء</div>
+        <div class="ingredient-check done" id="check-0">✓</div>
+      </div>
+      <div class="ingredient-row" id="ing-1">
+        <div class="ingredient-icon"></div>
+        <div class="ingredient-name translatable" data-en="2-3 tbsp Arabic coffee" data-ar="٢-٣ ملاعق بن عربي">2-3 tbsp
+          Arabic coffee</div>
+        <div class="ingredient-ar">بن</div>
+        <div class="ingredient-check" id="check-1"></div>
+      </div>
+      <div class="ingredient-row" id="ing-2">
+        <div class="ingredient-icon"></div>
+        <div class="ingredient-name translatable" data-en="1 tbsp cardamom pods" data-ar="ملعقة هيل">1 tbsp cardamom
+          pods</div>
+        <div class="ingredient-ar">هيل</div>
+        <div class="ingredient-check" id="check-2"></div>
+      </div>
+      <div class="ingredient-row" id="ing-3">
+        <div class="ingredient-icon"></div>
+        <div class="ingredient-name translatable" data-en="Pinch of saffron" data-ar="شوية زعفران">Pinch of saffron
+        </div>
+        <div class="ingredient-ar">زعفران</div>
+        <div class="ingredient-check" id="check-3"></div>
+      </div>
+      <div class="ingredient-row" id="ing-4">
+        <div class="ingredient-icon"></div>
+        <div class="ingredient-name translatable" data-en="Finjan (small cup)" data-ar="فنجان">Finjan (small cup)</div>
+        <div class="ingredient-ar">فنجان</div>
+        <div class="ingredient-check" id="check-4"></div>
+      </div>
+      <div class="ingredient-row" id="ing-5">
+        <div class="ingredient-icon"></div>
+        <div class="ingredient-name translatable" data-en="Dates (for serving)" data-ar="تمر (للتقديم)">Dates (for
+          serving)</div>
+        <div class="ingredient-ar">تمر</div>
+        <div class="ingredient-check" id="check-5"></div>
+      </div>
+    </div>
+
+    <!-- NAV BUTTONS -->
+    <div class="step-nav">
+      <button class="btn-prev" id="btn-prev" onclick="prevStep()" style="display:none">
+        <span class="translatable" data-en="← Previous" data-ar="→ السابق">← Previous</span>
+      </button>
+      <button class="btn-next" id="btn-next" onclick="nextStep()">
+        <span class="translatable" data-en="Next Step →" data-ar="← الخطوة الجاية">Next Step →</span>
+      </button>
+    </div>
+
+    <!-- COMPLETION CARD -->
+    <div class="completion-card" id="completion-card">
+      <div class="completion-emoji"><img src="dallah.png" alt="Dallah" class="emoji-img"></div>
+      <div class="completion-title translatable" data-en="Your Qahwa is Ready!" data-ar="قهوتك جاهزة!">Your Qahwa is
+        Ready!</div>
+      <div class="completion-text translatable"
+        data-en="You've just learned how to prepare authentic Najdi Qahwa — the same way it's been made for generations. Now place the dallah on your table using AR and feel the tradition come alive."
+        data-ar="تعلمت الحين طريقة القهوة النجدية الأصيلة — نفس طريقة الجدود. حط الدلة على طاولتك بالواقع المعزز وعيش التجربة.">
+        You've just learned how to prepare authentic Najdi Qahwa — the same way it's been made for generations. Now
+        place the dallah on your table using AR and feel the tradition come alive.</div>
+      <button class="btn-gold" onclick="launchAR()" style="margin-bottom:12px">
+        📸 <span class="translatable" data-en="Place Dallah in AR" data-ar="حط الدلة بالواقع المعزز">Place Dallah in
+          AR</span>
+      </button>
+      <div style="display:flex;gap:12px;margin-top:8px;">
+        <button class="btn-outline translatable" onclick="resetSteps()" style="flex:1" data-en="Start Over"
+          data-ar="من البداية">Start Over</button>
+        <a href="food.html" class="btn-gold translatable" style="flex:1;text-decoration:none" data-en="← Back"
+          data-ar="← رجوع">← Back</a>
+      </div>
+    </div>
+
+  </main>
+
+  <div class="cl-footer">هاكاثون نورة 2026 | CultureLens</div>
+
+  <script src="ThemeManager.js"></script>
+  <script src="ExperienceController.js"></script>
+  <script src="MiniGameModule.js"></script>
+  <script src="HeritagePulse.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Add standard overlay container if not exists
+      if (!document.getElementById('narrator-bar')) {
+          const div = document.createElement('div');
+          div.id = 'narrator-bar';
+          document.body.appendChild(div);
+      }
+      
+      const pulse = new HeritagePulse();
+      pulse.init();
+
+      const engine = new ExperienceController('qahwa-najdi');
+      engine.init();
+      
+      // We can also bind the AR button manually since AR is specific to this view
+      const arBtn = document.getElementById('ar-launch-btn');
+      if (arBtn) {
+          arBtn.addEventListener('click', () => {
+              const viewer = document.getElementById('ar-model');
+              if (viewer && viewer.canActivateAR) {
+                  viewer.activateAR();
+              } else {
+                  alert(window.currentLang === 'ar' ? 'افتح الصفحة من جوالك 📱' : 'Open this page on your phone to use AR! 📱');
+              }
+          });
+      }
+    });
+  </script>
+
+  <script src="language.js"></script>
+</body>
+
+</html>
+
+
+

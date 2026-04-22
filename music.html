@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Music & Performance — CultureLens</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="cl-header">
+  <a href="index.html" class="back-btn">‹</a>
+  <div class="logo translatable" data-en="<img src='logo.png' class='logo-img'> Culture<span>Lens</span>" data-ar="<img src='logo.png' class='logo-img'> عدسة <span>الثقافة</span>" data-html="true"><img src="logo.png" class="logo-img"> Culture<span>Lens</span></div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="font-size:10px;color:var(--text-light);text-align:right" class="translatable" data-en="<img src='oud.png' alt='Oud' class='emoji-img'> Music & Performance" data-ar="<img src='oud.png' alt='Oud' class='emoji-img'> الفن والطرب" data-html="true"><img src="oud.png" alt="Oud" class="emoji-img"> Music & Performance</div>
+    <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">🇸🇦 العربية</span></button>
+  </div>
+</header>
+
+<main class="page" style="padding-top: 80px; padding-bottom: 80px;">
+  <div class="hub-page-header">
+    <div class="hub-title translatable" data-en="Music & Performance" data-ar="الفن والطرب">الموسيقى والأداء</div>
+    <div class="hub-subtitle translatable" data-en="Music & Performance — Rhythm & Heritage" data-ar="الفن والطرب — الإيقاع والأصالة">Music & Performance — Rhythm & Heritage</div>
+  </div>
+
+  <div class="hub-container">
+    
+    <!-- Experience 1: Available -->
+    <a href="samri.html" class="hub-card">
+      <div class="hub-thumb">
+        🥁
+        <div class="hub-status status-available translatable" data-en="Available" data-ar="متاح">Available</div>
+      </div>
+      <div class="hub-card-body">
+        <div class="hub-card-title translatable" data-en="Al-Samri Circle" data-ar="جلسة السامري">Al-Samri Circle</div>
+        <div class="hub-card-ar">فرقة السامري</div>
+        <div class="hub-card-desc translatable" data-en="Immerse yourself in a 3D circle and keep the rhythm in a call-and-response traditional performance." data-ar="ادخل جلسة السامري، وعيش الإيقاع معهم في تجربة فريدة.">Immerse yourself in a 3D circle and keep the rhythm in a call-and-response traditional performance.</div>
+        <div class="hub-card-meta translatable" data-en="⏳ 4 min experience" data-ar="⏳ ٤ دقايق تجربة">⏳ 4 min experience</div>
+      </div>
+    </a>
+
+    <!-- Experience 2: Locked -->
+    <a href="#" class="hub-card locked" onclick="showToast(event)">
+      <div class="hub-thumb">
+        ⚔️
+        <div class="hub-status status-locked translatable" data-en="Coming Soon" data-ar="قريباً">Coming Soon</div>
+        <div class="lock-icon">🔒</div>
+      </div>
+      <div class="hub-card-body">
+        <div class="hub-card-title translatable" data-en="Al-Ardah Sword Dance" data-ar="العرضة النجدية">Al-Ardah Sword Dance</div>
+        <div class="hub-card-ar">العرضة النجدية</div>
+        <div class="hub-card-desc translatable" data-en="Participate in the unifying sword dance of the Najd region, traditionally performed before battle." data-ar="شارك في العرضة النجدية، رقصة العز والفخر اللي توحد الصفوف.">Participate in the unifying sword dance of the Najd region, traditionally performed before battle.</div>
+        <div class="hub-card-meta translatable" data-en="⏳ 5 min experience" data-ar="⏳ ٥ دقايق تجربة">⏳ 5 min experience</div>
+      </div>
+    </a>
+
+    <!-- Experience 3: Locked -->
+    <a href="#" class="hub-card locked" onclick="showToast(event)">
+      <div class="hub-thumb">
+        📜
+        <div class="hub-status status-locked translatable" data-en="Coming Soon" data-ar="قريباً">Coming Soon</div>
+        <div class="lock-icon">🔒</div>
+      </div>
+      <div class="hub-card-body">
+        <div class="hub-card-title translatable" data-en="Al-Mizmar & Nabati Poetry" data-ar="المزمار والشعر النبطي">Al-Mizmar & Nabati Poetry</div>
+        <div class="hub-card-ar">المزمار والشعر النبطي</div>
+        <div class="hub-card-desc translatable" data-en="Discover the rhythm of the Hijaz through the Al-Mizmar stick dance and traditional desert poetry." data-ar="اكتشف إيقاع الحجاز مع رقصة المزمار، واستمتع بعذوبة الشعر النبطي.">Discover the rhythm of the Hijaz through the Al-Mizmar stick dance and traditional desert poetry.</div>
+        <div class="hub-card-meta translatable" data-en="⏳ 3 min experience" data-ar="⏳ ٣ دقايق تجربة">⏳ 3 min experience</div>
+      </div>
+    </a>
+
+  </div>
+</main>
+
+<button class="scan-btn-floating" onclick="alert('Camera Scan mode coming soon!')">📷</button>
+
+<div class="toast translatable" id="hub-toast" data-en="Coming in Phase 2" data-ar="قريباً في المرحلة الثانية">Coming in Phase 2</div>
+
+<div class="cl-footer">
+  هاكاثون نورة 2026 | CultureLens
+</div>
+
+<script>
+function showToast(e) {
+  e.preventDefault();
+  const toast = document.getElementById('hub-toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+</script>
+<script src="language.js"></script>
+</body>
+</html>
+
+
+

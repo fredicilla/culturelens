@@ -1,0 +1,126 @@
+{
+  "qahwa-najdi": {
+    "metadata": {
+      "unesco_id": "01073",
+      "region": "najd",
+      "date_inscribed": "2015",
+      "artifact_name": {
+        "en": "Arabic Coffee (Qahwa)",
+        "ar": "القهوة العربية"
+      },
+      "source_citation": "UNESCO Intangible Cultural Heritage Database"
+    },
+    "visuals": {
+      "ar_model": "saudi_dallah.glb",
+      "ar_scale": "0.001 0.001 0.001"
+    },
+    "narrative": {
+      "intro": {
+        "en": "The dallah is never washed with soap — only rinsed with hot water. The residue from years of brewing adds depth to the flavor.",
+        "ar": "الدلة ما تنغسل بالصابون أبد — بس تنشطف بماي حار. الترسبات من سنين الاستخدام تعطي القهوة نكهة أعمق."
+      },
+      "history": {
+        "en": "Serving Arabic coffee is an important aspect of hospitality in Arab societies. The preparation process involves roasting, grinding with a mortar, and brewing with cardamom and saffron.",
+        "ar": "تقديم القهوة العربية هو جانب مهم من كرم الضيافة في المجتمعات العربية. عملية التحضير تتضمن التحميص، والدق بالنجر، والغلي مع الهيل والزعفران."
+      }
+    },
+    "minigame": {
+      "gameType": "StepTracker",
+      "logicHook": "QahwaPreparation",
+      "config": {
+        "steps": [
+          {
+            "model": "saudi_dallah.glb",
+            "title": { "en": "Boil fresh water", "ar": "غلّي الماي" },
+            "desc": {
+              "en": "Pour 3 cups of fresh, filtered water into a clean dallah. Place it over medium heat and bring it to a rolling boil.",
+              "ar": "حط ٣ كاسات ماي صافي بالدلة النظيفة. حطها على نار متوسطة وخلها تغلي."
+            },
+            "ingredients": ["water"]
+          },
+          {
+            "model": "coffee_beans.glb",
+            "title": { "en": "Add the coffee", "ar": "حط البن" },
+            "desc": {
+              "en": "Once the water is boiling, add 2-3 tablespoons of coarsely ground Arabic coffee beans.",
+              "ar": "لما يغلي الماي، حط ٢-٣ ملاعق بن عربي مطحون خشن."
+            },
+            "ingredients": ["water", "coffee"]
+          },
+          {
+            "model": "saudi_dallah.glb",
+            "title": { "en": "Add the spices", "ar": "زيد الهيل والزعفران" },
+            "desc": {
+              "en": "Add a tablespoon of freshly crushed green cardamom pods and a generous pinch of saffron threads.",
+              "ar": "زيد ملعقة هيل أخضر مدقوق طازج وشوية زعفران."
+            },
+            "ingredients": ["water", "coffee", "cardamom", "saffron"]
+          },
+          {
+            "model": "saudi_dallah.glb",
+            "title": { "en": "Let it simmer", "ar": "خلها تستوي" },
+            "desc": {
+              "en": "Reduce the heat to very low and let the mixture simmer gently for 10-15 minutes.",
+              "ar": "خفف النار وخل القهوة تستوي على هون ١٠-١٥ دقيقة."
+            },
+            "ingredients": ["water", "coffee", "cardamom", "saffron"]
+          },
+          {
+            "model": "saudi_dallah.glb",
+            "title": { "en": "Let the grounds settle", "ar": "خل البن يرقد" },
+            "desc": {
+              "en": "Remove the dallah from the heat and let it rest for 2-3 minutes.",
+              "ar": "شيل الدلة عن النار وخلها ترتاح ٢-٣ دقايق."
+            },
+            "ingredients": ["water", "coffee", "cardamom", "saffron"]
+          },
+          {
+            "model": "arabic_coffee_cup.glb",
+            "title": { "en": "Serve with dates", "ar": "صبها بالفنجان مع التمر" },
+            "desc": {
+              "en": "Pour the coffee gently into a finjan — filling only ¼ of the cup.",
+              "ar": "صب القهوة بالفنجان بهدوء — ربع الفنجان بس."
+            },
+            "ingredients": ["water", "coffee", "cardamom", "saffron", "finjan", "dates"]
+          }
+        ]
+      }
+    }
+  },
+  "samri-hijaz": {
+    "metadata": {
+      "unesco_id": "01066",
+      "region": "hijaz",
+      "date_inscribed": "2015",
+      "artifact_name": {
+        "en": "Al-Samri",
+        "ar": "السامري"
+      },
+      "source_citation": "UNESCO Intangible Cultural Heritage Database"
+    },
+    "visuals": {
+      "ar_model": null,
+      "ar_scale": null
+    },
+    "narrative": {
+      "intro": {
+        "en": "You are about to stand in the center of a traditional Samri circle.",
+        "ar": "أنت الحين في وسط جلسة سامري."
+      },
+      "history": {
+        "en": "Almazeed Al-Samri is a traditional dance and poetry performance from Saudi Arabia, accompanied by tambourines and drums.",
+        "ar": "السامري هو فن شعبي تقليدي يجمع بين الشعر والرقص بمصاحبة الطبول والدفوف."
+      }
+    },
+    "minigame": {
+      "gameType": "RhythmGame",
+      "logicHook": "SamriBeat",
+      "config": {
+        "verses": [
+          { "en": "Listen to the rhythm — tap when you hear the beat 🥁", "ar": "اسمع الإيقاع — اضرب الطبل مع الصوت 🥁" }
+        ],
+        "tempo": 120
+      }
+    }
+  }
+}

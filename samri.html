@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Al-Samri Circle — CultureLens</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="regional-patterns.css">
+  <style>
+    body {
+      /* Samri is an immersive 3D scene. Keep dark background for theatre feel.
+         Regional accent variables still theme the overlay UI. */
+      background: #0a0512;
+      overflow: hidden;
+    }
+
+    /* ── 3D CANVAS ── */
+    #three-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      touch-action: none;
+    }
+
+    /* ── OVERLAY UI ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .overlay.interactive {
+      pointer-events: all;
+    }
+
+    /* ── INTRO SCREEN ── */
+    #intro-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(5, 2, 12, 0.92);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+    }
+
+    .intro-emblem {
+      font-size: 64px;
+      margin-bottom: 16px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .intro-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+
+    .intro-arabic {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 22px;
+      color: var(--gold-lt);
+      direction: rtl;
+      margin-bottom: 12px;
+      font-style: italic;
+    }
+
+    .intro-desc {
+      font-size: 13px;
+      color: var(--text-light);
+      line-height: 1.7;
+      max-width: 320px;
+      margin: 0 auto 24px;
+    }
+
+    .tilt-hint {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      border-radius: 50px;
+      background: rgba(201, 168, 76, 0.1);
+      border: 1px solid rgba(201, 168, 76, 0.3);
+      font-size: 12px;
+      color: var(--gold);
+      margin-bottom: 24px;
+    }
+
+    /* ── NARRATOR OVERLAY ── */
+    #narrator-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      padding: 16px 20px 32px;
+      background: linear-gradient(to top, rgba(5, 2, 12, 0.95), transparent);
+      transform: translateY(100%);
+      transition: transform 0.5s ease;
+    }
+
+    #narrator-bar.show {
+      transform: translateY(0);
+    }
+
+    .narrator-content {
+      background: rgba(18, 10, 35, 0.9);
+      border: 1px solid rgba(201, 168, 76, 0.3);
+      border-left: 3px solid var(--gold);
+      border-radius: 14px;
+      padding: 14px 16px;
+      backdrop-filter: blur(8px);
+    }
+
+    .narrator-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+
+    .narrator-text {
+      font-size: 13px;
+      color: var(--cream);
+      line-height: 1.7;
+    }
+
+    /* ── TOP HUD ── */
+    #top-hud {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      padding: 60px 20px 16px;
+      background: linear-gradient(to bottom, rgba(5, 2, 12, 0.8), transparent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .hud-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 18px;
+      color: var(--white);
+    }
+
+    .hud-subtitle {
+      font-size: 10px;
+      color: var(--text-light);
+    }
+
+    .look-around-hint {
+      font-size: 10px;
+      color: rgba(201, 168, 76, 0.7);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    /* ── GAME SCREEN ── */
+    #game-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: linear-gradient(160deg, #0a0512, #1a0a2e);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 80px 20px 40px;
+      overflow-y: auto;
+    }
+
+    #game-screen.active {
+      display: flex;
+    }
+
+    .game-title-samri {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 26px;
+      color: var(--white);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .game-sub-samri {
+      font-size: 13px;
+      color: var(--text-light);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    /* drum */
+    .drum-container {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 24px;
+    }
+
+    .drum-outer {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #6b3f0f, #3d200a);
+      border: 4px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(201, 168, 76, 0.2), inset 0 2px 8px rgba(255, 255, 255, 0.1);
+      transition: transform 0.1s;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .drum-outer:active {
+      transform: scale(0.95);
+    }
+
+    .drum-inner {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 30%, #8b5520, #4a2810);
+      border: 3px solid rgba(201, 168, 76, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .drum-label {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 14px;
+      color: var(--gold-lt);
+      text-align: center;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .drum-ripple {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid var(--gold);
+      opacity: 0;
+    }
+
+    .drum-ripple.active {
+      animation: ripple 0.5s ease-out;
+    }
+
+    /* beat track */
+    .beat-track {
+      width: 100%;
+      max-width: 360px;
+      margin-bottom: 20px;
+    }
+
+    .beat-label {
+      font-size: 11px;
+      color: var(--text-light);
+      margin-bottom: 8px;
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .beat-dots {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .beat-dot {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid rgba(201, 168, 76, 0.3);
+      background: rgba(18, 10, 35, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: all 0.15s;
+    }
+
+    .beat-dot.active-beat {
+      background: rgba(201, 168, 76, 0.3);
+      border-color: var(--gold);
+      box-shadow: 0 0 16px rgba(201, 168, 76, 0.6);
+      transform: scale(1.15);
+    }
+
+    .beat-dot.hit {
+      background: var(--gold);
+      border-color: var(--gold-lt);
+    }
+
+    .beat-dot.miss {
+      background: rgba(244, 67, 54, 0.3);
+      border-color: #f44336;
+    }
+
+    /* verse info */
+    .verse-info {
+      width: 100%;
+      max-width: 360px;
+      background: rgba(18, 10, 35, 0.8);
+      border: 1px solid rgba(201, 168, 76, 0.2);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .verse-num {
+      font-size: 10px;
+      color: var(--gold);
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .verse-text {
+      font-size: 13px;
+      color: var(--cream);
+      line-height: 1.6;
+    }
+
+    .verse-ar {
+      font-size: 12px;
+      color: var(--gold-lt);
+      direction: rtl;
+      text-align: right;
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    /* score */
+    .samri-score {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .samri-stat {
+      text-align: center;
+      background: rgba(18, 10, 35, 0.6);
+      border: 1px solid rgba(201, 168, 76, 0.2);
+      border-radius: 12px;
+      padding: 10px 18px;
+    }
+
+    .samri-num {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 28px;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .samri-lbl {
+      font-size: 10px;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+
+    /* timing feedback */
+    .timing-feedback {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 28px;
+      font-weight: 700;
+      text-align: center;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 70;
+      transition: all 0.15s;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+    }
+
+    .timing-feedback.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .timing-feedback.hide {
+      opacity: 0;
+      transform: translate(-50%, -60%) scale(1.1);
+    }
+
+    /* enter button on immersive */
+    #enter-game-btn {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+      width: calc(100% - 40px);
+      max-width: 380px;
+      display: none;
+    }
+
+    #enter-game-btn.show {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="cl-header" style="z-index:100;background:transparent;border:none">
+    <a href="index.html" class="back-btn">‹</a>
+    <div class="logo translatable" data-en="<img src='logo.png' class='logo-img'> Culture<span>Lens</span>" data-ar="<img src='logo.png' class='logo-img'> عدسة <span>الثقافة</span>" data-html="true"><img src="logo.png" class="logo-img"> Culture<span>Lens</span></div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="font-size:10px;color:var(--text-light)" class="translatable"
+        data-en="<img src='oud.png' alt='Oud' class='emoji-img'> Samri"
+        data-ar="<img src='oud.png' alt='Oud' class='emoji-img'> سامري" data-html="true"><img src="oud.png" alt="Oud"
+          class="emoji-img"> Samri</div>
+      <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">🇸🇦 العربية</span></button>
+    </div>
+  </header>
+
+  <!-- THREE.JS CANVAS -->
+  <canvas id="three-canvas"></canvas>
+
+  <!-- TOP HUD (shown during immersive) -->
+  <div id="top-hud" style="display:none">
+    <div>
+      <div class="hud-title translatable" data-en="السامري" data-ar="السامري">السامري</div>
+      <div class="hud-subtitle translatable" data-en="Al-Samri Circle — Hijaz" data-ar="جلسة السامري — الحجاز">Al-Samri
+        Circle — Hijaz</div>
+    </div>
+    <div class="look-around-hint translatable" data-en="📱 Tilt to look around" data-ar="📱 حرك جوالك لتشوف حولك">📱
+      Tilt to look around</div>
+  </div>
+
+  <!-- NARRATOR BAR -->
+  <div id="narrator-bar">
+    <div class="narrator-content">
+      <div class="narrator-label" id="narrator-label">THE CIRCLE</div>
+      <div class="narrator-text" id="narrator-text"></div>
+    </div>
+  </div>
+
+  <!-- ENTER GAME BUTTON -->
+  <div id="enter-game-btn">
+    <button class="btn-gold" onclick="startRhythmGame()">Join the Circle — Enter the Game 🥁</button>
+  </div>
+
+  <!-- INTRO SCREEN -->
+  <div id="intro-screen">
+    <div class="intro-emblem">🔥</div>
+    <div class="intro-title translatable" data-en="Al-Samri" data-ar="السامري">Al-Samri</div>
+    <div class="intro-arabic">السامري</div>
+    <div class="intro-desc translatable"
+      data-en="You are about to stand in the center of a traditional Samri circle — a bonfire before you, 12 men swaying in unison around you. Tilt your phone to look around the full 360°."
+      data-ar="أنت الحين في وسط جلسة سامري — النار قدامك، وحولك ١٢ رجل يتمايلون مع بعض. حرك جوالك عشان تشوف المجلس كامل ٣٦٠ درجة.">
+      You are about to stand in the center of a traditional Samri circle — a bonfire before you, 12 men swaying in
+      unison around you. Tilt your phone to look around the full 360°.
+    </div>
+    <div class="tilt-hint translatable" data-en="📱 Tilt your phone to look around" data-ar="📱 حرك جوالك لتشوف حولك">📱
+      Tilt your phone to look around</div>
+    <button class="btn-gold translatable" onclick="enterImmersive()" style="max-width:280px"
+      data-en="Enter the Circle ›" data-ar="ادخل الجلسة ›">
+      Enter the Circle ›
+    </button>
+    <div style="margin-top:16px;font-size:11px;color:rgba(168,200,176,0.5)">
+      Works best on mobile — Chrome recommended
+    </div>
+  </div>
+
+  <!-- TIMING FEEDBACK -->
+  <div class="timing-feedback" id="timing-feedback"></div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen">
+
+    <div class="game-title-samri translatable" data-en="Join the Beat" data-ar="ادخل على الإيقاع">Join the Beat</div>
+    <div class="game-sub-samri translatable" data-en="اضرب مع الإيقاع — Tap in time with the Tabl drum"
+      data-ar="اضرب مع الإيقاع بالوقت الصح">اضرب مع الإيقاع — Tap in time with the Tabl drum</div>
+
+    <div class="samri-score">
+      <div class="samri-stat">
+        <div class="samri-num" id="hit-count">0</div>
+        <div class="samri-lbl translatable" data-en="Hits" data-ar="الضربات">Hits</div>
+      </div>
+      <div class="samri-stat">
+        <div class="samri-num" id="streak-count">0</div>
+        <div class="samri-lbl translatable" data-en="Streak 🔥" data-ar="متتالية 🔥">Streak 🔥</div>
+      </div>
+      <div class="samri-stat">
+        <div class="samri-num" id="verse-count">1/3</div>
+        <div class="samri-lbl translatable" data-en="Verse" data-ar="البيت">Verse</div>
+      </div>
+    </div>
+
+    <!-- Verse info -->
+    <div class="verse-info" id="verse-info">
+      <div class="verse-num">VERSE 1</div>
+      <div class="verse-text" id="verse-text"></div>
+      <div class="verse-ar" id="verse-ar"></div>
+    </div>
+
+    <!-- Beat track -->
+    <div class="beat-track">
+      <div class="beat-label translatable" data-en="Upcoming beats" data-ar="الإيقاع الجاي">Upcoming beats</div>
+      <div class="beat-dots" id="beat-dots"></div>
+    </div>
+
+    <!-- Drum -->
+    <div class="drum-container">
+      <div class="drum-outer" id="drum" onpointerdown="hitDrum()">
+        <div class="drum-inner">
+          <div class="drum-label">الطبل<br><span style="font-size:10px;font-weight:400">Tap!</span></div>
+        </div>
+        <div class="drum-ripple" id="drum-ripple"></div>
+      </div>
+    </div>
+
+    <div style="font-size:11px;color:var(--text-light);text-align:center;margin-bottom:20px" class="translatable"
+      data-en="Listen to the rhythm — tap when you hear the beat 🥁" data-ar="اسمع الإيقاع — اضرب الطبل مع الصوت 🥁">
+      Listen to the rhythm — tap when you hear the beat 🥁
+    </div>
+
+    <div id="game-over-section" style="display:none;width:100%;max-width:360px">
+      <div class="fact-box" style="background:rgba(18,10,35,0.9)">
+        <div class="fact-label translatable"
+          data-en="<img src='oud.png' alt='Oud' class='emoji-img'> Al-Samri — Cultural Insight"
+          data-ar="<img src='oud.png' alt='Oud' class='emoji-img'> السامري — معلومة ثقافية" data-html="true"><img
+            src="oud.png" alt="Oud" class="emoji-img"> Al-Samri — Cultural Insight</div>
+        <div class="fact-text" id="unlock-fact"></div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:12px">
+        <button class="btn-outline translatable" onclick="restartGame()" style="flex:1" data-en="Play Again"
+          data-ar="العب مرة ثانية">Play Again</button>
+        <a href="index.html" class="btn-gold translatable" style="flex:1;text-decoration:none" data-en="← Back Home"
+          data-ar="← الرئيسية">← Back Home</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- THREE.JS CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // ══════════════════════════════════════════════════════
+    // THREE.JS — AL-SAMRI 3D CIRCLE
+    // ══════════════════════════════════════════════════════
+
+    let scene, camera, renderer, clock;
+    let figures = [], bonfire = [], smokeParticles = [];
+    let animRunning = false;
+    let cameraAngle = 0;
+    let deviceAlpha = 0, deviceBeta = 0;
+    let touchStartX = 0, lastTouchX = 0;
+    let swayPhase = 0;
+    let stars = [];
+
+    function initThree() {
+      const canvas = document.getElementById('three-canvas');
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x050208);
+      scene.fog = new THREE.Fog(0x050208, 8, 25);
+
+      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(0, 1.6, 0); // eye height at center
+
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+
+      clock = new THREE.Clock();
+
+      buildScene();
+      window.addEventListener('resize', onResize);
+      canvas.addEventListener('touchstart', onTouchStart, { passive: true });
+      canvas.addEventListener('touchmove', onTouchMove, { passive: true });
+    }
+
+    function buildScene() {
+      // ── GROUND ──
+      const groundGeo = new THREE.CircleGeometry(12, 64);
+      const groundMat = new THREE.MeshLambertMaterial({ color: 0x1a0e08 });
+      const ground = new THREE.Mesh(groundGeo, groundMat);
+      ground.rotation.x = -Math.PI / 2;
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      // carpet pattern on ground
+      const carpetGeo = new THREE.CircleGeometry(5, 32);
+      const carpetMat = new THREE.MeshLambertMaterial({ color: 0x5a1010 });
+      const carpet = new THREE.Mesh(carpetGeo, carpetMat);
+      carpet.rotation.x = -Math.PI / 2;
+      carpet.position.y = 0.01;
+      scene.add(carpet);
+
+      // ── BONFIRE CENTER ──
+      buildBonfire();
+
+      // ── 12 FIGURES in circle ──
+      const NUM = 12;
+      const RADIUS = 4.5;
+      for (let i = 0; i < NUM; i++) {
+        const angle = (i / NUM) * Math.PI * 2;
+        const x = Math.sin(angle) * RADIUS;
+        const z = Math.cos(angle) * RADIUS;
+        const fig = buildFigure(i);
+        fig.position.set(x, 0, z);
+        fig.rotation.y = -angle;
+        fig.userData = { angle, baseAngle: angle, swayOffset: (i / NUM) * Math.PI * 2 };
+        scene.add(fig);
+        figures.push(fig);
+      }
+
+      // ── AMBIENT STARS ──
+      buildStars();
+
+      // ── LIGHTING ──
+      const ambient = new THREE.AmbientLight(0x1a0820, 0.4);
+      scene.add(ambient);
+
+      // fire light (warm orange, flickering)
+      const fireLight = new THREE.PointLight(0xff6a00, 3, 8);
+      fireLight.position.set(0, 0.8, 0);
+      fireLight.castShadow = true;
+      scene.add(fireLight);
+      scene.userData.fireLight = fireLight;
+
+      // purple night light from above
+      const nightLight = new THREE.DirectionalLight(0x3a1060, 0.6);
+      nightLight.position.set(0, 10, 0);
+      scene.add(nightLight);
+    }
+
+    function buildFigure(idx) {
+      const group = new THREE.Group();
+      const isSinging = idx === 0; // lead singer
+
+      // Body (thobe — white)
+      const bodyGeo = new THREE.CylinderGeometry(0.18, 0.22, 1.0, 8);
+      const bodyMat = new THREE.MeshLambertMaterial({
+        color: isSinging ? 0xf0e8d0 : 0xd8d0c0,
+        emissive: isSinging ? 0x3a2a00 : 0x0a0a0a,
+      });
+      const body = new THREE.Mesh(bodyGeo, bodyMat);
+      body.position.y = 0.5;
+      group.add(body);
+
+      // Head
+      const headGeo = new THREE.SphereGeometry(0.16, 12, 10);
+      const headMat = new THREE.MeshLambertMaterial({ color: 0xc8a882 });
+      const head = new THREE.Mesh(headGeo, headMat);
+      head.position.y = 1.18;
+      group.add(head);
+
+      // Ghutrah (white cloth on head)
+      const ghutrahGeo = new THREE.ConeGeometry(0.2, 0.28, 8);
+      const ghutrahMat = new THREE.MeshLambertMaterial({
+        color: isSinging ? 0xffffff : 0xe8e0d0,
+        emissive: isSinging ? 0x2a2000 : 0x050505,
+      });
+      const ghutrah = new THREE.Mesh(ghutrahGeo, ghutrahMat);
+      ghutrah.position.y = 1.42;
+      group.add(ghutrah);
+
+      // Iqal (black ring)
+      const iqalGeo = new THREE.TorusGeometry(0.18, 0.025, 8, 20);
+      const iqalMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
+      const iqal = new THREE.Mesh(iqalGeo, iqalMat);
+      iqal.position.y = 1.32;
+      iqal.rotation.x = Math.PI / 2;
+      group.add(iqal);
+
+      // Arms
+      [-1, 1].forEach(side => {
+        const armGeo = new THREE.CylinderGeometry(0.04, 0.05, 0.55, 6);
+        const armMat = new THREE.MeshLambertMaterial({ color: 0xc8a882 });
+        const arm = new THREE.Mesh(armGeo, armMat);
+        arm.position.set(side * 0.26, 0.82, 0);
+        arm.rotation.z = side * 0.3;
+        group.add(arm);
+      });
+
+      group.userData.isLeader = isSinging;
+      return group;
+    }
+
+    function buildBonfire() {
+      // Log base
+      const logMat = new THREE.MeshLambertMaterial({ color: 0x3d1a08 });
+      for (let i = 0; i < 4; i++) {
+        const logGeo = new THREE.CylinderGeometry(0.05, 0.07, 0.8, 6);
+        const log = new THREE.Mesh(logGeo, logMat);
+        const a = (i / 4) * Math.PI * 2;
+        log.position.set(Math.sin(a) * 0.25, 0.05, Math.cos(a) * 0.25);
+        log.rotation.z = Math.sin(a) * 0.6;
+        log.rotation.x = Math.cos(a) * 0.6;
+        scene.add(log);
+        bonfire.push(log);
+      }
+
+      // Fire — multiple cone layers
+      const fireColors = [0xff6a00, 0xff8c00, 0xffcc00, 0xff4400];
+      fireColors.forEach((col, i) => {
+        const fGeo = new THREE.ConeGeometry(0.22 - i * 0.04, 0.6 + i * 0.1, 8);
+        const fMat = new THREE.MeshLambertMaterial({
+          color: col, emissive: col, emissiveIntensity: 0.8,
+          transparent: true, opacity: 0.85 - i * 0.15,
+        });
+        const flame = new THREE.Mesh(fGeo, fMat);
+        flame.position.y = 0.3 + i * 0.05;
+        flame.userData = { baseY: 0.3 + i * 0.05, phase: i * 0.8 };
+        scene.add(flame);
+        bonfire.push(flame);
+      });
+
+      // Embers (particles)
+      for (let i = 0; i < 40; i++) {
+        const eGeo = new THREE.SphereGeometry(0.015, 4, 4);
+        const eMat = new THREE.MeshBasicMaterial({ color: 0xff9900 });
+        const ember = new THREE.Mesh(eGeo, eMat);
+        ember.position.set(
+          (Math.random() - 0.5) * 0.5,
+          Math.random() * 2,
+          (Math.random() - 0.5) * 0.5
+        );
+        ember.userData = {
+          vel: new THREE.Vector3((Math.random() - 0.5) * 0.005, 0.008 + Math.random() * 0.01, (Math.random() - 0.5) * 0.005),
+          life: Math.random()
+        };
+        scene.add(ember);
+        smokeParticles.push(ember);
+      }
+    }
+
+    function buildStars() {
+      const starGeo = new THREE.BufferGeometry();
+      const positions = [];
+      for (let i = 0; i < 800; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        const r = 18 + Math.random() * 4;
+        positions.push(
+          r * Math.sin(phi) * Math.cos(theta),
+          r * Math.abs(Math.cos(phi)) * 0.5 + 3,
+          r * Math.sin(phi) * Math.sin(theta)
+        );
+      }
+      starGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.06, transparent: true, opacity: 0.8 });
+      scene.add(new THREE.Points(starGeo, starMat));
+    }
+
+    function animate() {
+      if (!animRunning) return;
+      requestAnimationFrame(animate);
+      const t = clock.getElapsedTime();
+      swayPhase = t;
+
+      // ── SWAY FIGURES ──
+      figures.forEach((fig, i) => {
+        const offset = fig.userData.swayOffset;
+        const swayAmt = 0.12 + Math.sin(t * 0.3) * 0.04; // increases when drum is hit
+        fig.rotation.z = Math.sin(t * 1.4 + offset) * swayAmt;
+        fig.position.y = Math.abs(Math.sin(t * 1.4 + offset)) * 0.03;
+      });
+
+      // ── FIRE FLICKER ──
+      bonfire.forEach(obj => {
+        if (obj.userData.phase !== undefined) {
+          obj.scale.x = 1 + Math.sin(t * 6 + obj.userData.phase) * 0.12;
+          obj.scale.z = 1 + Math.cos(t * 5 + obj.userData.phase) * 0.1;
+          obj.scale.y = 1 + Math.sin(t * 4 + obj.userData.phase) * 0.08;
+          obj.position.y = obj.userData.baseY + Math.sin(t * 7 + obj.userData.phase) * 0.02;
+        }
+      });
+
+      // ── FIRE LIGHT FLICKER ──
+      const fl = scene.userData.fireLight;
+      if (fl) {
+        fl.intensity = 2.5 + Math.sin(t * 8) * 0.6 + Math.sin(t * 13) * 0.3;
+        fl.color.setHSL(0.08 + Math.sin(t * 3) * 0.02, 1, 0.55);
+      }
+
+      // ── EMBERS ──
+      smokeParticles.forEach(p => {
+        p.userData.life += 0.005;
+        if (p.userData.life > 1) {
+          p.position.set((Math.random() - 0.5) * 0.3, 0.1, (Math.random() - 0.5) * 0.3);
+          p.userData.life = 0;
+        }
+        p.position.addScaledVector(p.userData.vel, 1);
+        p.material.opacity = 1 - p.userData.life;
+        p.scale.setScalar(1 - p.userData.life * 0.5);
+      });
+
+      // ── CAMERA (device orientation or touch drag) ──
+      camera.rotation.order = 'YXZ';
+      camera.rotation.y = cameraAngle;
+      camera.rotation.x = Math.max(-0.4, Math.min(0.4, deviceBeta));
+
+      renderer.render(scene, camera);
+    }
+
+    // ── DEVICE ORIENTATION ──
+    function enableGyro() {
+      if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission().then(p => {
+          if (p === 'granted') listenOrientation();
+        }).catch(() => { });
+      } else {
+        listenOrientation();
+      }
+    }
+    function listenOrientation() {
+      window.addEventListener('deviceorientation', e => {
+        if (e.alpha !== null) {
+          cameraAngle = -(e.alpha * Math.PI / 180);
+          deviceBeta = (e.beta - 90) * Math.PI / 180 * 0.3;
+        }
+      }, true);
+    }
+
+    // ── TOUCH DRAG ──
+    function onTouchStart(e) { touchStartX = e.touches[0].clientX; lastTouchX = touchStartX; }
+    function onTouchMove(e) {
+      const dx = e.touches[0].clientX - lastTouchX;
+      cameraAngle -= dx * 0.008;
+      lastTouchX = e.touches[0].clientX;
+    }
+
+    function onResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // ══════════════════════════════════════════════════════
+    // NARRATIVE FLOW
+    // ══════════════════════════════════════════════════════
+    const narrations = [
+      {
+        label: { en: 'YOU ARE STANDING IN THE CENTER', ar: 'أنت واقف في قلب الجلسة' },
+        text: { en: 'A bonfire burns before you. 12 men in white Thobes stand in a circle — swaying left, then right, in perfect unison. The rhythm is ancient. You are inside an Al-Samri circle.', ar: 'النار قدامك، و١٢ رجال بثيابهم البيض مسوين دائرة— يتمايلون يسار ويمين. إيقاع القدامى يحوطك. أنت الحين في جلسة سامري.' }
+      },
+      {
+        label: { en: 'THE CALL AND RESPONSE', ar: 'الشيلة والردية' },
+        text: { en: 'The lead poet — the figure in front of you — sings a verse. The circle responds in a low, unified hum. Back and forth. Call and response. This has been happening in the Hijaz for over 400 years.', ar: 'الشاعر — اللي قدامك — يشيل البيت. والدائرة ترد عليه بصوت واحد. أخذ وعطا... كذا الحجاز تغني من ٤٠٠ سنة.' }
+      },
+      {
+        label: { en: 'THE TABL DRUM', ar: 'الطبل' },
+        text: { en: 'The heartbeat of the Samri is the Tabl drum — a large frame drum struck with one hand. Every sway, every step, every breath in this circle follows that beat. Now it will be yours to keep.', ar: 'نبض السامري هو الطبل — ينضرب بيد وحدة. كل حركة وكل ميلان في هالجلسة يمشي عليه. الحين دورك تضبط الإيقاع.' }
+      }
+    ];
+    let narrationStep = 0;
+    let narrationInterval;
+    let bgAudio = new Audio('samri_audio.mp4');
+    bgAudio.loop = true;
+    bgAudio.volume = 0.6;
+
+    function enterImmersive() {
+      document.getElementById('intro-screen').style.opacity = '0';
+      document.getElementById('intro-screen').style.pointerEvents = 'none';
+      setTimeout(() => { document.getElementById('intro-screen').style.display = 'none'; }, 500);
+
+      document.getElementById('top-hud').style.display = 'flex';
+      initThree();
+      animRunning = true;
+      animate();
+      enableGyro();
+
+      // Start the background music
+      bgAudio.play().catch(e => console.log('Audio autoplay blocked:', e));
+
+      setTimeout(showNarration, 800);
+    }
+
+    function showNarration() {
+      if (narrationStep >= narrations.length) {
+        document.getElementById('narrator-bar').classList.remove('show');
+        document.getElementById('enter-game-btn').classList.add('show');
+        return;
+      }
+      const n = narrations[narrationStep];
+      const isAr = window.currentLang === 'ar';
+      document.getElementById('narrator-label').textContent = isAr ? n.label.ar : n.label.en;
+      document.getElementById('narrator-text').textContent = isAr ? n.text.ar : n.text.en;
+      document.getElementById('narrator-bar').classList.add('show');
+      narrationStep++;
+      setTimeout(() => {
+        document.getElementById('narrator-bar').classList.remove('show');
+        setTimeout(showNarration, 1000);
+      }, 5000);
+    }
+
+    // ══════════════════════════════════════════════════════
+    // RHYTHM GAME
+    // ══════════════════════════════════════════════════════
+    const verses = [
+      {
+        num: 1, bpm: 72, beats: 8,
+        text: 'Two rows of men face each other in the firelight. The poet opens with the first verse — a tale of longing from a distant homeland.',
+        ar: '"يا ليل الصب متى غده" — O night of the yearning lover, when will you end?',
+        fact: 'Al-Samri originated in the Hijaz (Makkah/Madinah) region. The poetry always speaks of love, longing, or heroism.'
+      },
+      {
+        num: 2, bpm: 88, beats: 10,
+        text: 'The circle tightens. The sway deepens. The second verse is faster — the lead poet\'s voice rises above the drum.',
+        ar: '"الشوق يجمعنا على الأثر" — Longing unites us along the path',
+        fact: 'Al-Samri can last for hours. The call-and-response continues until the host signals an end, usually around midnight.'
+      },
+      {
+        num: 3, bpm: 108, beats: 12,
+        text: 'The final verse. The fire rises. Every man in the circle sways as one. Your drumming now carries the whole performance.',
+        ar: '"والسامري يدور في الليل" — And the Samri turns through the night',
+        fact: 'At PNU, students from the Hijaz region are the keepers of this tradition. Without them, the next generation may never hear it.'
+      }
+    ];
+
+    let AudioCtx2 = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+    let currentVerse = 0;
+    let hits = 0, streak = 0, maxStreak = 0;
+    let beatInterval = null;
+    let currentBeat = 0;
+    let totalBeats = 0;
+    let expectedBeatTime = 0;
+    let BPM = 72;
+    let beatDots = [];
+    let isGameActive = false;
+
+    function startRhythmGame() {
+      document.getElementById('enter-game-btn').classList.remove('show');
+      document.getElementById('narrator-bar').classList.remove('show');
+      document.getElementById('game-screen').classList.add('active');
+      animRunning = false; // stop 3D to save battery
+      loadVerse(0);
+    }
+
+    function loadVerse(idx) {
+      const v = verses[idx];
+      BPM = v.bpm;
+      totalBeats = v.beats;
+      currentBeat = 0;
+      hits = 0;
+      document.getElementById('verse-count').textContent = `${idx + 1}/3`;
+      document.getElementById('verse-text').textContent = v.text;
+      document.getElementById('verse-ar').textContent = v.ar;
+      document.querySelector('.verse-num').textContent = `VERSE ${v.num}`;
+
+      // build beat dots
+      const dotsContainer = document.getElementById('beat-dots');
+      dotsContainer.innerHTML = '';
+      beatDots = [];
+      for (let i = 0; i < v.beats; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'beat-dot';
+        dot.textContent = '🥁';
+        dotsContainer.appendChild(dot);
+        beatDots.push(dot);
+      }
+
+      isGameActive = true;
+      if (!audioCtx) audioCtx = new AudioCtx2();
+      startBeatLoop(v.bpm);
+    }
+
+    function startBeatLoop(bpm) {
+      if (beatInterval) clearInterval(beatInterval);
+      const interval = (60 / bpm) * 1000;
+      expectedBeatTime = Date.now() + interval;
+
+      beatInterval = setInterval(() => {
+        if (currentBeat >= totalBeats) {
+          clearInterval(beatInterval);
+          beatInterval = null;
+          setTimeout(() => nextVerse(), 800);
+          return;
+        }
+        // play drum
+        playDrumBeat();
+        // activate dot
+        if (beatDots[currentBeat]) {
+          beatDots[currentBeat].classList.add('active-beat');
+          const b = currentBeat;
+          setTimeout(() => { if (beatDots[b]) beatDots[b].classList.remove('active-beat'); }, interval * 0.4);
+        }
+        expectedBeatTime = Date.now() + interval;
+        currentBeat++;
+      }, interval);
+    }
+
+    function hitDrum() {
+      if (!isGameActive) return;
+      // drum visual
+      document.getElementById('drum').style.transform = 'scale(0.92)';
+      setTimeout(() => { document.getElementById('drum').style.transform = 'scale(1)'; }, 80);
+      const ripple = document.getElementById('drum-ripple');
+      ripple.classList.remove('active');
+      void ripple.offsetWidth;
+      ripple.classList.add('active');
+
+      // timing check
+      const now = Date.now();
+      const diff = Math.abs(now - expectedBeatTime);
+      const interval = (60 / BPM) * 1000;
+
+      let quality, color;
+      const isAr = window.currentLang === 'ar';
+      if (diff < interval * 0.15) { quality = isAr ? 'ممتاز! 🔥' : 'Perfect! 🔥'; color = '#C9A84C'; streak++; hits++; }
+      else if (diff < interval * 0.3) { quality = isAr ? 'جيد ✓' : 'Good ✓'; color = '#90c090'; streak++; hits++; }
+      else { quality = isAr ? 'فاتتك' : 'Miss'; color = '#f47070'; streak = 0; }
+
+      maxStreak = Math.max(maxStreak, streak);
+      document.getElementById('hit-count').textContent = hits;
+      document.getElementById('streak-count').textContent = streak;
+
+      // mark nearest dot
+      const dotIdx = Math.max(0, currentBeat - 1);
+      if (beatDots[dotIdx]) {
+        beatDots[dotIdx].classList.remove('active-beat');
+        beatDots[dotIdx].classList.add(diff < interval * 0.3 ? 'hit' : 'miss');
+        beatDots[dotIdx].textContent = diff < interval * 0.3 ? '✓' : '✗';
+      }
+
+      showTimingFeedback(quality, color);
+      playHitSound();
+    }
+
+    function showTimingFeedback(text, color) {
+      const el = document.getElementById('timing-feedback');
+      el.textContent = text;
+      el.style.color = color;
+      el.classList.remove('hide');
+      el.classList.add('show');
+      setTimeout(() => { el.classList.remove('show'); el.classList.add('hide'); }, 500);
+    }
+
+    function nextVerse() {
+      currentVerse++;
+      if (currentVerse < verses.length) {
+        loadVerse(currentVerse);
+      } else {
+        endGame();
+      }
+    }
+
+    function endGame() {
+      isGameActive = false;
+      clearInterval(beatInterval);
+      const isAr = window.currentLang === 'ar';
+      const facts = verses.map(v => v.fact).join(' ');
+      document.getElementById('unlock-fact').textContent = isAr
+        ? `السامري فن أصيل من الحجاز. أكبر متتالية حققتها ${maxStreak} ضربة. مجموع الضربات الصح: ${hits}.`
+        : `Al-Samri is a living tradition of the Hijaz region. ${verses[2].fact} Your max streak was ${maxStreak} beats. Total hits: ${hits}.`;
+      document.getElementById('game-over-section').style.display = 'block';
+    }
+
+    function restartGame() {
+      currentVerse = 0; hits = 0; streak = 0; maxStreak = 0;
+      document.getElementById('game-over-section').style.display = 'none';
+      document.getElementById('hit-count').textContent = '0';
+      document.getElementById('streak-count').textContent = '0';
+      loadVerse(0);
+    }
+
+    // ── AUDIO ──
+    function playDrumBeat() {
+      if (!audioCtx) return;
+      // low thump
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.frequency.setValueAtTime(120, audioCtx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.18);
+      o.type = 'sine';
+      g.gain.setValueAtTime(0.6, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+      o.start(); o.stop(audioCtx.currentTime + 0.25);
+
+      // click transient
+      const b = audioCtx.createOscillator(), bg = audioCtx.createGain();
+      b.connect(bg); bg.connect(audioCtx.destination);
+      b.frequency.value = 800; b.type = 'square';
+      bg.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      bg.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+      b.start(); b.stop(audioCtx.currentTime + 0.04);
+    }
+
+    function playHitSound() {
+      if (!audioCtx) return;
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.frequency.value = 600 + Math.random() * 200; o.type = 'sine';
+      g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+      o.start(); o.stop(audioCtx.currentTime + 0.1);
+    }
+  </script>
+  <script src="language.js"></script>
+</body>
+
+</html>
+

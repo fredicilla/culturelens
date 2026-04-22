@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Iqal & Ghutrah — CultureLens</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body { background:var(--green); }
+.phase { display:none; min-height:100vh; padding:80px 20px 40px; flex-direction:column; }
+.phase.active { display:flex; }
+
+/* ── SCENE ── */
+.dress-scene {
+  max-width:420px; margin:0 auto 20px; width:100%;
+  background:linear-gradient(160deg,#0e1a28,#1a2d45);
+  border-radius:24px; overflow:hidden;
+  border:1px solid rgba(201,168,76,0.2);
+  box-shadow:0 8px 40px rgba(0,0,0,0.5);
+  padding-bottom:20px;
+}
+.scene-top-bar {
+  height:6px;
+  background:linear-gradient(90deg,#1a2d45,#C9A84C,#1a2d45);
+}
+.figure-stage {
+  display:flex; justify-content:center; align-items:flex-end;
+  padding:24px 20px 0; min-height:180px; gap:16px;
+}
+/* CSS figure */
+.figure { position:relative; display:flex; flex-direction:column; align-items:center; }
+.figure-head {
+  width:52px; height:52px; border-radius:50%;
+  background:linear-gradient(135deg,#c8a882,#a0785a);
+  border:3px solid rgba(201,168,76,0.3);
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; position:relative; margin-bottom:-2px;
+  transition:all 0.4s;
+}
+.figure-body {
+  width:70px; height:90px;
+  background:linear-gradient(160deg,#2a3a4a,#1a2530);
+  border-radius:8px 8px 16px 16px;
+  border:2px solid rgba(100,140,180,0.3);
+  position:relative; transition:all 0.4s;
+}
+/* clothing overlays */
+.ghutrah-layer {
+  position:absolute; top:-38px; left:-14px; right:-14px;
+  height:56px; border-radius:50% 50% 0 0;
+  opacity:0; transition:opacity 0.5s;
+  pointer-events:none;
+}
+.iqal-layer {
+  position:absolute; top:-10px; left:50%; transform:translateX(-50%);
+  width:56px; height:10px; border-radius:50px;
+  background:#111; border:2px solid #333;
+  opacity:0; transition:opacity 0.5s;
+}
+.thobe-layer {
+  position:absolute; inset:0; border-radius:8px 8px 16px 16px;
+  opacity:0; transition:opacity 0.5s;
+}
+
+/* grandfather figure (right) */
+.grandfather { opacity:0.7; transform:scale(0.85); }
+
+/* ── CLOTHING ITEMS ── */
+.clothing-shelf {
+  max-width:420px; margin:0 auto 16px; width:100%;
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+}
+.clothing-item {
+  background:var(--card-dark); border-radius:16px; padding:14px 10px;
+  text-align:center; cursor:pointer;
+  border:2px solid rgba(201,168,76,0.15);
+  transition:all 0.25s; position:relative; overflow:hidden;
+}
+.clothing-item:hover { border-color:rgba(201,168,76,0.5); transform:translateY(-2px); }
+.clothing-item.selected { border-color:var(--gold); background:rgba(201,168,76,0.1); }
+.clothing-item.correct { border-color:#4caf50; background:rgba(76,175,80,0.1); }
+.clothing-item.wrong { border-color:#f44336; background:rgba(244,67,54,0.1); animation:shake 0.3s; }
+@keyframes shake {
+  0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
+}
+.clothing-emoji { font-size:28px; margin-bottom:6px; }
+.clothing-name { font-size:11px; color:var(--cream); font-weight:600; }
+.clothing-ar { font-size:10px; color:var(--gold); direction:rtl; margin-top:2px; }
+
+/* ── OCCASION BANNER ── */
+.occasion-banner {
+  max-width:420px; margin:0 auto 16px; width:100%;
+  background:var(--card-dark); border-radius:14px; padding:14px 16px;
+  border-left:4px solid var(--gold);
+  display:flex; align-items:center; gap:14px;
+}
+.occasion-icon { font-size:32px; flex-shrink:0; }
+.occasion-title {
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:16px; color:var(--white); font-weight:700;
+}
+.occasion-sub { font-size:12px; color:var(--text-light); margin-top:2px; }
+.occasion-instruction {
+  font-size:12px; color:var(--gold); margin-top:6px; font-weight:600;
+}
+
+/* ── FACT CARD ── */
+.clothing-fact {
+  max-width:420px; margin:0 auto 12px; width:100%;
+  background:rgba(18,43,30,0.8); border-radius:14px; padding:14px 16px;
+  border:1px solid rgba(201,168,76,0.2);
+  display:none; animation:fadeUp 0.4s ease;
+}
+.clothing-fact.show { display:block; }
+
+/* ── STORY PANELS ── */
+.story-panels { padding:0; max-width:420px; margin:0 auto; width:100%; }
+.story-panel { display:none; animation:fadeUp 0.5s ease; }
+.story-panel.active { display:block; }
+.panel-continue { text-align:center; font-size:12px; color:var(--text-light); animation:pulse 2s infinite; margin-top:12px; }
+</style>
+</head>
+<body>
+
+<header class="cl-header">
+  <a href="index.html" class="back-btn">‹</a>
+  <div class="logo translatable" data-en="<img src='logo.png' class='logo-img'> Culture<span>Lens</span>" data-ar="<img src='logo.png' class='logo-img'> عدسة <span>الثقافة</span>" data-html="true"><img src="logo.png" class="logo-img"> Culture<span>Lens</span></div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="font-size:10px;color:var(--text-light);text-align:right" class="translatable" data-en="🧵 Ghutrah" data-ar="🧵 الغترة">🧵 Ghutrah</div>
+    <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">🇸🇦 العربية</span></button>
+  </div>
+</header>
+
+<!-- ═══════════════════════════ PHASE 1 — STORY ═══════════════════════════ -->
+<section class="phase active" id="phase-story">
+
+  <!-- SCENE -->
+  <div class="dress-scene">
+    <div class="scene-top-bar"></div>
+    <div class="figure-stage">
+
+      <!-- Young man -->
+      <div class="figure" id="young-man">
+        <div class="figure-head" id="young-head">
+          😐
+          <div class="ghutrah-layer" id="ghutrah-overlay"
+            style="background:linear-gradient(135deg,rgba(255,255,255,0.9),rgba(200,200,200,0.7))"></div>
+          <div class="iqal-layer" id="iqal-overlay"></div>
+        </div>
+        <div class="figure-body" id="young-body">
+          <div class="thobe-layer" id="thobe-overlay"
+            style="background:linear-gradient(160deg,rgba(240,240,240,0.9),rgba(220,220,220,0.7));border-radius:8px 8px 16px 16px;"></div>
+        </div>
+        <div style="font-size:10px;color:var(--text-light);margin-top:6px" class="translatable" data-en="You" data-ar="أنت">You</div>
+      </div>
+
+      <!-- Grandfather -->
+      <div class="figure grandfather" id="grandpa">
+        <div class="figure-head" style="background:linear-gradient(135deg,#a08060,#806040)">
+          🧓
+          <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:56px;height:10px;border-radius:50px;background:#111;border:2px solid #333;opacity:1"></div>
+          <div style="position:absolute;top:-44px;left:-14px;right:-14px;height:56px;border-radius:50% 50% 0 0;background:linear-gradient(135deg,rgba(255,255,255,0.9),rgba(180,140,100,0.6));opacity:1"></div>
+        </div>
+        <div class="figure-body" style="background:linear-gradient(160deg,#3a2a1a,#2a1a0a);border-color:rgba(201,168,76,0.3)">
+          <div style="position:absolute;inset:0;border-radius:8px 8px 16px 16px;background:linear-gradient(160deg,rgba(201,168,76,0.15),transparent)"></div>
+        </div>
+        <div style="font-size:10px;color:var(--text-light);margin-top:6px" class="translatable" data-en="Grandfather" data-ar="الجد">Grandfather</div>
+      </div>
+
+    </div>
+    <div style="text-align:center;padding:12px 20px 0">
+      <div style="font-size:10px;color:var(--gold);animation:pulse 2s infinite" class="translatable" data-en="✦ Tap to follow the lesson ✦" data-ar="✦ اضغط لمتابعة الدرس ✦">✦ Tap to follow the lesson ✦</div>
+    </div>
+  </div>
+
+  <!-- STORY PANELS -->
+  <div class="story-panels">
+    <div class="story-panel active" id="panel-0">
+      <div class="narrator-box">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">🧔</div>
+          <div style="font-size:12px;color:var(--gold);font-weight:600" class="translatable" data-en="Eid Morning — Riyadh, Najd" data-ar="صباح العيد — الرياض، نجد">Eid Morning — Riyadh, Najd</div>
+        </div>
+        <p class="translatable" data-en="You are getting dressed for Eid. Your grandfather stands behind you, watching every movement. Before you can tie your Ghutrah, he steps forward — and starts again from the beginning." data-ar="تتجهز للعيد وجدك يراقب كل حركة. قبل تلف غترتك، قرب منك وبدأ يعلمك من الصفر.">You are getting dressed for Eid. Your grandfather stands behind you, watching every movement. Before you can tie your Ghutrah, he steps forward — and starts again from the beginning.</p>
+        <p style="margin-top:10px;color:var(--text-light);font-size:13px" class="translatable" data-en='"How you wear this," he says, "tells the world who your family is."' data-ar='"لبسك،" يقول جدك، "يعلم العالم من أنت ومن وين جاي."'>"How you wear this," he says, "tells the world who your family is."</p>
+      </div>
+      <div class="panel-continue translatable" data-en="Tap to continue ▾" data-ar="اضغط للمتابعة ▾">Tap to continue ▾</div>
+    </div>
+
+    <div class="story-panel" id="panel-1">
+      <div class="narrator-box">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:700">1</div>
+          <div style="font-size:12px;color:var(--gold);font-weight:600">The Thobe — الثوب</div>
+        </div>
+        <p>The <strong style="color:var(--gold)">Thobe</strong> comes first. In Najd, it is always white — long, clean, and pressed. The length must reach exactly the ankle. Too short means carelessness. Too long means arrogance.</p>
+        <p style="margin-top:10px;color:var(--text-light);font-size:13px">The whiteness is intentional — it signals purity and readiness to receive guests.</p>
+      </div>
+      <div class="panel-continue">Tap to continue ▾</div>
+    </div>
+
+    <div class="story-panel" id="panel-2">
+      <div class="narrator-box">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:700">2</div>
+          <div style="font-size:12px;color:var(--gold);font-weight:600">The Ghutrah — الغترة</div>
+        </div>
+        <p>The <strong style="color:var(--gold)">Ghutrah</strong> is the white headscarf of Najd. Unlike the red-checkered <em>Shumagh</em> common in colder regions, the pure white Ghutrah signals you are from the heartland.</p>
+        <div style="margin-top:10px;background:rgba(201,168,76,0.08);border-radius:8px;padding:10px">
+          <div style="font-size:11px;color:var(--text-light)">White Ghutrah = Najd & Riyadh region</div>
+          <div style="font-size:11px;color:var(--text-light);margin-top:4px">Red Shumagh = Northern regions, colder climates</div>
+        </div>
+      </div>
+      <div class="panel-continue">Tap to continue ▾</div>
+    </div>
+
+    <div class="story-panel" id="panel-3">
+      <div class="narrator-box">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:700">3</div>
+          <div style="font-size:12px;color:var(--gold);font-weight:600">The Iqal — العقال</div>
+        </div>
+        <p>The <strong style="color:var(--gold)">Iqal</strong> — the black doubled cord — holds the Ghutrah in place. But its origins are far older than fashion. Bedouin tribesmen used the same rope to <strong>tether their camels</strong> at night, then wrap it on their heads by day.</p>
+        <p style="margin-top:10px;color:var(--text-light);font-size:13px">Its thickness and weave once identified your tribe before you spoke a single word.</p>
+      </div>
+      <div class="panel-continue">Tap to continue ▾</div>
+    </div>
+
+    <div class="story-panel" id="panel-4">
+      <div class="narrator-box" style="text-align:center">
+        <div style="font-size:36px;margin-bottom:10px">🧔</div>
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:20px;color:var(--gold);margin-bottom:8px" class="translatable" data-en="Now you dress for the occasion" data-ar="الحين أنت اختار اللبس">Now you dress for the occasion</div>
+        <div style="font-size:13px;color:var(--cream);line-height:1.7" class="translatable" data-en="Three occasions. Three different dress codes. Your grandfather will judge each one. Dress correctly and earn his approval — يرحمك الله." data-ar="ثلاث مناسبات. وثلاث لبسات مختلفة. جدك بيقرا لبسك، اختر صح عشان يرضى عليك.">Three occasions. Three different dress codes. Your grandfather will judge each one. Dress correctly and earn his approval — يرحمك الله.</div>
+      </div>
+      <div style="margin-top:16px">
+        <button class="btn-gold translatable" onclick="startGame()" data-en="Begin the Lesson 🧵" data-ar="اِبدأ الدرس 🧵">Begin the Lesson 🧵</button>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════ PHASE 2 — GAME ═══════════════════════════ -->
+<section class="phase" id="phase-game">
+
+  <div style="max-width:420px;margin:0 auto 16px;width:100%;text-align:center">
+    <div style="font-family:'Playfair Display',Georgia,serif;font-size:22px;color:var(--white)" class="translatable" data-en="Dress for the Occasion" data-ar="البَس للمناسبة">Dress for the Occasion</div>
+    <div style="font-size:13px;color:var(--text-light);margin-top:4px" class="translatable" data-en="الزي المناسب للمناسبة المناسبة" data-ar="اللبس الصح بالوقت الصح">الزي المناسب للمناسبة المناسبة</div>
+    <div style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:12px">
+      <div class="score-badge" id="score-display">⭐ 0 / 3</div>
+      <div class="progress-bar" style="width:120px;height:6px">
+        <div class="progress-fill" id="game-progress" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Occasion -->
+  <div class="occasion-banner" id="occasion-banner">
+    <div class="occasion-icon" id="occ-icon"></div>
+    <div>
+      <div class="occasion-title" id="occ-title"></div>
+      <div class="occasion-sub" id="occ-sub"></div>
+      <div class="occasion-instruction" id="occ-instruction"></div>
+    </div>
+  </div>
+
+  <!-- Clothing shelf -->
+  <div class="clothing-shelf" id="clothing-shelf">
+    <div class="clothing-item" onclick="selectItem(0)">
+      <div class="clothing-emoji">⬜</div>
+      <div class="clothing-name">White Ghutrah</div>
+      <div class="clothing-ar">الغترة البيضاء</div>
+    </div>
+    <div class="clothing-item" onclick="selectItem(1)">
+      <div class="clothing-emoji">🟥</div>
+      <div class="clothing-name">Red Shumagh</div>
+      <div class="clothing-ar">الشماغ الأحمر</div>
+    </div>
+    <div class="clothing-item" onclick="selectItem(2)">
+      <div class="clothing-emoji">⚫</div>
+      <div class="clothing-name">Iqal</div>
+      <div class="clothing-ar">العقال</div>
+    </div>
+    <div class="clothing-item" onclick="selectItem(3)">
+      <div class="clothing-emoji">🤍</div>
+      <div class="clothing-name">Thobe</div>
+      <div class="clothing-ar">الثوب</div>
+    </div>
+    <div class="clothing-item" onclick="selectItem(4)">
+      <div class="clothing-emoji">🧥</div>
+      <div class="clothing-name">Bisht</div>
+      <div class="clothing-ar">البشت</div>
+    </div>
+    <div class="clothing-item" onclick="selectItem(5)">
+      <div class="clothing-emoji">👞</div>
+      <div class="clothing-name">Sandals</div>
+      <div class="clothing-ar">الصندل</div>
+    </div>
+  </div>
+
+  <div class="clothing-fact" id="clothing-fact">
+    <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--gold);margin-bottom:6px">✦ FACT UNLOCKED</div>
+    <div id="fact-content" style="font-size:13px;color:var(--cream);line-height:1.7"></div>
+  </div>
+
+  <div style="max-width:420px;margin:0 auto;width:100%">
+    <button class="btn-gold translatable" id="confirm-btn" onclick="confirmChoice()" style="display:none" data-en="Confirm Outfit 🧔" data-ar="أكّد لبستك 🧔">
+      Confirm Outfit 🧔
+    </button>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════ PHASE 3 — SCORE ═══════════════════════════ -->
+<section class="phase" id="phase-score">
+  <div style="max-width:420px;margin:0 auto;width:100%;text-align:center">
+    <div style="font-family:'Playfair Display',Georgia,serif;font-size:14px;color:var(--text-light);margin-bottom:16px;letter-spacing:1px" class="translatable" data-en="GRANDFATHER'S VERDICT" data-ar="رأي الجد">GRANDFATHER'S VERDICT</div>
+    <div style="font-size:60px;margin-bottom:12px" id="verdict-emoji">🧓</div>
+    <div class="score-circle" style="width:110px;height:110px;margin:0 auto 16px">
+      <div class="score-num" id="final-score">0</div>
+      <div class="score-max translatable" data-en="out of 3" data-ar="من ٣">out of 3</div>
+    </div>
+    <div id="verdict-text" style="font-size:16px;color:var(--cream);margin-bottom:20px"></div>
+    <div class="fact-box">
+      <div class="fact-label translatable" data-en="🧵 Cultural Insight Unlocked" data-ar="🧵 معلومة ثقافية انفتحت">🧵 Cultural Insight Unlocked</div>
+      <div class="fact-text translatable" data-en="In Najdi culture, clothing is a social contract. The Iqal alone can tell a stranger your region, your status, and whether you are dressed for war, celebration, or mourning. Across PNU's 13 regions, every student carries a different dress code — each as rich as the next." data-ar="بنجد، اللبس رسالة. العقال لحاله يعلمك وش حالة الرجال، زواج ولا حرب ولا حزن. وكل منطقة لها لبس، من الشمال للجنوب، وكل طالبة بجامعة نورة تمثل جزء من هذا التنوع العظيم.">In Najdi culture, clothing is a social contract. The Iqal alone can tell a stranger your region, your status, and whether you are dressed for war, celebration, or mourning. Across PNU's 13 regions, every student carries a different dress code — each as rich as the next.</div>
+      <div style="margin-top:12px;direction:rtl;text-align:right;font-size:12px;color:var(--gold)">"الزي هو الهوية قبل الكلام"</div>
+      <div style="font-size:11px;color:var(--text-light)" class="translatable" data-en="Clothing is identity before words are spoken" data-ar='"اللبس يعلم بالهوية قبل النطق"'>Clothing is identity before words are spoken</div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:12px">
+      <button class="btn-outline translatable" onclick="resetGame()" style="flex:1" data-en="Try Again" data-ar="حاول مرة ثانية">Try Again</button>
+      <a href="index.html" class="btn-gold translatable" style="flex:1;text-decoration:none" data-en="← Back Home" data-ar="← الرئيسية">← Back Home</a>
+    </div>
+  </div>
+  <div class="cl-footer">هاكاثون نورة 2026 | CultureLens</div>
+</section>
+
+<div class="feedback-popup" id="feedback">
+  <div class="feedback-emoji" id="fb-emoji"></div>
+  <div class="feedback-label" id="fb-label"></div>
+  <div class="feedback-sub" id="fb-sub"></div>
+</div>
+
+<script>
+// ── STORY ──
+let currentPanel=0;
+document.addEventListener('click',function(e){
+  if(document.getElementById('phase-story').classList.contains('active') && !e.target.closest('button'))
+    nextPanel();
+});
+function nextPanel(){
+  const panels=document.querySelectorAll('.story-panel');
+  if(currentPanel<panels.length-1){
+    panels[currentPanel].classList.remove('active');
+    currentPanel++;
+    panels[currentPanel].classList.add('active');
+    updateFigure(currentPanel);
+    playTick();
+  }
+}
+function updateFigure(step){
+  const g=document.getElementById('ghutrah-overlay');
+  const iq=document.getElementById('iqal-overlay');
+  const th=document.getElementById('thobe-overlay');
+  if(step>=2){ th.style.opacity='0.9'; }
+  if(step>=3){ g.style.opacity='0.9'; }
+  if(step>=4){ iq.style.opacity='0.9'; }
+}
+
+// ── GAME ──
+const occasions=[
+  {
+    icon:'🕌', title:'Eid Prayer', sub:'صلاة العيد — Mosque, formal',
+    instruction:'Choose the correct full outfit',
+    correct:[0,2,3], // white ghutrah + iqal + thobe
+    facts:['For Eid prayer, a white Ghutrah + Iqal + white Thobe is the standard. The Iqal must sit perfectly straight — a tilted Iqal at the mosque signals disrespect.',
+           'The Bisht is optional for elders but not required for younger men at Eid prayer.']
+  },
+  {
+    icon:'💼', title:'Job Interview', sub:'مقابلة عمل — Professional setting',
+    instruction:'Choose appropriate professional attire',
+    correct:[2,3], // iqal + thobe (no bisht, can wear red shumagh too)
+    facts:['In a professional Riyadh setting, a clean white Thobe with a proper Iqal is appropriate. The Ghutrah should be neatly pressed — no casual fold.',
+           'Sandals are acceptable in the interview room if they are formal leather sandals — not flip-flops.']
+  },
+  {
+    icon:'💍', title:'Wedding Celebration', sub:'حفل زواج — Highest formality',
+    instruction:'Dress for the highest occasion',
+    correct:[0,2,3,4], // ghutrah + iqal + thobe + bisht
+    facts:['The Bisht is the mark of a wedding guest. This gold-trimmed ceremonial cloak signals you are honoring the occasion. Arriving without it at a formal Saudi wedding is noticed.',
+           'The Bisht of Al-Ahsa is considered the finest — hand-woven gold thread on black fabric, taking 3 months to make.']
+  }
+];
+let currentOccasion=0, selected=[], score=0;
+
+function startGame(){
+  document.getElementById('phase-story').classList.remove('active');
+  document.getElementById('phase-game').classList.add('active');
+  loadOccasion(0);
+}
+
+function loadOccasion(idx){
+  const occ=occasions[idx];
+  document.getElementById('occ-icon').textContent=occ.icon;
+  document.getElementById('occ-title').textContent=occ.title;
+  document.getElementById('occ-sub').textContent=occ.sub;
+  document.getElementById('occ-instruction').textContent=occ.instruction;
+  selected=[];
+  document.querySelectorAll('.clothing-item').forEach(c=>c.classList.remove('selected','correct','wrong'));
+  document.getElementById('clothing-fact').classList.remove('show');
+  document.getElementById('confirm-btn').style.display='none';
+}
+
+function selectItem(idx){
+  const items=document.querySelectorAll('.clothing-item');
+  const item=items[idx];
+  if(item.classList.contains('correct')) return;
+  if(item.classList.contains('selected')){
+    item.classList.remove('selected');
+    selected=selected.filter(i=>i!==idx);
+  } else {
+    item.classList.add('selected');
+    selected.push(idx);
+  }
+  document.getElementById('confirm-btn').style.display = selected.length>0 ? 'block' : 'none';
+  playTick();
+}
+
+function confirmChoice(){
+  const occ=occasions[currentOccasion];
+  const correct=occ.correct.sort().join(',');
+  const chosen=selected.sort().join(',');
+  const isCorrect = correct===chosen;
+
+  const items=document.querySelectorAll('.clothing-item');
+  const isAr = window.currentLang === 'ar';
+  if(isCorrect){
+    selected.forEach(i=>{ items[i].classList.remove('selected'); items[i].classList.add('correct'); });
+    score++;
+    showFeedback('✅',isAr?'صح!':'Correct!',isAr?'كفو — الجد راضي عليك':'يرحمك الله — Your grandfather approves');
+    playSuccess();
+    // show fact
+    const fc=document.getElementById('clothing-fact');
+    document.getElementById('fact-content').textContent=occ.facts[0];
+    fc.classList.add('show');
+    updateScore();
+    setTimeout(()=>{
+      currentOccasion++;
+      if(currentOccasion<occasions.length){ loadOccasion(currentOccasion); }
+      else endGame();
+    },2000);
+  } else {
+    selected.forEach(i=>{ items[i].classList.remove('selected'); items[i].classList.add('wrong'); });
+    // show what was missing
+    const missing=occ.correct.filter(i=>!selected.includes(i));
+    const extra=selected.filter(i=>!occ.correct.includes(i));
+    let hint='';
+    if(missing.length) hint+=isAr?'ناقصك قطع. ':'Missing items. ';
+    if(extra.length) hint+=isAr?'لابس أشياء مالها لزوم. ':'Too many items for this occasion.';
+    showFeedback('❌',isAr?'مو كذا!':'Not quite!',hint||(isAr?'تأكد من المناسبة':'Check the occasion again'));
+    playFail();
+    setTimeout(()=>{
+      document.querySelectorAll('.clothing-item').forEach(c=>c.classList.remove('wrong','selected'));
+      selected=[];
+      document.getElementById('confirm-btn').style.display='none';
+    },1500);
+  }
+}
+
+function updateScore(){
+  document.getElementById('score-display').textContent=`⭐ ${score} / 3`;
+  document.getElementById('game-progress').style.width=(score/3*100)+'%';
+}
+
+function endGame(){
+  document.getElementById('phase-game').classList.remove('active');
+  document.getElementById('phase-score').classList.add('active');
+  document.getElementById('final-score').textContent=score;
+  const isAr = window.currentLang === 'ar';
+  const emojis=['😐','🤔','😊','🧓✅'];
+  const textsEn=['Keep studying — يتعلم','Getting better — ممتاز','Well dressed — لابق','Grandfather approves! — الله يبارك فيك 🎉'];
+  const textsAr=['يبي لك تعلم','تحسنت','لابسك زين','ونعم التربية — الجد راضي عليك 🎉'];
+  const texts = isAr ? textsAr : textsEn;
+  document.getElementById('verdict-emoji').textContent=emojis[score]||'🧓';
+  document.getElementById('verdict-text').textContent=texts[score]||'';
+}
+
+function resetGame(){
+  score=0; currentOccasion=0; selected=[];
+  updateScore();
+  loadOccasion(0);
+  document.getElementById('phase-score').classList.remove('active');
+  document.getElementById('phase-game').classList.add('active');
+}
+
+// ── AUDIO ──
+const AudioCtx=window.AudioContext||window.webkitAudioContext;
+let ctx;
+function getCtx(){ if(!ctx) ctx=new AudioCtx(); return ctx; }
+function playTick(){
+  try{const c=getCtx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=700;o.type='sine';g.gain.setValueAtTime(0.12,c.currentTime);g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.08);o.start();o.stop(c.currentTime+0.08);}catch(e){}
+}
+function playSuccess(){
+  try{const c=getCtx();[523,659,784].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=f;o.type='sine';const t=c.currentTime+i*0.15;g.gain.setValueAtTime(0.2,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.4);o.start(t);o.stop(t+0.4);});}catch(e){}
+}
+function playFail(){
+  try{const c=getCtx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=200;o.type='sawtooth';g.gain.setValueAtTime(0.15,c.currentTime);g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.35);o.start();o.stop(c.currentTime+0.35);}catch(e){}
+}
+function showFeedback(emoji,label,sub){
+  const el=document.getElementById('feedback');
+  document.getElementById('fb-emoji').textContent=emoji;
+  document.getElementById('fb-label').textContent=label;
+  document.getElementById('fb-sub').textContent=sub;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),1800);
+}
+</script>
+<script src="language.js"></script>
+</body>
+</html>
+
+
+

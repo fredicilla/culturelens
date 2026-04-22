@@ -1,0 +1,714 @@
+/**
+ * regional-patterns.css — CultureLens 13-Province Pattern Engine
+ *
+ * Structure:
+ *  1. Pattern overlay base element
+ *  2. Full body[data-region] expanded theme variables
+ *  3. Pattern definitions per region (body[data-region] #region-pattern-overlay)
+ *  4. Region-specific UI overrides (hero gradients, glow, card styles)
+ *  5. Heritage badge styles
+ *  6. Modal improvements
+ */
+
+/* ════════════════════════════════════════
+   PATTERN OVERLAY BASE
+   ════════════════════════════════════════ */
+#region-pattern-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+body[data-region] #region-pattern-overlay {
+  opacity: 0.55;  /* Visible but not distracting */
+}
+
+/* Ensure specific content layers sit above the pattern correctly */
+/* Only raise specific known siblings — never blanket-force position:relative */
+#region-modal,
+.cl-header,
+.heritage-pulse {
+  z-index: revert; /* let their own stacking contexts manage themselves */
+}
+
+/* ════════════════════════════════════════
+   BODY THEME — SMOOTH TRANSITIONS
+   ════════════════════════════════════════ */
+body {
+  transition: background-color 0.9s ease, color 0.9s ease;
+}
+
+/* ════════════════════════════════════════
+
+   1. RIYADH — Najdi Diamond Lattice
+   Heritage: At-Turaif WHC C1329 · Al-Qahwa ICH RL01073 · Al-Ardha ICH RL01064
+   Pattern: Classic Najdi carved-gypsum diamond geometry
+
+   ════════════════════════════════════════ */
+body[data-region="riyadh"] {
+  --region-bg:        #0D3B2A;
+  --region-accent:    #C9A84C;
+  --region-accent-lt: #E8C96B;
+  --region-card:      #122B1E;
+  --region-text:      #F9F3E8;
+  --region-border:    rgba(201,168,76,0.22);
+  --region-glow:      rgba(201,168,76,0.12);
+  --region-muted:     rgba(249,243,232,0.45);
+  --region-hero-a:    #061f16;
+  --region-hero-b:    #0D3B2A;
+}
+
+body[data-region="riyadh"] #region-pattern-overlay {
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(201,168,76,0.055) 0px, rgba(201,168,76,0.055) 1px,
+      transparent 1px, transparent 28px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(201,168,76,0.055) 0px, rgba(201,168,76,0.055) 1px,
+      transparent 1px, transparent 28px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(201,168,76,0.02) 0px, rgba(201,168,76,0.02) 1px,
+      transparent 1px, transparent 28px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(201,168,76,0.02) 0px, rgba(201,168,76,0.02) 1px,
+      transparent 1px, transparent 28px
+    );
+  background-size: 28px 28px;
+}
+
+/* ════════════════════════════════════════
+
+   2. MAKKAH — Eight-Pointed Star (Rub El Hizb)
+   Heritage: Historic Jeddah WHC C1361
+   Pattern: Classic Islamic 8-pointed star tile
+
+   ════════════════════════════════════════ */
+body[data-region="makkah"] {
+  --region-bg:        #1a0800;
+  --region-accent:    #D4A843;
+  --region-accent-lt: #EAC060;
+  --region-card:      #130500;
+  --region-text:      #FDF5E6;
+  --region-border:    rgba(212,168,67,0.22);
+  --region-glow:      rgba(212,168,67,0.12);
+  --region-muted:     rgba(253,245,230,0.45);
+  --region-hero-a:    #0e0400;
+  --region-hero-b:    #1a0800;
+}
+
+body[data-region="makkah"] #region-pattern-overlay {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(212,168,67,0.04) 0px, rgba(212,168,67,0.04) 1px,
+      transparent 1px, transparent 38px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(212,168,67,0.04) 0px, rgba(212,168,67,0.04) 1px,
+      transparent 1px, transparent 38px
+    ),
+    repeating-linear-gradient(
+      45deg,
+      rgba(212,168,67,0.03) 0px, rgba(212,168,67,0.03) 1px,
+      transparent 1px, transparent 27px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(212,168,67,0.03) 0px, rgba(212,168,67,0.03) 1px,
+      transparent 1px, transparent 27px
+    );
+  background-size: 38px 38px, 38px 38px, 38px 38px, 38px 38px;
+}
+
+/* ════════════════════════════════════════
+
+   3. MADINAH — Arabesque Floral Dots
+   Heritage: Falconry ICH RL01209 · Hejaz Railway (candidate)
+   Pattern: Offset dot-grid evoking Arabesque floral arrangement
+
+   ════════════════════════════════════════ */
+body[data-region="madinah"] {
+  --region-bg:        #061808;
+  --region-accent:    #4CAF75;
+  --region-accent-lt: #74C894;
+  --region-card:      #031005;
+  --region-text:      #F0FFF4;
+  --region-border:    rgba(76,175,117,0.22);
+  --region-glow:      rgba(76,175,117,0.12);
+  --region-muted:     rgba(240,255,244,0.45);
+  --region-hero-a:    #030e04;
+  --region-hero-b:    #061808;
+}
+
+body[data-region="madinah"] #region-pattern-overlay {
+  background-image:
+    radial-gradient(circle, rgba(76,175,117,0.12) 1.5px, transparent 1.5px),
+    radial-gradient(circle, rgba(76,175,117,0.06) 1px, transparent 1px);
+  background-size: 22px 22px, 11px 11px;
+  background-position: 0 0, 5.5px 5.5px;
+}
+
+/* ════════════════════════════════════════
+
+   4. EASTERN PROVINCE — Hexagonal (Al-Ahsa)
+   Heritage: Al-Ahsa Oasis WHC C1563 · Al-Sadu ICH RL01567
+   Pattern: Honeycomb hexagonal referencing geometric desert landscape
+
+   ════════════════════════════════════════ */
+body[data-region="eastern"] {
+  --region-bg:        #04111E;
+  --region-accent:    #4A9FC9;
+  --region-accent-lt: #72BEE0;
+  --region-card:      #020C16;
+  --region-text:      #EDF6FF;
+  --region-border:    rgba(74,159,201,0.22);
+  --region-glow:      rgba(74,159,201,0.12);
+  --region-muted:     rgba(237,246,255,0.45);
+  --region-hero-a:    #020A14;
+  --region-hero-b:    #04111E;
+}
+
+body[data-region="eastern"] #region-pattern-overlay {
+  background-image:
+    repeating-linear-gradient(
+      60deg,
+      rgba(74,159,201,0.06) 0px, rgba(74,159,201,0.06) 1px,
+      transparent 1px, transparent 20px
+    ),
+    repeating-linear-gradient(
+      -60deg,
+      rgba(74,159,201,0.06) 0px, rgba(74,159,201,0.06) 1px,
+      transparent 1px, transparent 20px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(74,159,201,0.04) 0px, rgba(74,159,201,0.04) 1px,
+      transparent 1px, transparent 35px
+    );
+  background-size: 20px 35px;
+}
+
+/* ════════════════════════════════════════
+
+   5. ASIR — Al-Qatt Al-Asiri Horizontal Bands
+   Heritage: Al-Qatt Al-Asiri ICH RL01063 (2017) — exclusive to Asir women
+   Pattern: Signature horizontal bands with triangular notches in Asiri palette
+
+   ════════════════════════════════════════ */
+body[data-region="aseer"] {
+  --region-bg:        #160600;
+  --region-accent:    #D1495B;
+  --region-accent-lt: #E87080;
+  --region-card:      #0E0300;
+  --region-text:      #FFF0EE;
+  --region-border:    rgba(209,73,91,0.25);
+  --region-glow:      rgba(209,73,91,0.14);
+  --region-muted:     rgba(255,240,238,0.45);
+  --region-hero-a:    #0e0300;
+  --region-hero-b:    #160600;
+}
+
+body[data-region="aseer"] #region-pattern-overlay {
+  /* Al-Qatt Asiri: layered horizontal color bands */
+  background-image:
+    repeating-linear-gradient(
+      180deg,
+      rgba(209,73,91,0.08)  0px,  rgba(209,73,91,0.08)  3px,
+      rgba(232,116,74,0.06) 3px,  rgba(232,116,74,0.06) 6px,
+      rgba(88,179,104,0.05) 6px,  rgba(88,179,104,0.05) 9px,
+      rgba(212,168,67,0.07) 9px,  rgba(212,168,67,0.07) 12px,
+      transparent           12px, transparent            22px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(209,73,91,0.025) 0px, rgba(209,73,91,0.025) 1px,
+      transparent 1px, transparent 18px
+    );
+  background-size: 100% 22px, 18px 22px;
+}
+
+/* ════════════════════════════════════════
+
+   6. TABUK — Nabataean Arch
+   Heritage: Hegra WHC C1293 (2008) — Saudi Arabia's FIRST World Heritage Site
+   Pattern: Repeated arch forms echoing Nabataean rock-cut tomb facades
+
+   ════════════════════════════════════════ */
+body[data-region="tabuk"] {
+  --region-bg:        #080F1A;
+  --region-accent:    #4DB8D4;
+  --region-accent-lt: #78CEDF;
+  --region-card:      #040A12;
+  --region-text:      #E8F8FF;
+  --region-border:    rgba(77,184,212,0.22);
+  --region-glow:      rgba(77,184,212,0.12);
+  --region-muted:     rgba(232,248,255,0.45);
+  --region-hero-a:    #040810;
+  --region-hero-b:    #080F1A;
+}
+
+body[data-region="tabuk"] #region-pattern-overlay {
+  /* Nabataean arches rising from the bottom */
+  background-image:
+    repeating-radial-gradient(
+      ellipse 30px 22px at 50% 100%,
+      transparent 18px,
+      rgba(77,184,212,0.07) 19px,
+      rgba(77,184,212,0.07) 20px,
+      transparent 21px
+    ),
+    repeating-radial-gradient(
+      ellipse 30px 22px at 50% 0%,
+      transparent 18px,
+      rgba(77,184,212,0.04) 19px,
+      rgba(77,184,212,0.04) 20px,
+      transparent 21px
+    );
+  background-size: 60px 44px;
+}
+
+/* ════════════════════════════════════════
+
+   7. HAIL — Petroglyph Dots
+   Heritage: Rock Art Hail WHC C1472 (2015) — Jubbah & Shuwaymis, 10,000 years
+   Pattern: Scattered circles and dots mimicking ancient rock engravings
+
+   ════════════════════════════════════════ */
+body[data-region="hail"] {
+  --region-bg:        #180C04;
+  --region-accent:    #E8744A;
+  --region-accent-lt: #F49670;
+  --region-card:      #100700;
+  --region-text:      #FFF5F0;
+  --region-border:    rgba(232,116,74,0.22);
+  --region-glow:      rgba(232,116,74,0.12);
+  --region-muted:     rgba(255,245,240,0.45);
+  --region-hero-a:    #100700;
+  --region-hero-b:    #180C04;
+}
+
+body[data-region="hail"] #region-pattern-overlay {
+  /* Petroglyph concentric circles — rock art style */
+  background-image:
+    radial-gradient(circle, rgba(232,116,74,0.18) 2px, transparent 2px),
+    radial-gradient(circle, rgba(232,116,74,0.10) 4.5px, transparent 4.5px),
+    radial-gradient(circle, rgba(232,116,74,0.05) 9px,   transparent 9px),
+    radial-gradient(circle, rgba(232,116,74,0.09) 1.5px, transparent 1.5px);
+  background-size: 48px 48px, 48px 48px, 48px 48px, 24px 24px;
+  background-position: 0 0, 0 0, 0 0, 12px 12px;
+}
+
+/* ════════════════════════════════════════
+
+   8. NORTHERN BORDERS — Sadu Chevron Weave
+   Heritage: Al-Sadu ICH RL01567 (2020) — Bedouin tribal textile tradition
+   Pattern: Herringbone chevron mimicking Sadu loom-weave geometry
+
+   ════════════════════════════════════════ */
+body[data-region="northern"] {
+  --region-bg:        #070F1C;
+  --region-accent:    #7BBAE0;
+  --region-accent-lt: #A2CFF0;
+  --region-card:      #040A14;
+  --region-text:      #F0F8FF;
+  --region-border:    rgba(123,186,224,0.22);
+  --region-glow:      rgba(123,186,224,0.12);
+  --region-muted:     rgba(240,248,255,0.45);
+  --region-hero-a:    #040A14;
+  --region-hero-b:    #070F1C;
+}
+
+body[data-region="northern"] #region-pattern-overlay {
+  /* Sadu chevron / herringbone */
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgba(123,186,224,0.07) 0px, rgba(123,186,224,0.07) 2px,
+      transparent 2px, transparent 14px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(123,186,224,0.07) 0px, rgba(123,186,224,0.07) 2px,
+      transparent 2px, transparent 14px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(123,186,224,0.03) 0px, rgba(123,186,224,0.03) 1px,
+      transparent 1px, transparent 28px
+    );
+  background-size: 28px 28px;
+}
+
+/* ════════════════════════════════════════
+
+   9. JAZAN — Wave & Scale (Red Sea Coast)
+   Heritage: Farasan Islands (candidate) · Tihama coastal culture
+   Pattern: Fish-scale / wave repetition evoking the Red Sea coastline
+
+   ════════════════════════════════════════ */
+body[data-region="jazan"] {
+  --region-bg:        #001508;
+  --region-accent:    #2EC97A;
+  --region-accent-lt: #56DE9A;
+  --region-card:      #000F05;
+  --region-text:      #F0FFF8;
+  --region-border:    rgba(46,201,122,0.22);
+  --region-glow:      rgba(46,201,122,0.12);
+  --region-muted:     rgba(240,255,248,0.45);
+  --region-hero-a:    #000F05;
+  --region-hero-b:    #001508;
+}
+
+body[data-region="jazan"] #region-pattern-overlay {
+  /* Fish-scale / coastal wave */
+  background-image:
+    repeating-radial-gradient(
+      circle at 0 50%,
+      transparent 22px,
+      rgba(46,201,122,0.07) 23px,
+      rgba(46,201,122,0.07) 24px,
+      transparent 25px
+    ),
+    repeating-radial-gradient(
+      circle at 100% 50%,
+      transparent 22px,
+      rgba(46,201,122,0.07) 23px,
+      rgba(46,201,122,0.07) 24px,
+      transparent 25px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(46,201,122,0.025) 0px, rgba(46,201,122,0.025) 1px,
+      transparent 1px, transparent 24px
+    );
+  background-size: 48px 24px, 48px 24px, 100% 24px;
+}
+
+/* ════════════════════════════════════════
+
+   10. NAJRAN — Mud Brick (Qasr Architecture)
+   Heritage: Al-Ukhdud (candidate) · Najrani tower-house mud architecture
+   Pattern: Offset brick coursing typical of Najrani clay construction
+
+   ════════════════════════════════════════ */
+body[data-region="najran"] {
+  --region-bg:        #180A00;
+  --region-accent:    #E09B3D;
+  --region-accent-lt: #F0B860;
+  --region-card:      #100600;
+  --region-text:      #FFF8EC;
+  --region-border:    rgba(224,155,61,0.22);
+  --region-glow:      rgba(224,155,61,0.12);
+  --region-muted:     rgba(255,248,236,0.45);
+  --region-hero-a:    #100600;
+  --region-hero-b:    #180A00;
+}
+
+body[data-region="najran"] #region-pattern-overlay {
+  /* Mud-brick offset coursing */
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(224,155,61,0.08) 0px,  rgba(224,155,61,0.08) 1px,
+      transparent           1px,  transparent            18px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(224,155,61,0.06) 0px,  rgba(224,155,61,0.06) 1px,
+      transparent           1px,  transparent            32px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(224,155,61,0.03) 0px,  rgba(224,155,61,0.03) 1px,
+      transparent           1px,  transparent            32px
+    );
+  background-size: 32px 18px, 32px 18px, 32px 9px;
+  background-position: 0 0, 0 0, 16px 9px; /* offset for staggered brick */
+}
+
+/* ════════════════════════════════════════
+
+   11. AL-BAHAH — Mountain Terracing
+   Heritage: Asiri stone tower architecture (candidate) · Ghamdi oral poetry
+   Pattern: Diagonal parallel lines evoking agricultural mountain terraces
+
+   ════════════════════════════════════════ */
+body[data-region="albahah"] {
+  --region-bg:        #031508;
+  --region-accent:    #4DB865;
+  --region-accent-lt: #74CE86;
+  --region-card:      #020E05;
+  --region-text:      #EEF9EF;
+  --region-border:    rgba(77,184,101,0.22);
+  --region-glow:      rgba(77,184,101,0.12);
+  --region-muted:     rgba(238,249,239,0.45);
+  --region-hero-a:    #020E05;
+  --region-hero-b:    #031508;
+}
+
+body[data-region="albahah"] #region-pattern-overlay {
+  /* Mountain terraces — diagonal parallel lines */
+  background-image:
+    repeating-linear-gradient(
+      -18deg,
+      rgba(77,184,101,0.07) 0px, rgba(77,184,101,0.07) 1px,
+      transparent 1px, transparent 14px
+    ),
+    repeating-linear-gradient(
+      -18deg,
+      rgba(77,184,101,0.03) 0px, rgba(77,184,101,0.03) 1px,
+      transparent 1px, transparent 7px
+    );
+  background-size: 100% 14px, 100% 7px;
+}
+
+/* ════════════════════════════════════════
+
+   12. AL-JAWF — Radial Rose / Ancient Olive
+   Heritage: Dumat Al-Jandal (candidate) · Al-Jouf olive landscape
+   Pattern: Radial lines from center evoking rose petals / olive grove radii
+
+   ════════════════════════════════════════ */
+body[data-region="aljawf"] {
+  --region-bg:        #100608;
+  --region-accent:    #C46FA0;
+  --region-accent-lt: #DA94BC;
+  --region-card:      #0A0305;
+  --region-text:      #FFF0F8;
+  --region-border:    rgba(196,111,160,0.22);
+  --region-glow:      rgba(196,111,160,0.12);
+  --region-muted:     rgba(255,240,248,0.45);
+  --region-hero-a:    #0A0305;
+  --region-hero-b:    #100608;
+}
+
+body[data-region="aljawf"] #region-pattern-overlay {
+  /* Radial rose petal pattern */
+  background-image:
+    repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      rgba(196,111,160,0.06) 0deg,
+      rgba(196,111,160,0.06) 20deg,
+      transparent 20deg,
+      transparent 60deg
+    ),
+    repeating-radial-gradient(
+      circle,
+      rgba(196,111,160,0.04) 0px,
+      rgba(196,111,160,0.04) 1px,
+      transparent 1px,
+      transparent 44px
+    );
+  background-size: 88px 88px, 44px 44px;
+  background-position: center center;
+}
+
+/* ════════════════════════════════════════
+
+   13. AL-QASSIM — Palm Frond Fan
+   Heritage: Date Palm ICH RL01509 (2019) · Arabic Coffee ICH RL01073
+   Pattern: Radial fan lines mimicking date palm fronds
+
+   ════════════════════════════════════════ */
+body[data-region="alqassim"] {
+  --region-bg:        #180F00;
+  --region-accent:    #CFA020;
+  --region-accent-lt: #E3BE42;
+  --region-card:      #100A00;
+  --region-text:      #FFFAED;
+  --region-border:    rgba(207,160,32,0.22);
+  --region-glow:      rgba(207,160,32,0.12);
+  --region-muted:     rgba(255,250,237,0.45);
+  --region-hero-a:    #100A00;
+  --region-hero-b:    #180F00;
+}
+
+body[data-region="alqassim"] #region-pattern-overlay {
+  /* Palm frond radial fan */
+  background-image:
+    repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      rgba(207,160,32,0.07) 0deg,
+      rgba(207,160,32,0.07) 8deg,
+      transparent 8deg,
+      transparent 24deg
+    ),
+    repeating-radial-gradient(
+      circle,
+      rgba(207,160,32,0.05) 0px,
+      rgba(207,160,32,0.05) 1px,
+      transparent 1px,
+      transparent 60px
+    );
+  background-size: 120px 120px, 60px 60px;
+  background-position: center center;
+}
+
+/* ════════════════════════════════════════
+   HERO GRADIENT — ADAPTS PER REGION
+   ════════════════════════════════════════ */
+body[data-region] .hero::before {
+  background-image:
+    radial-gradient(circle at 20% 20%, var(--region-glow, rgba(201,168,76,0.08)) 0%, transparent 55%),
+    radial-gradient(circle at 80% 80%, var(--region-glow, rgba(201,168,76,0.05)) 0%, transparent 55%);
+}
+
+body[data-region] .hero {
+  background: linear-gradient(160deg, var(--region-hero-a, var(--region-bg)), var(--region-hero-b, var(--region-bg)));
+}
+
+/* ════════════════════════════════════════
+   DOT GRID ACCENT COLOR OVERRIDE
+   ════════════════════════════════════════ */
+body[data-region] .dot-grid span {
+  background: var(--region-accent);
+}
+
+body[data-region] .accent-bar {
+  background: linear-gradient(to bottom, transparent, var(--region-accent), transparent);
+}
+
+body[data-region] .hero-eyebrow {
+  color: var(--region-accent);
+}
+
+body[data-region] .hero-title span,
+body[data-region] .hero-arabic {
+  color: var(--region-accent-lt);
+}
+
+body[data-region] .track-badge {
+  background: var(--region-glow);
+  border-color: var(--region-border);
+  color: var(--region-accent);
+}
+
+body[data-region] .cat-card-top {
+  background: linear-gradient(90deg, var(--region-accent), var(--region-accent-lt));
+}
+
+body[data-region] .cat-card:hover {
+  border-color: var(--region-border);
+  box-shadow: 0 12px 40px var(--region-glow);
+}
+
+body[data-region] .cat-experience {
+  color: var(--region-accent);
+}
+
+/* ════════════════════════════════════════
+   GLOW HIGHLIGHT ON CARDS
+   ════════════════════════════════════════ */
+body[data-region] .card,
+body[data-region] .hub-card,
+body[data-region] .step-card,
+body[data-region] .verse-info {
+  box-shadow: 0 4px 24px var(--region-shadow, rgba(0,0,0,0.3)),
+              inset 0 0 0 1px var(--region-border);
+}
+
+/* ════════════════════════════════════════
+   NARRATOR BOX
+   ════════════════════════════════════════ */
+body[data-region] .narrator-box,
+body[data-region] .narrator-content {
+  border-left-color: var(--region-accent);
+  background: color-mix(in srgb, var(--region-card) 92%, transparent);
+}
+
+body[data-region] .narrator-label {
+  color: var(--region-accent);
+}
+
+/* ════════════════════════════════════════
+   HERITAGE BADGE STYLES (in region grid)
+   ════════════════════════════════════════ */
+.heritage-badge {
+  display: inline-block;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  padding: 2px 7px;
+  border-radius: 50px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.heritage-badge.verified {
+  background: rgba(46,204,113,0.18);
+  border: 1px solid rgba(46,204,113,0.45);
+  color: #56DE9A;
+}
+
+.heritage-badge.candidate {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.5);
+}
+
+/* ════════════════════════════════════════
+   IMPROVED REGION CARD — per-card accent
+   ════════════════════════════════════════ */
+.region-card:hover {
+  border-color: var(--card-accent, rgba(201,168,76,0.5));
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.45),
+    0 0 0 1px var(--card-accent, rgba(201,168,76,0.25));
+}
+
+/* ════════════════════════════════════════
+   SCORE BADGE & PROGRESS ACCENTS
+   ════════════════════════════════════════ */
+body[data-region] .score-badge {
+  background: var(--region-glow);
+  border-color: var(--region-border);
+  color: var(--region-accent);
+}
+
+body[data-region] .progress-fill,
+body[data-region] .prog-dot.active,
+body[data-region] .prog-dot.completed {
+  background: var(--region-accent);
+}
+
+body[data-region] .step-pip.active {
+  background: var(--region-accent);
+  box-shadow: 0 0 8px var(--region-glow);
+}
+
+body[data-region] .step-pip.done {
+  background: color-mix(in srgb, var(--region-accent) 60%, transparent);
+}
+
+/* ════════════════════════════════════════
+   SCROLLBAR THEMING
+   ════════════════════════════════════════ */
+body[data-region] ::-webkit-scrollbar-thumb {
+  background: var(--region-accent);
+  border-radius: 4px;
+}
+body[data-region] ::-webkit-scrollbar-track {
+  background: var(--region-card);
+}
+body[data-region] ::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* ════════════════════════════════════════
+   TEXT SELECTION HIGHLIGHT
+   ════════════════════════════════════════ */
+body[data-region] ::selection {
+  background: var(--region-accent);
+  color: var(--region-bg);
+}
