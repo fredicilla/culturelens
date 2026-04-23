@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="240" viewBox="0 0 360 240">
+  <defs>
+
+    <!-- 1. AL-QATT AL-ASIRI (Asir) — colorful geometric mural -->
+    <pattern id="p-asir" patternUnits="userSpaceOnUse" width="80" height="80">
+      <rect width="80" height="80" fill="#FDFAF2"/>
+      <rect x="0"  y="0"  width="20" height="20" fill="#E63946"/>
+      <rect x="20" y="0"  width="20" height="20" fill="#457B9D"/>
+      <rect x="40" y="0"  width="20" height="20" fill="#F4A261"/>
+      <rect x="60" y="0"  width="20" height="20" fill="#2A9D8F"/>
+      <rect x="0"  y="20" width="20" height="20" fill="#E9C46A"/>
+      <rect x="40" y="20" width="20" height="20" fill="#E63946"/>
+      <rect x="60" y="20" width="20" height="20" fill="#F4A261"/>
+      <rect x="10" y="30" width="10" height="10" fill="#264653"/>
+      <rect x="50" y="30" width="10" height="10" fill="#264653"/>
+      <rect x="0"  y="40" width="20" height="20" fill="#2A9D8F"/>
+      <rect x="20" y="40" width="20" height="20" fill="#E63946"/>
+      <rect x="40" y="40" width="20" height="20" fill="#E9C46A"/>
+      <rect x="60" y="40" width="20" height="20" fill="#457B9D"/>
+      <rect x="0"  y="60" width="20" height="20" fill="#F4A261"/>
+      <rect x="20" y="60" width="20" height="20" fill="#2A9D8F"/>
+      <rect x="40" y="60" width="20" height="20" fill="#264653"/>
+      <rect x="60" y="60" width="20" height="20" fill="#E63946"/>
+      <polygon points="10,5 15,15 5,15" fill="#FDFAF2"/>
+      <polygon points="50,5 55,15 45,15" fill="#FDFAF2"/>
+      <polygon points="30,45 35,55 25,55" fill="#264653"/>
+      <polygon points="70,45 75,55 65,55" fill="#E9C46A"/>
+    </pattern>
+
+    <!-- 2. NAJDI GEOMETRIC (Central) — diamonds on ochre -->
+    <pattern id="p-najd" patternUnits="userSpaceOnUse" width="60" height="60">
+      <rect width="60" height="60" fill="#F5E6C8"/>
+      <polygon points="30,5 55,30 30,55 5,30" fill="none" stroke="#8B5E1A" stroke-width="2"/>
+      <polygon points="30,15 45,30 30,45 15,30" fill="#C9962A" opacity="0.4"/>
+      <line x1="0" y1="0" x2="30" y2="30" stroke="#8B5E1A" stroke-width="1" opacity="0.3"/>
+      <line x1="60" y1="0" x2="30" y2="30" stroke="#8B5E1A" stroke-width="1" opacity="0.3"/>
+      <line x1="0" y1="60" x2="30" y2="30" stroke="#8B5E1A" stroke-width="1" opacity="0.3"/>
+      <line x1="60" y1="60" x2="30" y2="30" stroke="#8B5E1A" stroke-width="1" opacity="0.3"/>
+      <circle cx="30" cy="30" r="3" fill="#8B5E1A"/>
+      <circle cx="0"  cy="0"  r="2" fill="#C9962A"/>
+      <circle cx="60" cy="0"  r="2" fill="#C9962A"/>
+      <circle cx="0"  cy="60" r="2" fill="#C9962A"/>
+      <circle cx="60" cy="60" r="2" fill="#C9962A"/>
+    </pattern>
+
+    <!-- 3. ISLAMIC STAR (Medina) — 8-point star in green & gold -->
+    <pattern id="p-medina" patternUnits="userSpaceOnUse" width="80" height="80">
+      <rect width="80" height="80" fill="#0D3B2B"/>
+      <g fill="none" stroke="#C9962A" stroke-width="1">
+        <polygon points="40,10 48,24 64,24 52,34 56,50 40,42 24,50 28,34 16,24 32,24"/>
+        <polygon points="40,18 46,28 58,28 50,36 53,47 40,40 27,47 30,36 22,28 34,28"/>
+      </g>
+      <circle cx="40" cy="40" r="3" fill="#C9962A"/>
+      <circle cx="0"  cy="0"  r="2" fill="#C9962A" opacity="0.5"/>
+      <circle cx="80" cy="0"  r="2" fill="#C9962A" opacity="0.5"/>
+      <circle cx="0"  cy="80" r="2" fill="#C9962A" opacity="0.5"/>
+      <circle cx="80" cy="80" r="2" fill="#C9962A" opacity="0.5"/>
+    </pattern>
+
+    <!-- 4. BEDOUIN WUSUM (Northern / Ha'il) — petroglyph symbols -->
+    <pattern id="p-wusum" patternUnits="userSpaceOnUse" width="100" height="100">
+      <rect width="100" height="100" fill="#D4C9B0"/>
+      <g stroke="#5A4830" stroke-width="1.8" fill="none" opacity="0.7">
+        <line x1="20" y1="10" x2="20" y2="40"/>
+        <line x1="14" y1="20" x2="26" y2="20"/>
+        <line x1="14" y1="30" x2="26" y2="30"/>
+        <line x1="14" y1="20" x2="20" y2="10"/>
+        <line x1="26" y1="20" x2="20" y2="10"/>
+        <line x1="70" y1="60" x2="70" y2="90"/>
+        <line x1="60" y1="75" x2="80" y2="75"/>
+        <polygon points="70,60 60,75 80,75" fill="#5A4830" opacity="0.3"/>
+        <rect x="40" y="15" width="20" height="20" rx="2"/>
+        <line x1="50" y1="15" x2="50" y2="35"/>
+        <line x1="40" y1="25" x2="60" y2="25"/>
+        <circle cx="25" cy="70" r="8"/>
+        <line x1="17" y1="70" x2="33" y2="70"/>
+        <line x1="25" y1="62" x2="25" y2="78"/>
+        <line x1="80" y1="20" x2="95" y2="20"/>
+        <line x1="80" y1="25" x2="95" y2="25"/>
+        <line x1="80" y1="30" x2="95" y2="30"/>
+        <line x1="80" y1="20" x2="87" y2="10"/>
+        <line x1="95" y1="20" x2="87" y2="10"/>
+      </g>
+    </pattern>
+
+    <!-- 5. TRIBAL EMBROIDERY (Jizan / Najran) — thread & bead -->
+    <pattern id="p-southern" patternUnits="userSpaceOnUse" width="60" height="60">
+      <rect width="60" height="60" fill="#1C0A14"/>
+      <rect width="60" height="8" fill="#9B1D3C"/>
+      <rect y="52" width="60" height="8" fill="#9B1D3C"/>
+      <rect width="8" height="60" fill="#9B1D3C"/>
+      <rect x="52" width="8" height="60" fill="#9B1D3C"/>
+      <rect x="4"  y="4"  width="52" height="4" fill="#F5A623"/>
+      <rect x="4"  y="52" width="52" height="4" fill="#F5A623"/>
+      <rect x="4"  y="4"  width="4" height="52" fill="#F5A623"/>
+      <rect x="52" y="4"  width="4" height="52" fill="#F5A623"/>
+      <polygon points="30,16 36,24 30,32 24,24" fill="#F5A623"/>
+      <polygon points="30,28 36,36 30,44 24,36" fill="#9B1D3C"/>
+      <line x1="16" y1="16" x2="44" y2="44" stroke="#F5A623" stroke-width="1" opacity="0.4"/>
+      <line x1="44" y1="16" x2="16" y2="44" stroke="#F5A623" stroke-width="1" opacity="0.4"/>
+      <circle cx="30" cy="30" r="3" fill="#F5A623"/>
+      <circle cx="16" cy="16" r="2" fill="#F5A623"/>
+      <circle cx="44" cy="16" r="2" fill="#F5A623"/>
+      <circle cx="16" cy="44" r="2" fill="#F5A623"/>
+      <circle cx="44" cy="44" r="2" fill="#F5A623"/>
+    </pattern>
+
+    <!-- 6. PALM & HARVEST (Qassim) — palm frond + dates -->
+    <pattern id="p-palm" patternUnits="userSpaceOnUse" width="80" height="80">
+      <rect width="80" height="80" fill="#EDD9A3"/>
+      <g fill="#5C7A1F" opacity="0.7">
+        <ellipse cx="40" cy="40" rx="3" ry="20" transform="rotate(-30 40 40)"/>
+        <ellipse cx="40" cy="40" rx="3" ry="20" transform="rotate(30 40 40)"/>
+        <ellipse cx="40" cy="40" rx="3" ry="18" transform="rotate(0 40 40)"/>
+        <ellipse cx="40" cy="40" rx="2" ry="15" transform="rotate(-60 40 40)"/>
+        <ellipse cx="40" cy="40" rx="2" ry="15" transform="rotate(60 40 40)"/>
+      </g>
+      <line x1="40" y1="55" x2="40" y2="75" stroke="#7A5C1F" stroke-width="2.5" fill="none"/>
+      <circle cx="40" cy="55" r="3" fill="#8B5E1A"/>
+      <circle cx="37" cy="58" r="2.5" fill="#C9962A"/>
+      <circle cx="43" cy="58" r="2.5" fill="#C9962A"/>
+      <circle cx="40" cy="62" r="2.5" fill="#8B5E1A"/>
+      <g fill="#5C7A1F" opacity="0.2">
+        <ellipse cx="0"  cy="15" rx="3" ry="14" transform="rotate(-30 0 15)"/>
+        <ellipse cx="80" cy="65" rx="3" ry="14" transform="rotate(30 80 65)"/>
+      </g>
+    </pattern>
+
+    <!-- clip each cell to 120×120 -->
+    <clipPath id="c1"><rect x="0"   y="0"   width="120" height="120"/></clipPath>
+    <clipPath id="c2"><rect x="120" y="0"   width="120" height="120"/></clipPath>
+    <clipPath id="c3"><rect x="240" y="0"   width="120" height="120"/></clipPath>
+    <clipPath id="c4"><rect x="0"   y="120" width="120" height="120"/></clipPath>
+    <clipPath id="c5"><rect x="120" y="120" width="120" height="120"/></clipPath>
+    <clipPath id="c6"><rect x="240" y="120" width="120" height="120"/></clipPath>
+  </defs>
+
+  <!-- 6 patchwork cells, each 120×120 -->
+  <g clip-path="url(#c1)"><rect x="0"   y="0"   width="120" height="120" fill="url(#p-asir)"/></g>
+  <g clip-path="url(#c2)"><rect x="120" y="0"   width="120" height="120" fill="url(#p-najd)"/></g>
+  <g clip-path="url(#c3)"><rect x="240" y="0"   width="120" height="120" fill="url(#p-medina)"/></g>
+  <g clip-path="url(#c4)"><rect x="0"   y="120" width="120" height="120" fill="url(#p-wusum)"/></g>
+  <g clip-path="url(#c5)"><rect x="120" y="120" width="120" height="120" fill="url(#p-southern)"/></g>
+  <g clip-path="url(#c6)"><rect x="240" y="120" width="120" height="120" fill="url(#p-palm)"/></g>
+
+  <!-- gold "stitching" between squares -->
+  <g stroke="#C9962A" stroke-width="1.5" stroke-dasharray="3 3" fill="none" opacity="0.85">
+    <line x1="120" y1="0" x2="120" y2="240"/>
+    <line x1="240" y1="0" x2="240" y2="240"/>
+    <line x1="0"   y1="120" x2="360" y2="120"/>
+  </g>
+
+  <!-- subtle outer frame per cell -->
+  <g stroke="rgba(0,0,0,0.25)" stroke-width="0.75" fill="none">
+    <rect x="0"   y="0"   width="120" height="120"/>
+    <rect x="120" y="0"   width="120" height="120"/>
+    <rect x="240" y="0"   width="120" height="120"/>
+    <rect x="0"   y="120" width="120" height="120"/>
+    <rect x="120" y="120" width="120" height="120"/>
+    <rect x="240" y="120" width="120" height="120"/>
+  </g>
+</svg>

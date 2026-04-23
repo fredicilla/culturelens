@@ -1,5 +1,4 @@
 ﻿/* ── CultureLens Shared Styles ── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 @import url('https://cdn.jsdelivr.net/gh/mokhtarbsaid/saudi-font/all.min.css');
 
 :root {
@@ -89,14 +88,28 @@ body {
   width: 100%;
   min-height: 100dvh;
   min-height: 100vh;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: var(--region-bg);
+  font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
+  background-color: var(--region-bg);
+  background-image: url('patchwork-bg.svg');
+  background-repeat: repeat;
+  background-size: 180px 120px;
+  background-attachment: fixed;
   color: var(--region-text);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  transition: background 0.8s ease, color 0.8s ease;
+  transition: background-color 0.8s ease, color 0.8s ease;
   overscroll-behavior-y: none;
 }
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--region-bg) 35%, transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+body > * { position: relative; z-index: 1; }
 
 /* ── HEADER ── */
 .cl-header {
@@ -120,7 +133,7 @@ body {
 }
 
 .cl-header .logo {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
   font-size: 20px;
   font-weight: 700;
   color: var(--white);
@@ -224,7 +237,7 @@ body {
   border-radius: 50px;
   background: var(--region-accent);
   color: var(--region-bg);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
   font-weight: 700;
   font-size: 15px;
   border: none;
@@ -253,7 +266,7 @@ body {
   border-radius: 50px;
   background: transparent;
   color: var(--region-accent);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
   font-weight: 600;
   font-size: 14px;
   border: 1.5px solid var(--region-accent);
@@ -531,7 +544,7 @@ body {
 }
 
 .hub-title {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
   font-size: 28px;
   color: var(--white);
   font-weight: 700;
@@ -605,7 +618,7 @@ body {
 }
 
 .hub-card-title {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
   font-size: 18px;
   color: var(--white);
   font-weight: 700;
@@ -918,7 +931,7 @@ html[dir="rtl"] .hub-card-ar {
 .pulse-panel h4 {
   color: var(--region-accent);
   margin-bottom: 8px;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
   font-size: 16px;
 }
 
@@ -929,7 +942,7 @@ html[dir="rtl"] .hub-card-ar {
   color: var(--region-text);
   border-radius: 8px;
   padding: 8px;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
   font-size: 12px;
   resize: vertical;
 }
@@ -990,7 +1003,7 @@ body[data-region="northern"] { --region-bg:#070F1C; --region-accent:#7BBAE0; --r
 }
 
 .modal-title {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
   font-size: clamp(26px, 7vw, 40px);
   font-weight: 700;
   color: #fff;
@@ -1062,7 +1075,7 @@ body[data-region="northern"] { --region-bg:#070F1C; --region-accent:#7BBAE0; --r
 }
 
 .region-card-name {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
   font-size: 13px;
   font-weight: 700;
   color: #fff;
@@ -1256,7 +1269,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    background: #0a0a0a;
+    background-color: #0a0a0a;
   }
   .regional-theme-container,
   #region-modal {

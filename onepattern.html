@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Saudi Regional Pattern Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --gold: #C9962A;
+    --dark: #1a1208;
+    --cream: #f5efe0;
+    --text: #2a1f0a;
+    --card-bg: #fffdf7;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--dark);
+    color: var(--cream);
+    font-family: 'Tajawal', sans-serif;
+    min-height: 100vh;
+  }
+
+  header {
+    text-align: center;
+    padding: 48px 24px 32px;
+    border-bottom: 1px solid rgba(201,150,42,0.3);
+    background: rgba(0,0,0,0.3);
+  }
+
+  header h1 {
+    font-family: 'Amiri', serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  header p {
+    font-size: 0.95rem;
+    opacity: 0.65;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 28px;
+    padding: 40px 32px;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .card {
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(201,150,42,0.25);
+    background: var(--card-bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  }
+
+  .preview {
+    height: 200px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .preview svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .info {
+    padding: 20px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .region-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-bottom: 10px;
+    background: var(--gold);
+    color: white;
+  }
+
+  .info h2 {
+    font-family: 'Amiri', serif;
+    font-size: 1.25rem;
+    margin-bottom: 6px;
+    color: var(--dark);
+  }
+
+  .info p {
+    font-size: 0.82rem;
+    opacity: 0.65;
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 9px 14px;
+    font-size: 0.78rem;
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    border-radius: 2px;
+    border: none;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--dark);
+    color: var(--gold);
+    border: 1px solid var(--dark);
+  }
+
+  .btn-primary:hover { background: #2d1f0a; }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid rgba(0,0,0,0.18);
+  }
+
+  .btn-secondary:hover { background: rgba(0,0,0,0.05); }
+
+  /* ---- MODAL ---- */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--card-bg);
+    color: var(--text);
+    border-radius: 4px;
+    max-width: 700px;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid rgba(201,150,42,0.4);
+  }
+
+  .modal-preview {
+    height: 220px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .modal-preview svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .modal-body { padding: 24px; }
+
+  .modal-body h3 {
+    font-family: 'Amiri', serif;
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+  }
+
+  .modal-body .desc {
+    font-size: 0.85rem;
+    opacity: 0.6;
+    margin-bottom: 16px;
+  }
+
+  .code-block {
+    background: #1a1208;
+    color: #e8d5a3;
+    border-radius: 3px;
+    padding: 16px;
+    font-size: 0.75rem;
+    font-family: monospace;
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+    margin-bottom: 14px;
+  }
+
+  .modal-actions { display: flex; gap: 10px; }
+
+  .close-btn {
+    margin-top: 0;
+    background: transparent;
+    border: 1px solid rgba(0,0,0,0.2);
+    color: var(--text);
+    padding: 9px 18px;
+    cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 0.82rem;
+    border-radius: 2px;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--gold);
+    color: white;
+    padding: 10px 24px;
+    border-radius: 2px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    transition: transform 0.3s;
+    z-index: 200;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Saudi Regional Pattern Library</h1>
+  <p>Traditional patterns from across the Kingdom — ready to use as CSS backgrounds in your webapp</p>
+</header>
+
+<div class="grid" id="grid"></div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-preview" id="modalPreview"></div>
+    <div class="modal-body">
+      <h3 id="modalTitle"></h3>
+      <p class="desc" id="modalDesc"></p>
+      <div class="code-block" id="modalCode"></div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="copyCode()">Copy CSS</button>
+        <button class="close-btn" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">CSS Copied!</div>
+
+<script>
+const patterns = [
+  {
+    region: "Asir",
+    name: "Al-Qatt Al-Asiri",
+    unesco: true,
+    desc: "UNESCO-inscribed (2017). Colorful geometric murals painted by women on interior walls — bold angular shapes, high contrast, layered symbols.",
+    colors: ["#E63946","#457B9D","#F4A261","#2A9D8F","#E9C46A","#264653"],
+    svgPattern: `<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'>
+      <rect width='80' height='80' fill='#FDFAF2'/>
+      <rect x='0' y='0' width='20' height='20' fill='#E63946'/>
+      <rect x='20' y='0' width='20' height='20' fill='#457B9D'/>
+      <rect x='40' y='0' width='20' height='20' fill='#F4A261'/>
+      <rect x='60' y='0' width='20' height='20' fill='#2A9D8F'/>
+      <rect x='0' y='20' width='20' height='20' fill='#E9C46A'/>
+      <rect x='20' y='20' width='20' height='20' fill='#FDFAF2'/>
+      <rect x='40' y='20' width='20' height='20' fill='#E63946'/>
+      <rect x='60' y='20' width='20' height='20' fill='#F4A261'/>
+      <rect x='10' y='30' width='10' height='10' fill='#264653'/>
+      <rect x='50' y='30' width='10' height='10' fill='#264653'/>
+      <rect x='0' y='40' width='20' height='20' fill='#2A9D8F'/>
+      <rect x='20' y='40' width='20' height='20' fill='#E63946'/>
+      <rect x='40' y='40' width='20' height='20' fill='#E9C46A'/>
+      <rect x='60' y='40' width='20' height='20' fill='#457B9D'/>
+      <rect x='0' y='60' width='20' height='20' fill='#F4A261'/>
+      <rect x='20' y='60' width='20' height='20' fill='#2A9D8F'/>
+      <rect x='40' y='60' width='20' height='20' fill='#264653'/>
+      <rect x='60' y='60' width='20' height='20' fill='#E63946'/>
+      <polygon points='10,5 15,15 5,15' fill='#FDFAF2'/>
+      <polygon points='50,5 55,15 45,15' fill='#FDFAF2'/>
+      <polygon points='30,45 35,55 25,55' fill='#264653'/>
+      <polygon points='70,45 75,55 65,55' fill='#E9C46A'/>
+    </svg>`,
+    css: `background-color: #FDFAF2;
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23FDFAF2'/%3E%3Crect x='0' y='0' width='20' height='20' fill='%23E63946'/%3E%3Crect x='20' y='0' width='20' height='20' fill='%23457B9D'/%3E%3Crect x='40' y='0' width='20' height='20' fill='%23F4A261'/%3E%3Crect x='60' y='0' width='20' height='20' fill='%232A9D8F'/%3E%3Crect x='0' y='20' width='20' height='20' fill='%23E9C46A'/%3E%3Crect x='40' y='20' width='20' height='20' fill='%23E63946'/%3E%3Crect x='60' y='20' width='20' height='20' fill='%23F4A261'/%3E%3Crect x='10' y='30' width='10' height='10' fill='%23264653'/%3E%3Crect x='50' y='30' width='10' height='10' fill='%23264653'/%3E%3Crect x='0' y='40' width='20' height='20' fill='%232A9D8F'/%3E%3Crect x='20' y='40' width='20' height='20' fill='%23E63946'/%3E%3Crect x='40' y='40' width='20' height='20' fill='%23E9C46A'/%3E%3Crect x='60' y='40' width='20' height='20' fill='%23457B9D'/%3E%3Crect x='0' y='60' width='20' height='20' fill='%23F4A261'/%3E%3Crect x='20' y='60' width='20' height='20' fill='%232A9D8F'/%3E%3Crect x='40' y='60' width='20' height='20' fill='%23264653'/%3E%3Crect x='60' y='60' width='20' height='20' fill='%23E63946'/%3E%3C/svg%3E");
+background-size: 80px 80px;`
+  },
+  {
+    region: "Najd / Central",
+    name: "Najdi Geometric",
+    unesco: false,
+    desc: "Inspired by Najdi mud-brick architecture — repeating diamond and chevron motifs carved in plasterwork. Earthy ochres, sand, and warm brown.",
+    svgPattern: `<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60'>
+      <rect width='60' height='60' fill='#F5E6C8'/>
+      <polygon points='30,5 55,30 30,55 5,30' fill='none' stroke='#8B5E1A' stroke-width='2'/>
+      <polygon points='30,15 45,30 30,45 15,30' fill='#C9962A' opacity='0.4'/>
+      <line x1='0' y1='0' x2='30' y2='30' stroke='#8B5E1A' stroke-width='1' opacity='0.3'/>
+      <line x1='60' y1='0' x2='30' y2='30' stroke='#8B5E1A' stroke-width='1' opacity='0.3'/>
+      <line x1='0' y1='60' x2='30' y2='30' stroke='#8B5E1A' stroke-width='1' opacity='0.3'/>
+      <line x1='60' y1='60' x2='30' y2='30' stroke='#8B5E1A' stroke-width='1' opacity='0.3'/>
+      <circle cx='30' cy='30' r='3' fill='#8B5E1A'/>
+      <circle cx='0' cy='0' r='2' fill='#C9962A'/>
+      <circle cx='60' cy='0' r='2' fill='#C9962A'/>
+      <circle cx='0' cy='60' r='2' fill='#C9962A'/>
+      <circle cx='60' cy='60' r='2' fill='#C9962A'/>
+    </svg>`,
+    css: `background-color: #F5E6C8;
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%23F5E6C8'/%3E%3Cpolygon points='30%2C5 55%2C30 30%2C55 5%2C30' fill='none' stroke='%238B5E1A' stroke-width='2'/%3E%3Cpolygon points='30%2C15 45%2C30 30%2C45 15%2C30' fill='%23C9962A' opacity='0.4'/%3E%3Cline x1='0' y1='0' x2='30' y2='30' stroke='%238B5E1A' stroke-width='1' opacity='0.3'/%3E%3Cline x1='60' y1='0' x2='30' y2='30' stroke='%238B5E1A' stroke-width='1' opacity='0.3'/%3E%3Cline x1='0' y1='60' x2='30' y2='30' stroke='%238B5E1A' stroke-width='1' opacity='0.3'/%3E%3Cline x1='60' y1='60' x2='30' y2='30' stroke='%238B5E1A' stroke-width='1' opacity='0.3'/%3E%3Ccircle cx='30' cy='30' r='3' fill='%238B5E1A'/%3E%3C/svg%3E");
+background-size: 60px 60px;`
+  },
+  {
+    region: "Hijaz / Western",
+    name: "Mashrabiya Lattice",
+    unesco: false,
+    desc: "Based on the carved wooden Mashrabiya screens of Jeddah's historic Al-Balad district — interlocking star and polygon forms filtering light.",
+    svgPattern: `<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'>
+      <rect width='80' height='80' fill='#F0EAD6'/>
+      <g stroke='#5C3D11' stroke-width='1.5' fill='none'>
+        <polygon points='40,10 52,20 52,36 40,46 28,36 28,20'/>
+        <polygon points='40,34 52,44 52,60 40,70 28,60 28,44'/>
+        <polygon points='16,0 28,10 28,26 16,36 4,26 4,10'/>
+        <polygon points='64,0 76,10 76,26 64,36 52,26 52,10'/>
+        <polygon points='16,44 28,54 28,70 16,80 4,70 4,54'/>
+        <polygon points='64,44 76,54 76,70 64,80 52,70 52,54'/>
+      </g>
+      <g fill='#C9962A' opacity='0.2'>
+        <polygon points='40,10 52,20 52,36 40,46 28,36 28,20'/>
+      </g>
+    </svg>`,
+    css: `background-color: #F0EAD6;
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23F0EAD6'/%3E%3Cg stroke='%235C3D11' stroke-width='1.5' fill='none'%3E%3Cpolygon points='40%2C10 52%2C20 52%2C36 40%2C46 28%2C36 28%2C20'/%3E%3Cpolygon points='40%2C34 52%2C44 52%2C60 40%2C70 28%2C60 28%2C44'/%3E%3Cpolygon points='16%2C0 28%2C10 28%2C26 16%2C36 4%2C26 4%2C10'/%3E%3Cpolygon points='64%2C0 76%2C10 76%2C26 64%2C36 52%2C26 52%2C10'/%3E%3Cpolygon points='16%2C44 28%2C54 28%2C70 16%2C80 4%2C70 4%2C54'/%3E%3Cpolygon points='64%2C44 76%2C54 76%2C70 64%2C80 52%2C70 52%2C54'/%3E%3C/g%3E%3C/svg%3E");
+background-size: 80px 80px;`
+  },
+  {
+    region: "Eastern Province",
+    name: "Al-Sadu Tribal Weave",
+    unesco: true,
+    desc: "UNESCO-inscribed (2020). Bedouin weaving tradition of the eastern desert — bold horizontal stripes interlocked with diamond lozenges in wool tones.",
+    svgPattern: `<svg xmlns='http://www.w3.org/2000/svg' width='100' height='40'>
+      <rect width='100' height='40' fill='#1A0A00'/>
+      <rect y='0' width='100' height='6' fill='#8B1A1A'/>
+      <rect y='6' width='100' height='3' fill='#C9962A'/>
+      <rect y='9' width='100' height='6' fill='#F5DEB3'/>
+      <rect y='15' width='100' height='3' fill='#C9962A'/>
+      <rect y='18' width='100' height='4' fill='#1A0A00'/>
+      <rect y='22' width='100' height='3' fill='#C9962A'/>
+      <rect y='25' width='100' height='6' fill='#F5DEB3'/>
+      <rect y='31' width='100' height='3' fill='#C9962A'/>
+      <rect y='34' width='100' height='6' fill='#8B1A1A'/>
+      <polygon points='10,0 20,10 10,20 0,10' fill='#C9962A' opacity='0.6'/>
+      <polygon points='30,0 40,10 30,20 20,10' fill='#8B1A1A' opacity='0.6'/>
+      <polygon points='50,0 60,10 50,20 40,10' fill='#C9962A' opacity='0.6'/>
+      <polygon points='70,0 80,10 70,20 60,10' fill='#8B1A1A' opacity='0.6'/>
+      <polygon points='90,0 100,10 90,20 80,10' fill='#C9962A' opacity='0.6'/>
+      <polygon points='10,20 20,30 10,40 0,30' fill='#F5DEB3' opacity='0.4'/>
+      <polygon points='50,20 60,30 50,40 40,30' fill='#F5DEB3' opacity='0.4'/>
+      <polygon points='90,20 100,30 90,40 80,30' fill='#F5DEB3' opacity='0.4'/>
+    </svg>`,
+    css: `background-color: #1A0A00;
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='40'%3E%3Crect width='100' height='40' fill='%231A0A00'/%3E%3Crect y='0' width='100' height='6' fill='%238B1A1A'/%3E%3Crect y='6' width='100' height='3' fill='%23C9962A'/%3E%3Crect y='9' width='100' height='6' fill='%23F5DEB3'/%3E%3Crect y='15' width='100' height='3' fill='%23C9962A'/%3E%3Crect y='18' width='100' height='4' fill='%231A0A00'/%3E%3Crect y='22' width='100' height='3' fill='%23C9962A'/%3E%3Crect y='25' width='100' height='6' fill='%23F5DEB3'/%3E%3Crect y='31' width='100' height='3' fill='%23C9962A'/%3E%3Crect y='34' width='100' height='6' fill='%238B1A1A'/%3E%3Cpolygon points='10%2C0 20%2C10 10%2C20 0%2C10' fill='%23C9962A' opacity='0.6'/%3E%3Cpolygon points='50%2C0 60%2C10 50%2C20 40%2C10' fill='%23C9962A' opacity='0.6'/%3E%3Cpolygon points='90%2C0 100%2C10 90%2C20 80%2C10' fill='%23C9962A' opacity='0.6'/%3E%3C/svg%3E");
+background-size: 100px 40px;`
+  },
+  {
+    region: "Southern (Jizan / Najran)",
+    name: "Tribal Embroidery",
+    unesco: false,
+    desc: "Inspired by the colorful thread-and-bead embroidery of southern Saudi thawbs — dense repeated diamond borders with vibrant cross-stitch motifs.",
+    svgPattern: `<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60'>
+      <rect width='60' height='60' fill='#1C0A14'/>
+      <rect width='60' height='8' fill='#9B1D3C'/>
+      <rect y='52' width='60' height='8' fill='#9B1D3C'/>
+      <rect width='8' height='60' fill='#9B1D3C'/>
+      <rect x='52' width='8' height='60' fill='#9B1D3C'/>
+      <rect x='4' y='4' width='52' height='4' fill='#F5A623'/>
+      <rect x='4' y='52' width='52' height='4' fill='#F5A623'/>
+      <rect x='4' y='4' width='4' height='52' fill='#F5A623'/>
+      <rect x='52' y='4' width='4' height='52' fill='#F5A623'/>
+      <polygon points='30,16 36,24 30,32 24,24' fill='#F5A623'/>
+      <polygon points='30,28 36,36 30,44 24,36' fill='#9B1D3C'/>
+      <line x1='16' y1='16' x2='44' y2='44' stroke='#F5A623' stroke-width='1' opacity='0.4'/>
+      <line x1='44' y1='16' x2='16' y2='44' stroke='#F5A623' stroke-width='1' opacity='0.4'/>
+      <circle cx='30' cy='30' r='3' fill='#F5A623'/>
+      <circle cx='16' cy='16' r='2' fill='#F5A623'/>
+      <circle cx='44' cy='16' r='2' fill='#F5A623'/>
+      <circle cx='16' cy='44' r='2' fill='#F5A623'/>
+      <circle cx='44' cy='44' r='2' fill='#F5A623'/>
+    </svg>`,
+    css: `background-color: #1C0A14;
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%231C0A14'/%3E%3Crect width='60' height='8' fill='%239B1D3C'/%3E%3Crect y='52' width='60' height='8' fill='%239B1D3C'/%3E%3Crect width='8' height='60' fill='%239B1D3C'/%3E%3Crect x='52' width='8' height='60' fill='%239B1D3C'/%3E%3Crect x='4' y='4' width='52' height='4' fill='%23F5A623'/%3E%3Crect x='4' y='52' width='52' height='4' fill='%23F5A623'/%3E%3Crect x='4' y='4' width='4' height='52' fill='%23F5A623'/%3E%3Crect x='52' y='4' width='4' height='52' fill='%23F5A623'/%3E%3Cpolygon points='30%2C16 36%2C24 30%2C32 24%2C24' fill='%23F5A623'/%3E%3Cpolygon points='30%2C28 36%2C36 30%2C44 24%2C36' fill='%239B1D3C'/%3E%3Ccircle cx='30' cy='30' r='3' fill='%23F5A623'/%3E%3C/svg%3E");
+background-size: 60px 60px;`
+  },
+  {
+    region: "Northern (Ha'il / Jouf / Tabuk)",
+    name: "Bedouin Wusum",
+    unesco: false,
+    desc: "Inspired by ancient Bedouin tribal rock carvings (wusum) of Ha'il — sparse angular symbols on stone-grey ground, echoing petroglyphs.",
+    svgPattern: `<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'>
+      <rect width='100' height='100' fill='#D4C9B0'/>
+      <g stroke='#5A4830' stroke-width='1.8' fill='none' opacity='0.7'>
+        <line x1='20' y1='10' x2='20' y2='40'/>
+        <line x1='14' y1='20' x2='26' y2='20'/>
+        <line x1='14' y1='30' x2='26' y2='30'/>
+        <line x1='14' y1='20' x2='20' y2='10'/>
+        <line x1='26' y1='20' x2='20' y2='10'/>
+        <line x1='70' y1='60' x2='70' y2='90'/>
+        <line x1='60' y1='75' x2='80' y2='75'/>
+        <polygon points='70,60 60,75 80,75' fill='#5A4830' opacity='0.3'/>
+        <rect x='40' y='15' width='20' height='20' rx='2'/>
+        <line x1='50' y1='15' x2='50' y2='35'/>
+        <line x1='40' y1='25' x2='60' y2='25'/>
+        <circle cx='25' cy='70' r='8'/>
+        <line x1='17' y1='70' x2='33' y2='70'/>
+        <line x1='25' y1='62' x2='25' y2='78'/>
+        <line x1='80' y1='20' x2='95' y2='20'/>
+        <line x1='80' y1='25' x2='95' y2='25'/>
+        <line x1='80' y1='30' x2='95' y2='30'/>
+        <line x1='80' y1='20' x2='87' y2='10'/>
+        <line x1='95' y1='20' x2='87' y2='10'/>
+      </g>
+    </svg>`,
+    css: `background-color: #D4C9B0;
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23D4C9B0'/%3E%3Cg stroke='%235A4830' stroke-width='1.8' fill='none' opacity='0.7'%3E%3Cline x1='20' y1='10' x2='20' y2='40'/%3E%3Cline x1='14' y1='20' x2='26' y2='20'/%3E%3Cline x1='14' y1='30' x2='26' y2='30'/%3E%3Cline x1='14' y1='20' x2='20' y2='10'/%3E%3Cline x1='26' y1='20' x2='20' y2='10'/%3E%3Cline x1='70' y1='60' x2='70' y2='90'/%3E%3Cline x1='60' y1='75' x2='80' y2='75'/%3E%3Cpolygon points='70%2C60 60%2C75 80%2C75' fill='%235A4830' opacity='0.3'/%3E%3Crect x='40' y='15' width='20' height='20' rx='2'/%3E%3Cline x1='50' y1='15' x2='50' y2='35'/%3E%3Cline x1='40' y1='25' x2='60' y2='25'/%3E%3Ccircle cx='25' cy='70' r='8'/%3E%3Cline x1='17' y1='70' x2='33' y2='70'/%3E%3Cline x1='25' y1='62' x2='25' y2='78'/%3E%3C/g%3E%3C/svg%3E");
+background-size: 100px 100px;`
+  },
+  {
+    region: "Medina / Hijaz Interior",
+    name: "Islamic Star Geometry",
+    unesco: false,
+    desc: "Rooted in the geometric tradition of Medina's sacred architecture — repeating 8-point star tessellation in deep green and gold, referencing mosque tilework.",
+    svgPattern: `<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'>
+      <rect width='80' height='80' fill='#0D3B2B'/>
+      <g fill='none' stroke='#C9962A' stroke-width='1'>
+        <polygon points='40,10 48,24 64,24 52,34 56,50 40,42 24,50 28,34 16,24 32,24'/>
+        <polygon points='40,18 46,28 58,28 50,36 53,47 40,40 27,47 30,36 22,28 34,28'/>
+        <polygon points='0,0 8,14 24,14 12,24 16,40 0,32 -16,40 -12,24 -24,14 -8,14'/>
+        <polygon points='80,0 88,14 104,14 92,24 96,40 80,32 64,40 68,24 56,14 72,14'/>
+        <polygon points='0,80 8,94 24,94 12,104 16,120 0,112 -16,120 -12,104 -24,94 -8,94'/>
+        <polygon points='80,80 88,94 104,94 92,104 96,120 80,112 64,120 68,104 56,94 72,94'/>
+      </g>
+      <circle cx='40' cy='40' r='3' fill='#C9962A'/>
+      <circle cx='0' cy='0' r='2' fill='#C9962A' opacity='0.5'/>
+      <circle cx='80' cy='0' r='2' fill='#C9962A' opacity='0.5'/>
+      <circle cx='0' cy='80' r='2' fill='#C9962A' opacity='0.5'/>
+      <circle cx='80' cy='80' r='2' fill='#C9962A' opacity='0.5'/>
+    </svg>`,
+    css: `background-color: #0D3B2B;
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%230D3B2B'/%3E%3Cg fill='none' stroke='%23C9962A' stroke-width='1'%3E%3Cpolygon points='40%2C10 48%2C24 64%2C24 52%2C34 56%2C50 40%2C42 24%2C50 28%2C34 16%2C24 32%2C24'/%3E%3Cpolygon points='40%2C18 46%2C28 58%2C28 50%2C36 53%2C47 40%2C40 27%2C47 30%2C36 22%2C28 34%2C28'/%3E%3C/g%3E%3Ccircle cx='40' cy='40' r='3' fill='%23C9962A'/%3E%3C/svg%3E");
+background-size: 80px 80px;`
+  },
+  {
+    region: "Qassim / Ha'il",
+    name: "Palm & Harvest",
+    unesco: false,
+    desc: "From the agricultural heartland of Qassim — stylized palm frond and date cluster motifs repeated across a warm sand-dune ground.",
+    svgPattern: `<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'>
+      <rect width='80' height='80' fill='#EDD9A3'/>
+      <g fill='#5C7A1F' opacity='0.7'>
+        <line x1='40' y1='55' x2='40' y2='75' stroke='#7A5C1F' stroke-width='2.5' fill='none'/>
+        <ellipse cx='40' cy='40' rx='3' ry='20' transform='rotate(-30 40 40)'/>
+        <ellipse cx='40' cy='40' rx='3' ry='20' transform='rotate(30 40 40)'/>
+        <ellipse cx='40' cy='40' rx='3' ry='18' transform='rotate(0 40 40)'/>
+        <ellipse cx='40' cy='40' rx='2' ry='15' transform='rotate(-60 40 40)'/>
+        <ellipse cx='40' cy='40' rx='2' ry='15' transform='rotate(60 40 40)'/>
+      </g>
+      <circle cx='40' cy='55' r='3' fill='#8B5E1A'/>
+      <circle cx='37' cy='58' r='2.5' fill='#C9962A'/>
+      <circle cx='43' cy='58' r='2.5' fill='#C9962A'/>
+      <circle cx='40' cy='62' r='2.5' fill='#8B5E1A'/>
+      <g fill='#5C7A1F' opacity='0.2'>
+        <ellipse cx='0' cy='15' rx='3' ry='14' transform='rotate(-30 0 15)'/>
+        <ellipse cx='80' cy='65' rx='3' ry='14' transform='rotate(30 80 65)'/>
+      </g>
+    </svg>`,
+    css: `background-color: #EDD9A3;
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23EDD9A3'/%3E%3Cg fill='%235C7A1F' opacity='0.7'%3E%3Cellipse cx='40' cy='40' rx='3' ry='20' transform='rotate(-30 40 40)'/%3E%3Cellipse cx='40' cy='40' rx='3' ry='20' transform='rotate(30 40 40)'/%3E%3Cellipse cx='40' cy='40' rx='3' ry='18' transform='rotate(0 40 40)'/%3E%3C/g%3E%3Ccircle cx='40' cy='55' r='3' fill='%238B5E1A'/%3E%3Ccircle cx='37' cy='58' r='2.5' fill='%23C9962A'/%3E%3Ccircle cx='43' cy='58' r='2.5' fill='%23C9962A'/%3E%3C/svg%3E");
+background-size: 80px 80px;`
+  }
+];
+
+let currentPattern = null;
+
+function buildGrid() {
+  const grid = document.getElementById('grid');
+  patterns.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="preview" style="background:${previewBg(p)};${p.css.split('\n').slice(1).join('\n')}">
+        ${p.svgPattern}
+      </div>
+      <div class="info">
+        <div>
+          <span class="region-badge">${p.region}</span>
+          ${p.unesco ? '<span class="region-badge" style="background:#2A9D8F;margin-left:4px">UNESCO ✓</span>' : ''}
+        </div>
+        <h2>${p.name}</h2>
+        <p>${p.desc}</p>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="openModal(${i})">View CSS</button>
+          <button class="btn btn-secondary" onclick="quickCopy(${i},this)">Copy</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function previewBg(p) {
+  const first = p.css.split('\n')[0];
+  return first.replace('background-color:','').trim().replace(';','');
+}
+
+function openModal(i) {
+  currentPattern = patterns[i];
+  const overlay = document.getElementById('modalOverlay');
+  document.getElementById('modalPreview').innerHTML = currentPattern.svgPattern;
+  document.getElementById('modalPreview').style.cssText = `height:220px;overflow:hidden;position:relative;${currentPattern.css}`;
+  document.getElementById('modalTitle').textContent = currentPattern.name;
+  document.getElementById('modalDesc').textContent = `Region: ${currentPattern.region} — ${currentPattern.desc}`;
+  document.getElementById('modalCode').textContent = `/* ${currentPattern.name} — ${currentPattern.region} */\n.your-element {\n  ${currentPattern.css.split('\n').join('\n  ')}\n}`;
+  overlay.classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function copyCode() {
+  if (!currentPattern) return;
+  const code = `/* ${currentPattern.name} — ${currentPattern.region} */\n.your-element {\n  ${currentPattern.css.split('\n').join('\n  ')}\n}`;
+  navigator.clipboard.writeText(code);
+  showToast();
+}
+
+function quickCopy(i, btn) {
+  const p = patterns[i];
+  const code = `/* ${p.name} — ${p.region} */\n.your-element {\n  ${p.css.split('\n').join('\n  ')}\n}`;
+  navigator.clipboard.writeText(code);
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy', 2000);
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+buildGrid();
+</script>
+</body>
+</html>
