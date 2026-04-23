@@ -1,8 +1,81 @@
 ﻿/* ── CultureLens Shared Styles ── */
 @import url('https://cdn.jsdelivr.net/gh/mokhtarbsaid/saudi-font/all.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-  /* Legacy/Default colors (mapped to Najd by default) */
+  /* ═══════════════════════════════════
+     DESIGN TOKENS — foundation layer
+     ═══════════════════════════════════ */
+
+  /* Typography families */
+  --font-latin: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-arabic: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
+  --font-display: 'Inter', 'Segoe UI', system-ui, sans-serif;
+
+  /* Type scale (mobile-first, 1.25 ratio) */
+  --text-xs:     12px;
+  --text-sm:     14px;
+  --text-base:   16px;
+  --text-lg:     18px;
+  --text-xl:     22px;
+  --text-2xl:    28px;
+  --text-3xl:    36px;
+  --text-display:48px;
+
+  /* Line heights */
+  --leading-tight:  1.15;
+  --leading-snug:   1.3;
+  --leading-normal: 1.5;
+  --leading-relaxed:1.7;
+
+  /* Letter spacing */
+  --tracking-tight:  -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.05em;
+  --tracking-wider:  0.12em;
+  --tracking-eyebrow:0.22em;
+
+  /* Spacing scale (4px grid) */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-7:  32px;
+  --space-8:  40px;
+  --space-9:  56px;
+  --space-10: 80px;
+
+  /* Radii */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+  --radius-2xl:  24px;
+  --radius-pill: 999px;
+
+  /* Elevation / shadows */
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.2);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.3);
+  --shadow-lg:  0 12px 40px rgba(0,0,0,0.4);
+  --shadow-xl:  0 20px 56px -12px rgba(0,0,0,0.5);
+  --shadow-glow:0 0 0 1px var(--region-accent), 0 8px 32px color-mix(in srgb, var(--region-accent) 30%, transparent);
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast:  150ms;
+  --dur-base:  250ms;
+  --dur-slow:  450ms;
+
+  /* Mobile container cap */
+  --app-max-width: 430px;
+
+  /* ═══════════════════════════════════
+     COLOR TOKENS
+     ═══════════════════════════════════ */
+  /* Legacy aliases (kept only for files still referencing them — do NOT use in new code) */
   --green: #0D3B2A;
   --green-mid: #1A5C3A;
   --green-lt: #2D7A52;
@@ -16,55 +89,21 @@
   --text-light: #A8C8B0;
   --white: #FFFFFF;
 
-  /* Contextual Design System - Regional Tokens */
-  --region-bg: var(--green);
-  --region-accent: var(--gold);
-  --region-accent-lt: var(--gold-lt);
-  --region-card: var(--card-dark);
-  --region-text: var(--cream);
-  --region-border: rgba(201, 168, 76, 0.25);
-  
-  --najd-bg: #0D3B2A;
-  --najd-accent: #C9A84C;
-  --najd-accent-lt: #E8C96B;
-  --najd-card: #122B1E;
-  --najd-text: #F9F3E8;
-  
-  --aseer-bg: #2b0b14;
-  --aseer-accent: #d1495b;
-  --aseer-accent-lt: #ed6a7b;
-  --aseer-card: #1a060b;
-  --aseer-text: #f5e1e4;
+  /* Contextual region tokens — default = Najd */
+  --region-bg:        #0D3B2A;
+  --region-accent:    #C9A84C;
+  --region-accent-lt: #E8C96B;
+  --region-card:      #122B1E;
+  --region-text:      #F9F3E8;
+  --region-border:    rgba(201, 168, 76, 0.25);
+  --region-muted:     rgba(249, 243, 232, 0.55);
 
-  --hijaz-bg: #0b1a2e;
-  --hijaz-accent: #5e9fb8;
-  --hijaz-accent-lt: #8dc1d6;
-  --hijaz-card: #06101c;
-  --hijaz-text: #e6f0f5;
-
-  --hejaz-bg: #1a0a00;
-  --hejaz-accent: #D4A843;
-  --hejaz-accent-lt: #EAC060;
-  --hejaz-card: #130500;
-  --hejaz-text: #FDF5E6;
-
-  --eastern-bg: #04111E;
-  --eastern-accent: #4A9FC9;
-  --eastern-accent-lt: #72BEE0;
-  --eastern-card: #020C16;
-  --eastern-text: #EDF6FF;
-
-  --southern-bg: #160600;
-  --southern-accent: #D1495B;
-  --southern-accent-lt: #E87080;
-  --southern-card: #0E0300;
-  --southern-text: #FFF0EE;
-
-  --northern-bg: #070F1C;
-  --northern-accent: #7BBAE0;
-  --northern-accent-lt: #A2CFF0;
-  --northern-card: #040A14;
-  --northern-text: #F0F8FF;
+  /* Canonical 5-region palette (single source of truth) */
+  --najd-bg:      #0D3B2A; --najd-accent:      #C9A84C; --najd-accent-lt:      #E8C96B; --najd-card:      #122B1E; --najd-text:      #F9F3E8;
+  --hejaz-bg:     #1a0a00; --hejaz-accent:     #D4A843; --hejaz-accent-lt:     #EAC060; --hejaz-card:     #130500; --hejaz-text:     #FDF5E6;
+  --eastern-bg:   #04111E; --eastern-accent:   #4A9FC9; --eastern-accent-lt:   #72BEE0; --eastern-card:   #020C16; --eastern-text:   #EDF6FF;
+  --southern-bg:  #160600; --southern-accent:  #D1495B; --southern-accent-lt: #E87080;  --southern-card:  #0E0300; --southern-text:  #FFF0EE;
+  --northern-bg:  #070F1C; --northern-accent:  #7BBAE0; --northern-accent-lt: #A2CFF0;  --northern-card:  #040A14; --northern-text:  #F0F8FF;
 }
 
 * {
@@ -88,17 +127,27 @@ body {
   width: 100%;
   min-height: 100dvh;
   min-height: 100vh;
-  font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-latin);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
   background-color: var(--region-bg);
   background-image: url('patchwork-bg.svg');
   background-repeat: repeat;
   background-size: 180px 120px;
-  background-attachment: fixed;
   color: var(--region-text);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.8s ease, color 0.8s ease;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--dur-slow) var(--ease-out-expo), color var(--dur-slow) var(--ease-out-expo);
   overscroll-behavior-y: none;
+}
+
+/* Arabic typography scope */
+:lang(ar),
+[dir="rtl"],
+.arabic,
+[data-ar]:lang(ar) {
+  font-family: var(--font-arabic);
 }
 
 body::before {
@@ -111,6 +160,57 @@ body::before {
 }
 body > * { position: relative; z-index: 1; }
 
+/* ═══════════════════════════════════
+   TYPOGRAPHY UTILITIES
+   ═══════════════════════════════════ */
+.t-display {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 800;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+}
+.t-h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+}
+.t-h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-tight);
+}
+.t-h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: var(--leading-snug);
+}
+.t-lead {
+  font-size: var(--text-lg);
+  line-height: var(--leading-normal);
+  color: var(--region-muted);
+}
+.t-body { font-size: var(--text-base); line-height: var(--leading-normal); }
+.t-small { font-size: var(--text-sm); line-height: var(--leading-normal); }
+.t-caption {
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+  color: var(--region-muted);
+}
+.t-eyebrow {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--region-accent);
+}
+.t-numeric { font-variant-numeric: tabular-nums; }
+
 /* ── HEADER ── */
 .cl-header {
   position: fixed;
@@ -121,23 +221,23 @@ body > * { position: relative; z-index: 1; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 20px;
-  padding-top: max(14px, env(safe-area-inset-top));
-  padding-left: max(20px, env(safe-area-inset-left));
-  padding-right: max(20px, env(safe-area-inset-right));
-  background: color-mix(in srgb, var(--region-bg) 92%, transparent);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  padding: var(--space-3) var(--space-5);
+  padding-top: max(var(--space-3), env(safe-area-inset-top));
+  padding-left: max(var(--space-5), env(safe-area-inset-left));
+  padding-right: max(var(--space-5), env(safe-area-inset-right));
+  background: color-mix(in srgb, var(--region-bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
   border-bottom: 1px solid var(--region-border);
-  transition: all 0.8s ease;
+  transition: background-color var(--dur-slow) var(--ease-out-expo), border-color var(--dur-slow) var(--ease-out-expo);
 }
 
 .cl-header .logo {
-  font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
-  font-size: 20px;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
   font-weight: 700;
   color: var(--white);
-  letter-spacing: 0.5px;
+  letter-spacing: var(--tracking-tight);
 }
 
 .cl-header .logo span {
@@ -171,20 +271,22 @@ body > * { position: relative; z-index: 1; }
 }
 
 .back-btn {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--region-accent) 15%, transparent);
-  border: 1px solid color-mix(in srgb, var(--region-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--region-accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--region-accent) 35%, transparent);
   color: var(--region-accent);
-  font-size: 18px;
-  display: flex;
+  font-size: var(--text-lg);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: background var(--dur-base) var(--ease-out-expo), border-color var(--dur-base) var(--ease-out-expo), transform var(--dur-base) var(--ease-spring);
 }
+
+.back-btn:active { transform: scale(0.92); }
 
 .back-btn:hover {
   background: color-mix(in srgb, var(--region-accent) 30%, transparent);
@@ -193,16 +295,21 @@ body > * { position: relative; z-index: 1; }
 /* ── FOOTER ── */
 .cl-footer {
   text-align: center;
-  padding: 20px;
-  font-size: 11px;
-  color: rgba(168, 200, 176, 0.6);
-  letter-spacing: 0.5px;
+  padding: var(--space-5);
+  font-size: var(--text-xs);
+  color: var(--region-muted);
+  letter-spacing: var(--tracking-wide);
 }
 
 /* ── PAGE WRAPPER ── */
 .page {
-  padding-top: 70px;
+  padding-top: var(--space-10);
+  padding-left: var(--space-5);
+  padding-right: var(--space-5);
+  padding-bottom: var(--space-10);
   min-height: 100vh;
+  max-width: var(--app-max-width);
+  margin: 0 auto;
 }
 
 /* ── SCREEN TRANSITIONS ── */
@@ -232,19 +339,20 @@ body > * { position: relative; z-index: 1; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 14px 28px;
-  border-radius: 50px;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-7);
+  min-height: 48px;
+  border-radius: var(--radius-pill);
   background: var(--region-accent);
   color: var(--region-bg);
-  font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-latin);
   font-weight: 700;
-  font-size: 15px;
+  font-size: var(--text-sm);
   border: none;
   cursor: pointer;
   width: 100%;
-  transition: all 0.25s;
-  letter-spacing: 0.3px;
+  transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-base) var(--ease-out-expo);
+  letter-spacing: var(--tracking-wide);
   box-shadow: 0 4px 20px color-mix(in srgb, var(--region-accent) 35%, transparent);
 }
 
@@ -261,18 +369,20 @@ body > * { position: relative; z-index: 1; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 28px;
-  border-radius: 50px;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-7);
+  min-height: 44px;
+  border-radius: var(--radius-pill);
   background: transparent;
   color: var(--region-accent);
-  font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
+  font-family: var(--font-latin);
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-wide);
   border: 1.5px solid var(--region-accent);
   cursor: pointer;
   width: 100%;
-  transition: all 0.25s;
+  transition: background var(--dur-base) var(--ease-out-expo), color var(--dur-base) var(--ease-out-expo);
 }
 
 .btn-outline:hover {
@@ -544,16 +654,19 @@ body > * { position: relative; z-index: 1; }
 }
 
 .hub-title {
-  font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
-  font-size: 28px;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
   color: var(--white);
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: var(--space-1);
 }
 
 .hub-subtitle {
-  font-size: 14px;
-  color: var(--text-light);
+  font-size: var(--text-sm);
+  color: var(--region-muted);
+  line-height: var(--leading-normal);
 }
 
 .hub-card {
@@ -566,6 +679,9 @@ body > * { position: relative; z-index: 1; }
   flex-direction: column;
   position: relative;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: fadeUp 0.5s ease both;
+  position: relative;
+  overflow: hidden;
 }
 
 .hub-card:hover:not(.locked) {
@@ -588,14 +704,15 @@ body > * { position: relative; z-index: 1; }
 
 .hub-status {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 10px;
+  top: var(--space-3);
+  right: var(--space-3);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
   font-weight: 700;
   backdrop-filter: blur(4px);
-  letter-spacing: 0.5px;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
   z-index: 2;
 }
 
@@ -618,42 +735,49 @@ body > * { position: relative; z-index: 1; }
 }
 
 .hub-card-title {
-  font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
-  font-size: 18px;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
   color: var(--white);
   font-weight: 700;
-  margin-bottom: 4px;
+  letter-spacing: var(--tracking-tight);
+  margin-bottom: var(--space-1);
+  line-height: var(--leading-snug);
 }
 
 .hub-card-ar {
-  font-size: 12px;
-  color: var(--gold);
+  font-family: var(--font-arabic);
+  font-size: var(--text-xs);
+  color: var(--region-accent);
   direction: rtl;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 }
 
 .hub-card-desc {
-  font-size: 13px;
-  color: var(--text-light);
-  line-height: 1.5;
-  margin-bottom: 12px;
+  font-size: var(--text-sm);
+  color: var(--region-muted);
+  line-height: var(--leading-normal);
+  margin-bottom: var(--space-3);
   flex: 1;
 }
 
 .hub-card-meta {
-  font-size: 11px;
-  color: rgba(201, 168, 76, 0.8);
+  font-size: var(--text-xs);
+  color: var(--region-accent);
   font-weight: 600;
+  letter-spacing: var(--tracking-wide);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
-/* Locked Card State */
+/* Locked Card State — preserves WCAG contrast, removes opacity<0.7 */
 .hub-card.locked {
-  filter: grayscale(0.8) opacity(0.5);
+  filter: grayscale(0.6);
   cursor: not-allowed;
 }
+
+.hub-card.locked .hub-card-title,
+.hub-card.locked .hub-card-desc { color: var(--region-muted); }
 
 .hub-card.locked .hub-thumb {
   background: rgba(0, 0, 0, 0.3);
@@ -1051,7 +1175,12 @@ body[data-region="northern"] { --region-bg:#070F1C; --region-accent:#7BBAE0; --r
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 60%);
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    transparent 60%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
   pointer-events: none;
   border-radius: inherit;
 }
@@ -1126,13 +1255,12 @@ body[data-region="northern"] { --region-bg:#070F1C; --region-accent:#7BBAE0; --r
 
 /* ── SMOOTH THEME TRANSITIONS ── */
 body {
-  transition: background-color 0.8s ease, color 0.8s ease;
+  transition: background-color 0.8s ease;
 }
 
 /* ═══════════════════════════════════════════════
    GLASSMORPHISM SYSTEM — Ithra / At-Turaif DNA
    ═══════════════════════════════════════════════ */
-
 .glass-card {
   position: relative;
   background: linear-gradient(
@@ -1273,9 +1401,9 @@ body {
   }
   .regional-theme-container,
   #region-modal {
-    max-width: 430px;
+    max-width: var(--app-max-width);
     width: 100%;
-    box-shadow: 0 0 60px rgba(0,0,0,0.6);
+    box-shadow: var(--shadow-xl);
     min-height: 100dvh;
     min-height: 100vh;
   }
@@ -1291,9 +1419,12 @@ input, textarea, select {
 }
 
 /* Ensure all tappable areas meet 44×44px WCAG */
-button, a, [role="button"] {
+button:not(.inline),
+[role="button"]:not(.inline),
+.btn-gold,
+.btn-outline,
+.back-btn {
   min-height: 44px;
-  min-width: 44px;
 }
 
 /* Remove 300ms tap delay globally */
