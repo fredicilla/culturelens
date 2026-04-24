@@ -231,28 +231,38 @@ body > * { position: relative; z-index: 1; }
 
 /* Hide the "CultureLens" text — keep only the logo image */
 .cl-header .logo {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  font-size: 0;           /* collapses any text inside the logo */
-  line-height: 0;
-  gap: 0;
-}
-.cl-header .logo span { display: none; }
-
-/* Logo image — larger, with a circular badge behind it */
-.logo-img {
-  height: 48px;
+  justify-content: center;
   width: 48px;
-  object-fit: cover;
-  object-position: center 30%;
+  height: 48px;
   border-radius: 50%;
-  margin-right: 0;
-  padding: 0;
+  overflow: hidden;
   background: var(--region-bg);
   border: 2px solid var(--region-accent);
   box-shadow:
     0 0 0 2px color-mix(in srgb, var(--region-accent) 18%, transparent),
     0 4px 12px rgba(0, 0, 0, 0.4);
+  font-size: 0;
+  line-height: 0;
+  flex-shrink: 0;
+}
+.cl-header .logo span { display: none; }
+
+/* Logo image — scaled up so the artwork fills the circle */
+.logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  transform: scale(1.55);
+  transform-origin: center center;
 }
 
 /* Logo image on hero landing page */
