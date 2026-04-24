@@ -210,10 +210,11 @@ body > * { position: relative; z-index: 1; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 20px;
-  padding-top: max(14px, env(safe-area-inset-top));
+  padding: 8px 20px;
+  padding-top: max(8px, env(safe-area-inset-top));
   padding-left: max(20px, env(safe-area-inset-left));
   padding-right: max(20px, env(safe-area-inset-right));
+  min-height: 60px;
   background-color: color-mix(in srgb, var(--region-bg) 80%, transparent);
   background-image:
     linear-gradient(color-mix(in srgb, var(--region-bg) 72%, transparent),
@@ -240,18 +241,18 @@ body > * { position: relative; z-index: 1; }
 
 /* Logo image — larger, with a circular badge behind it */
 .logo-img {
-  height: 64px;
-  width: 64px;
+  height: 48px;
+  width: 48px;
   object-fit: cover;
   object-position: center 30%;
   border-radius: 50%;
   margin-right: 0;
-  padding: 2px;
+  padding: 0;
   background: var(--region-bg);
   border: 2px solid var(--region-accent);
   box-shadow:
-    0 0 0 3px color-mix(in srgb, var(--region-accent) 18%, transparent),
-    0 4px 16px rgba(0, 0, 0, 0.4);
+    0 0 0 2px color-mix(in srgb, var(--region-accent) 18%, transparent),
+    0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 /* Logo image on hero landing page */
