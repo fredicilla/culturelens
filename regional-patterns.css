@@ -271,7 +271,7 @@ body[data-region] .hero::before {
 }
 
 body[data-region] .hero {
-  background: linear-gradient(160deg, var(--region-hero-a, var(--region-bg)), var(--region-hero-b, var(--region-bg)));
+  background: var(--region-bg);
 }
 
 /* ════════════════════════════════════════

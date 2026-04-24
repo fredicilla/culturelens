@@ -284,12 +284,22 @@ body > * { position: relative; z-index: 1; }
 /* ── FOOTER ── */
 .cl-footer {
   position: relative;
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  margin-top: var(--space-8);
   text-align: center;
-  padding: var(--space-7) var(--space-5);
+  padding: var(--space-8) var(--space-5);
+  padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom));
+  padding-left: max(var(--space-5), env(safe-area-inset-left));
+  padding-right: max(var(--space-5), env(safe-area-inset-right));
   font-size: var(--text-xs);
   color: var(--region-muted);
   letter-spacing: var(--tracking-wide);
+  line-height: var(--leading-relaxed);
   border-top: 1px solid var(--region-border);
+  background-color: var(--region-bg);
   background-image: url('patchwork-bg.svg');
   background-repeat: repeat;
   background-size: 90px 60px;
