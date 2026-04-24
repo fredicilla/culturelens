@@ -6,98 +6,11 @@
 <title>Najdi Qahwa — CultureLens</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="regional-patterns.css">
-<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 <style>
 
 /* ── PHASE SYSTEM ── */
 .phase { display:none; min-height:100vh; padding:80px 20px 40px; flex-direction:column; }
 .phase.active { display:flex; }
-
-/* ── PHASE 0: AR VIEWER ── */
-.ar-wrap { max-width:460px; width:100%; margin:0 auto; }
-.ar-intro {
-  text-align:center; margin-bottom:16px;
-}
-.ar-intro .ar-eyebrow {
-  font-size:11px; letter-spacing:2px; color:var(--gold);
-  text-transform:uppercase; margin-bottom:6px; font-weight:700;
-}
-.ar-intro .ar-title {
-  font-family:'saudi-font','Segoe UI',Tahoma,sans-serif;
-  font-size:24px; font-weight:700; color:var(--white); margin-bottom:4px;
-}
-.ar-intro .ar-sub { font-size:13px; color:var(--text-light); }
-
-model-viewer {
-  width:100%;
-  height:70vh;
-  background:linear-gradient(160deg,#1a0e08,#2d1a0d);
-  border-radius:24px;
-  border:1px solid rgba(201,168,76,0.25);
-  box-shadow:0 8px 40px rgba(0,0,0,0.5);
-  --poster-color:transparent;
-}
-
-.ar-button {
-  position:absolute; bottom:16px; left:50%; transform:translateX(-50%);
-  display:inline-flex; align-items:center; gap:8px;
-  padding:10px 18px; border-radius:999px;
-  background:var(--gold); color:var(--green);
-  font-size:13px; font-weight:700; letter-spacing:0.5px;
-  border:none; cursor:pointer;
-  box-shadow:0 4px 20px rgba(201,168,76,0.5);
-}
-.ar-button:active { transform:translateX(-50%) scale(0.97); }
-
-.ar-cta { margin-top:20px; }
-
-/* ── PHASE 2: HOW TO BREW ── */
-.brew-header { text-align:center; max-width:460px; margin:0 auto 20px; }
-.brew-title {
-  font-family:'saudi-font','Segoe UI',Tahoma,sans-serif;
-  font-size:24px; font-weight:700; color:var(--white); margin-bottom:4px;
-}
-.brew-sub { font-size:13px; color:var(--text-light); }
-.brew-progress {
-  margin-top:12px; display:flex; align-items:center; justify-content:center; gap:12px;
-}
-.brew-steps {
-  max-width:460px; margin:0 auto; width:100%;
-  display:flex; flex-direction:column; gap:12px;
-}
-.brew-step {
-  background:var(--card-dark); border-radius:14px;
-  border-left:3px solid var(--gold);
-  padding:14px 16px;
-  display:none;
-  animation:fadeUp 0.4s ease;
-}
-.brew-step.revealed { display:block; }
-.brew-step .brew-step-head {
-  display:flex; align-items:center; gap:10px; margin-bottom:8px;
-}
-.brew-step .step-dot {
-  width:28px; height:28px; border-radius:50%; flex-shrink:0;
-  background:var(--gold); color:var(--green);
-  display:flex; align-items:center; justify-content:center;
-  font-size:13px; font-weight:700;
-}
-.brew-step .brew-step-label { font-size:12px; color:var(--gold); font-weight:600; letter-spacing:0.5px; }
-.brew-step .brew-step-en { font-size:13px; color:var(--cream); line-height:1.6; }
-.brew-step .brew-step-ar {
-  font-size:12px; color:var(--text-light); margin-top:4px;
-  direction:rtl; text-align:right;
-}
-.brew-next {
-  margin-top:4px; align-self:center;
-  background:rgba(201,168,76,0.12);
-  border:1.5px solid var(--gold);
-  color:var(--gold); font-weight:700; font-size:13px;
-  padding:10px 18px; border-radius:999px; cursor:pointer;
-  animation:pulse 2s ease-in-out infinite;
-}
-.brew-next:hover { background:rgba(201,168,76,0.25); }
-.brew-cta { margin-top:20px; max-width:460px; margin-left:auto; margin-right:auto; width:100%; }
 
 /* ── PHASE 1: STORY ── */
 .majlis-scene {
@@ -322,41 +235,9 @@ model-viewer {
 </header>
 
 <!-- ═══════════════════════════════════════ -->
-<!-- PHASE 0 — AR VIEWER                   -->
-<!-- ═══════════════════════════════════════ -->
-<section class="phase active" id="phase-ar">
-  <div class="ar-wrap">
-    <div class="ar-intro">
-      <div class="ar-eyebrow translatable" data-en="Step 1 of 4" data-ar="خطوة ١ من ٤">Step 1 of 4</div>
-      <div class="ar-title translatable" data-en="Meet the Dallah" data-ar="تعرف على الدلة">Meet the Dallah</div>
-      <div class="ar-sub translatable" data-en="Drag to rotate, pinch to zoom — or place it in your space with AR" data-ar="اسحب للتدوير، قرّب للتكبير — أو حطها بمكانك بالواقع المعزز">Drag to rotate, pinch to zoom — or place it in your space with AR</div>
-    </div>
-
-    <div style="position:relative">
-      <model-viewer
-        src="saudi_dallah.glb"
-        alt="Saudi Dallah 3D model"
-        ar
-        ar-modes="webxr scene-viewer quick-look"
-        camera-controls
-        auto-rotate
-        shadow-intensity="1"
-        exposure="1"
-        style="width:100%;height:70vh">
-        <button slot="ar-button" class="ar-button translatable" data-en="📸 View in your space" data-ar="📸 شوفها بمكانك">📸 View in your space</button>
-      </model-viewer>
-    </div>
-
-    <div class="ar-cta">
-      <button class="btn-gold translatable" onclick="goToStory()" data-en="I've seen it — tell me its story ▸" data-ar="شفتها — احكي لي قصتها ▸">I've seen it — tell me its story ▸</button>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════ -->
 <!-- PHASE 1 — IMMERSIVE STORY             -->
 <!-- ═══════════════════════════════════════ -->
-<section class="phase" id="phase-story">
+<section class="phase active" id="phase-story">
 
   <!-- THE MAJLIS SCENE -->
   <div class="majlis-scene" style="max-width:420px;margin:0 auto 20px;width:100%">
@@ -457,7 +338,7 @@ model-viewer {
         </div>
       </div>
       <div style="margin-top:20px">
-        <button class="btn-gold translatable" onclick="goToBrew()" data-en="Now learn how to brew it ▸" data-ar="الحين تعلم طريقة القهوة ▸">Now learn how to brew it ▸</button>
+        <button class="btn-gold translatable" onclick="startGame()" data-en="Begin the Ceremony <img src='dallah.png' alt='Dallah' class='emoji-img'>" data-ar="ابدأ المراسم <img src='dallah.png' alt='Dallah' class='emoji-img'>" data-html="true">Begin the Ceremony <img src="dallah.png" alt="Dallah" class="emoji-img"></button>
       </div>
     </div>
 
@@ -466,80 +347,7 @@ model-viewer {
 </section>
 
 <!-- ═══════════════════════════════════════ -->
-<!-- PHASE 2 — HOW TO BREW                 -->
-<!-- ═══════════════════════════════════════ -->
-<section class="phase" id="phase-brew">
-  <div class="brew-header">
-    <div class="ar-eyebrow translatable" style="font-size:11px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;font-weight:700;margin-bottom:6px" data-en="Step 3 of 4" data-ar="خطوة ٣ من ٤">Step 3 of 4</div>
-    <div class="brew-title translatable" data-en="How to Brew Najdi Qahwa" data-ar="طريقة قهوة نجد">How to Brew Najdi Qahwa</div>
-    <div class="brew-sub translatable" data-en="Tap to reveal each step" data-ar="اضغط تكشف كل خطوة">Tap to reveal each step</div>
-    <div class="brew-progress">
-      <div class="score-badge" id="brew-count">1 / 6</div>
-      <div class="progress-bar" style="width:140px;height:6px">
-        <div class="progress-fill" id="brew-progress-fill" style="width:16%"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="brew-steps" id="brew-steps">
-    <div class="brew-step revealed" data-step="1">
-      <div class="brew-step-head">
-        <div class="step-dot">1</div>
-        <div class="brew-step-label translatable" data-en="Roast lightly — التحميص" data-ar="التحميص">Roast lightly — التحميص</div>
-      </div>
-      <div class="brew-step-en translatable" data-en="Lightly roast green coffee beans — don't over-roast, they stay pale gold." data-ar="حمّص الحبوب الخضراء بهدوء حتى تصير ذهبية فاتحة — لا تحرقها.">Lightly roast green coffee beans — don't over-roast, they stay pale gold.</div>
-      <div class="brew-step-ar">حمّص الحبوب خفيف، تبقى لونها ذهبي فاتح</div>
-    </div>
-    <div class="brew-step" data-step="2">
-      <div class="brew-step-head">
-        <div class="step-dot">2</div>
-        <div class="brew-step-label translatable" data-en="Grind with hal & saffron — الطحن" data-ar="الطحن">Grind with hal & saffron — الطحن</div>
-      </div>
-      <div class="brew-step-en translatable" data-en="Grind coarsely with cardamom pods and a pinch of saffron." data-ar="اطحن طحن خشن مع حبوب الهيل ورشة زعفران.">Grind coarsely with cardamom pods and a pinch of saffron.</div>
-      <div class="brew-step-ar">طحن خشن مع هيل وزعفران</div>
-    </div>
-    <div class="brew-step" data-step="3">
-      <div class="brew-step-head">
-        <div class="step-dot">3</div>
-        <div class="brew-step-label translatable" data-en="Fill the dallah — التعبئة" data-ar="التعبئة">Fill the dallah — التعبئة</div>
-      </div>
-      <div class="brew-step-en translatable" data-en="Add to the dallah with cold water — about one spoon per cup." data-ar="حط المطحون في الدلة مع ماء بارد، ملعقة لكل فنجان.">Add to the dallah with cold water — about one spoon per cup.</div>
-      <div class="brew-step-ar">حط في الدلة مع ماء بارد، ملعقة لكل فنجان</div>
-    </div>
-    <div class="brew-step" data-step="4">
-      <div class="brew-step-head">
-        <div class="step-dot">4</div>
-        <div class="brew-step-label translatable" data-en="Simmer gently — الغلي" data-ar="الغلي">Simmer gently — الغلي</div>
-      </div>
-      <div class="brew-step-en translatable" data-en="Simmer on low heat for 10–15 minutes — never boil hard." data-ar="اغليها هادئ ١٠-١٥ دقيقة — لا تفور.">Simmer on low heat for 10–15 minutes — never boil hard.</div>
-      <div class="brew-step-ar">غلي هادئ ١٠-١٥ دقيقة، ما تفور</div>
-    </div>
-    <div class="brew-step" data-step="5">
-      <div class="brew-step-head">
-        <div class="step-dot">5</div>
-        <div class="brew-step-label translatable" data-en="Strain through the filter — التصفية" data-ar="التصفية">Strain through the filter — التصفية</div>
-      </div>
-      <div class="brew-step-en translatable" data-en="Strain through the dallah's built-in filter into a second dallah." data-ar="صفّيها من مصفاة الدلة لدلة ثانية.">Strain through the dallah's built-in filter into a second dallah.</div>
-      <div class="brew-step-ar">صفي من دلة لدلة</div>
-    </div>
-    <div class="brew-step" data-step="6">
-      <div class="brew-step-head">
-        <div class="step-dot">6</div>
-        <div class="brew-step-label translatable" data-en="Pour a quarter finjan — الصب" data-ar="الصب">Pour a quarter finjan — الصب</div>
-      </div>
-      <div class="brew-step-en translatable" data-en="Pour only a quarter of the finjan — a full cup means 'leave now'." data-ar="صب ربع الفنجان بس — الفنجان المليان يعني 'اطلع بره'.">Pour only a quarter of the finjan — a full cup means 'leave now'.</div>
-      <div class="brew-step-ar">صب ربع الفنجان بس</div>
-    </div>
-    <button class="brew-next translatable" id="brew-next-btn" onclick="revealNextBrew()" data-en="Tap for next step ▸" data-ar="اضغط للخطوة الجاية ▸">Tap for next step ▸</button>
-  </div>
-
-  <div class="brew-cta" id="brew-cta" style="display:none">
-    <button class="btn-gold translatable" onclick="startGame()" data-en="Now prove your skills ▸" data-ar="الحين اثبت مهارتك ▸">Now prove your skills ▸</button>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════ -->
-<!-- PHASE 3 — MINI GAME                   -->
+<!-- PHASE 2 — MINI GAME                   -->
 <!-- ═══════════════════════════════════════ -->
 <section class="phase" id="phase-game">
 
@@ -662,40 +470,10 @@ let pourLevel = 0;
 let selectedGuest = -1;
 let isPouringInterval = null;
 
-function goToStory() {
-  document.getElementById('phase-ar').classList.remove('active');
-  document.getElementById('phase-story').classList.add('active');
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-
-function goToBrew() {
-  document.getElementById('phase-story').classList.remove('active');
-  document.getElementById('phase-brew').classList.add('active');
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-
-let brewStep = 1;
-const totalBrewSteps = 6;
-function revealNextBrew() {
-  if (brewStep >= totalBrewSteps) return;
-  brewStep++;
-  const el = document.querySelector('.brew-step[data-step="' + brewStep + '"]');
-  if (el) el.classList.add('revealed');
-  document.getElementById('brew-count').textContent = brewStep + ' / ' + totalBrewSteps;
-  document.getElementById('brew-progress-fill').style.width = (brewStep/totalBrewSteps*100) + '%';
-  playTick();
-  if (brewStep === totalBrewSteps) {
-    document.getElementById('brew-next-btn').style.display = 'none';
-    document.getElementById('brew-cta').style.display = 'block';
-  }
-}
-
 function startGame() {
-  document.getElementById('phase-brew').classList.remove('active');
   document.getElementById('phase-story').classList.remove('active');
   document.getElementById('phase-game').classList.add('active');
   document.querySelectorAll('.guest-card')[0].classList.add('current');
-  window.scrollTo({top:0, behavior:'smooth'});
 }
 
 function selectGuest(idx) {
