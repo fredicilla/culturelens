@@ -381,47 +381,49 @@
 const samplePosts = [
   {
     id: 1,
-    user: 'Noura Al-Qahtani',
-    initials: 'NQ',
+    user: 'نورة القحطاني',
+    initials: 'نق',
     region: 'Asir',
-    time: '2h',
-    text: "Spent the morning in Rijal Almaa painting Al-Qatt Al-Asiri with my grandmother. The geometric patterns are a language older than any of us — every shape tells you about a family, a valley, a season. 🎨",
-    image: 'mudhouse.png',
-    likes: 42,
+    time: 'قبل ساعتين',
+    text: "قضيت الصبح مع جدتي في رجال ألمع نرسم القط العسيري 🎨 والله إن الحيطان تتكلم. كل نقشة وكل لون يحكي عن عائلة ووادي وموسم. الفن هذا اليونسكو سجلته من 2017 كتراث إنساني، وجدتي تسوّيه من وهي صغيرة بدون ما تشوف ورقة ولا مرجع. المواد طبيعية — طين وصبغات من النباتات. فخورة إني من عسير. �",
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Al-Qatt_Al-Asiri_Art.jpg',
+    likes: 312,
     liked: false,
     comments: [
-      { user: 'Turki A.', text: "This is beautiful. My mother still paints the majlis ceiling this way." },
-      { user: 'Layla M.', text: "Rijal Almaa is magical. Next trip for sure!" }
+      { user: 'تركي العسيري', text: "يا حلاة رجال ألمع، أمي لين اليوم ترسم سقف المجلس بنفس الطريقة" },
+      { user: 'ليلى محمد', text: "عسير جنة، الرحلة الجاية أكيد لها 🌿" },
+      { user: 'سلطان ع.', text: "الله يحفظ الجدات، هن اللي حافظين التراث" }
     ]
   },
   {
     id: 2,
-    user: 'Abdullah Al-Ghamdi',
-    initials: 'AG',
+    user: 'عبدالعزيز السديري',
+    initials: 'عس',
     region: 'Riyadh',
-    time: '6h',
-    text: "Hosted my first Najdi majlis last night. Served the eldest first, poured exactly ¼ of the finjan each time. My uncle finally nodded in approval — that silent nod means more than any compliment. ☕",
-    image: null,
-    likes: 89,
+    time: 'قبل 5 ساعات',
+    text: "زرت حي الطريف في الدرعية أمس مع العيال 🕌 هذا مو بس مبنى طين، هذا جذر الدولة السعودية الأولى. كل طوفة فيه تحكي قصة من 1446 ميلادي. اليونسكو سجّلته 2010 كتراث عالمي، واليوم صار الدرعية مشروع ضخم يرجع للمكان هيبته. روحوا وقت المغرب — النور على الطين شي ما ينوصف. 🇸🇦",
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/At-Turaif_District_of_Diriyah,_Saudi_Arabia.jpg',
+    likes: 487,
     liked: true,
     comments: [
-      { user: 'Khalid R.', text: "That nod is the real graduation certificate 😄" },
-      { user: 'Sara H.', text: "ما شاء الله! The quarter finjan rule is everything." },
-      { user: 'Omar F.', text: "Welcome to the brotherhood of hosts 👏" }
+      { user: 'خالد الراشد', text: "المكان يفتح النفس، وقصة الإمام محمد بن سعود تحس فيها وأنت ماشي" },
+      { user: 'سارة ح.', text: "ما شاء الله، الدرعية اليوم غير قبل خمس سنين 💛" },
+      { user: 'عمر ف.', text: "الهندسة النجدية نظيفة، بسيطة وقوية" }
     ]
   },
   {
     id: 3,
-    user: 'Reem Al-Harbi',
-    initials: 'RH',
-    region: 'Madinah',
-    time: '1d',
-    text: "Recording oud sessions with my father this week. He learned from his grandfather in Al-Hijaz. Some of these maqams have never been written down — they only live in the hands that pass them on. 🎵",
-    image: null,
-    likes: 124,
+    user: 'فيصل العطوي',
+    initials: 'فع',
+    region: 'Tabuk',
+    time: 'قبل يوم',
+    text: "الدحّة التبوكية ما توصف، لازم تعاش 🖤 ليلة أمس اجتمعنا في صحراء تبوك، صفّين متقابلين والأصوات تهز الجبل. هذي رقصة الأجداد قبل الحروب، يا هلا بكم وقت الفزعة. إذا ما شفت الدحة في ليلة باردة تحت القمر، ما عرفت الشمال صح. الإيقاع يدخل القلب قبل الأذن. 🪕",
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Jabal_Al-Lawz_Location.jpg',
+    likes: 256,
     liked: false,
     comments: [
-      { user: 'Mansour K.', text: "Please share when you can. This is heritage preservation." }
+      { user: 'منصور الكلبي', text: "الدحة هوية، الله يديمها فينا" },
+      { user: 'ريم ع.', text: "تبوك ما عليها كلام، خصوصاً جبل اللوز وقت الثلج ❄️" }
     ]
   }
 ];
@@ -455,7 +457,7 @@ function renderPost(p) {
           <div class="post-time">${esc(p.time)}</div>
         </div>
       </div>
-      <div class="post-text">${esc(p.text)}</div>
+      <div class="post-text" dir="auto">${esc(p.text)}</div>
       ${p.image ? `<div class="post-image"><img src="${esc(p.image)}" alt="Post image"></div>` : ''}
       <div class="post-actions">
         <button class="action-btn ${p.liked ? 'liked' : ''}" onclick="toggleLike(${p.id})">
@@ -472,8 +474,8 @@ function renderPost(p) {
           <div class="comment">
             <div class="avatar">${esc(c.user.split(' ').map(w=>w[0]).slice(0,2).join(''))}</div>
             <div class="comment-body">
-              <div class="comment-user">${esc(c.user)}</div>
-              <div class="comment-text">${esc(c.text)}</div>
+              <div class="comment-user" dir="auto">${esc(c.user)}</div>
+              <div class="comment-text" dir="auto">${esc(c.text)}</div>
             </div>
           </div>
         `).join('')}
