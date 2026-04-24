@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>My Account — CultureLens</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="regional-patterns.css">
+<style>
+  .page-wrap {
+    max-width: 460px;
+    margin: 0 auto;
+    padding: 96px 16px 120px;
+    width: 100%;
+  }
+
+  /* ── PROFILE HEADER ── */
+  .profile-header {
+    text-align: center;
+    padding: 8px 0 20px;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    margin-bottom: 24px;
+  }
+  .avatar-wrap {
+    position: relative;
+    width: 108px; height: 108px;
+    margin: 0 auto 14px;
+  }
+  .avatar-lg {
+    width: 108px; height: 108px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--gold-lt));
+    color: var(--green);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 36px;
+    box-shadow: 0 8px 32px rgba(201,168,76,0.45);
+    overflow: hidden;
+  }
+  .avatar-lg img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .avatar-cam {
+    position: absolute; right: 2px; bottom: 2px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--card-dark);
+    border: 2px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .avatar-cam:hover { transform: scale(1.08); }
+  .avatar-cam input { display: none; }
+  .cam-icon {
+    width: 14px; height: 10px;
+    background: var(--gold); border-radius: 2px;
+    position: relative;
+  }
+  .cam-icon::before {
+    content:''; position: absolute;
+    top: -3px; left: 4px; width: 6px; height: 3px;
+    background: var(--gold); border-radius: 1px 1px 0 0;
+  }
+  .cam-icon::after {
+    content:''; position: absolute;
+    top: 3px; left: 4px; width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--card-dark);
+  }
+
+  .display-name {
+    font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
+    font-size: 22px; font-weight: 700; color: var(--white);
+    display: inline-block; min-width: 120px;
+    padding: 2px 8px; border-radius: 6px;
+    outline: none;
+  }
+  .display-name:focus { background: rgba(201,168,76,0.08); }
+
+  .handle { font-size: 13px; color: var(--gold); margin-top: 2px; }
+
+  .bio {
+    display: inline-block; font-size: 13px; color: var(--cream);
+    margin-top: 10px; line-height: 1.5;
+    padding: 4px 10px; border-radius: 6px;
+    outline: none;
+    max-width: 90%;
+  }
+  .bio:focus { background: rgba(201,168,76,0.08); }
+
+  .region-pill {
+    display: inline-block; margin-top: 12px;
+    padding: 4px 12px; border-radius: 999px;
+    background: rgba(201,168,76,0.14);
+    border: 1px solid rgba(201,168,76,0.35);
+    color: var(--gold);
+    font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    margin-bottom: 26px;
+  }
+  .section-title {
+    font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
+    font-size: 16px; font-weight: 700; color: var(--white);
+    margin-bottom: 12px;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .section-title::before {
+    content:''; display:inline-block;
+    width: 4px; height: 18px; background: var(--gold);
+    border-radius: 2px;
+    align-self: center;
+  }
+  .section-title small { font-size: 11px; color: var(--text-light); font-weight: 400; }
+
+  /* ── JOURNEY CARDS ── */
+  .journey-card {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--card-dark);
+    border: 1px solid rgba(201,168,76,0.18);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .journey-card.locked { opacity: 0.55; }
+  .journey-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: linear-gradient(135deg, rgba(201,168,76,0.25), rgba(201,168,76,0.08));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+    border: 1px solid rgba(201,168,76,0.2);
+  }
+  .journey-icon img { width: 28px; height: 28px; }
+  .journey-body { flex: 1; min-width: 0; }
+  .journey-name { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+  .journey-bar { height: 6px; background: rgba(201,168,76,0.12); border-radius: 3px; overflow: hidden; }
+  .journey-bar-fill {
+    height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-lt));
+    border-radius: 3px;
+  }
+  .journey-score {
+    font-size: 11px; color: var(--text-light); margin-top: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .journey-check {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--gold); color: var(--green);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .journey-card.locked .journey-icon {
+    filter: grayscale(1); background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.08);
+  }
+  .journey-lock {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(255,255,255,0.08); color: var(--text-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+
+  /* ── POSTS GRID ── */
+  .posts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .post-tile {
+    background: var(--card-dark);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .post-tile:hover { transform: translateY(-2px); border-color: rgba(201,168,76,0.4); }
+  .post-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .post-tile-text {
+    padding: 14px;
+    font-size: 12px; line-height: 1.5; color: var(--cream);
+    height: 100%;
+    display: flex; align-items: center;
+    text-align: center;
+  }
+
+  /* ── SETTINGS ── */
+  .settings-list {
+    background: var(--card-dark);
+    border: 1px solid rgba(201,168,76,0.18);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .setting-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+    cursor: pointer;
+    background: transparent;
+    border-left: none; border-right: none; border-top: none;
+    width: 100%;
+    color: inherit;
+    font-family: inherit;
+    text-align: inherit;
+    transition: background 0.15s;
+  }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-row:hover { background: rgba(255,255,255,0.03); }
+  .setting-label { font-size: 14px; color: var(--cream); font-weight: 500; }
+  .setting-value {
+    font-size: 12px; color: var(--text-light);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .chev {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-top: 2px solid var(--text-light);
+    border-right: 2px solid var(--text-light);
+    transform: rotate(45deg);
+  }
+
+  /* toggle switch */
+  .toggle {
+    position: relative;
+    width: 44px; height: 24px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 999px;
+    transition: background 0.25s;
+    flex-shrink: 0;
+  }
+  .toggle::after {
+    content:''; position: absolute;
+    top: 2px; left: 2px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: white;
+    transition: transform 0.25s;
+  }
+  .toggle.on { background: var(--gold); }
+  .toggle.on::after { transform: translateX(20px); background: var(--green); }
+
+  .setting-row.danger .setting-label { color: #E8695B; }
+  .setting-row.danger:hover { background: rgba(232,105,91,0.08); }
+</style>
+</head>
+<body>
+
+<header class="cl-header">
+  <a href="index.html" class="back-btn">‹</a>
+  <div class="logo translatable" data-en="<img src='logo.png' class='logo-img'> Culture<span>Lens</span>" data-ar="<img src='logo.png' class='logo-img'> عدسة <span>الثقافة</span>" data-html="true"><img src="logo.png" class="logo-img"> Culture<span>Lens</span></div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="font-size:10px;color:var(--text-light);text-align:right" class="translatable" data-en="✦ Account" data-ar="✦ الحساب">✦ Account</div>
+    <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">🇸🇦 العربية</span></button>
+  </div>
+</header>
+
+<main class="page-wrap">
+
+  <!-- PROFILE HEADER -->
+  <section class="profile-header">
+    <div class="avatar-wrap">
+      <div class="avatar-lg" id="avatar-lg">
+        <span id="avatar-initials">YO</span>
+      </div>
+      <label class="avatar-cam" aria-label="Change profile picture">
+        <span class="cam-icon"></span>
+        <input type="file" accept="image/*" onchange="changeAvatar(event)">
+      </label>
+    </div>
+    <div class="display-name translatable" id="display-name" contenteditable="true" spellcheck="false" data-en="Your Name" data-ar="اسمك">Your Name</div>
+    <div class="handle">@yourhandle</div>
+    <div>
+      <div class="bio translatable" id="bio" contenteditable="true" spellcheck="false" data-en="Curious about Saudi heritage — always learning." data-ar="مهتم بالتراث السعودي — دايماً أتعلم.">Curious about Saudi heritage — always learning.</div>
+    </div>
+    <div>
+      <span class="region-pill translatable" data-en="🏜️ Riyadh — الرياض" data-ar="🏜️ الرياض">🏜️ Riyadh — الرياض</span>
+    </div>
+  </section>
+
+  <!-- MY JOURNEY -->
+  <section class="section">
+    <div class="section-title">
+      <span class="translatable" data-en="My Journey" data-ar="رحلتي">My Journey</span>
+      <small class="translatable" data-en="Your experience progress" data-ar="تقدمك في التجارب">Your experience progress</small>
+    </div>
+
+    <div class="journey-card">
+      <div class="journey-icon"><img src="dallah.png" alt="Dallah" class="emoji-img"></div>
+      <div class="journey-body">
+        <div class="journey-name translatable" data-en="Najdi Qahwa Ceremony" data-ar="مجلس القهوة النجدية">Najdi Qahwa Ceremony</div>
+        <div class="journey-bar"><div class="journey-bar-fill" style="width:100%"></div></div>
+        <div class="journey-score translatable" data-en="Score: 4 / 4 — Master of the Majlis" data-ar="النتيجة: ٤ / ٤ — راعي المجلس">Score: 4 / 4 — Master of the Majlis</div>
+      </div>
+      <div class="journey-check">✓</div>
+    </div>
+
+    <div class="journey-card">
+      <div class="journey-icon">🥁</div>
+      <div class="journey-body">
+        <div class="journey-name translatable" data-en="Al-Samri Circle" data-ar="جلسة السامري">Al-Samri Circle</div>
+        <div class="journey-bar"><div class="journey-bar-fill" style="width:75%"></div></div>
+        <div class="journey-score translatable" data-en="Score: 3 / 4 — Keep the rhythm!" data-ar="النتيجة: ٣ / ٤ — حافظ على الإيقاع!">Score: 3 / 4 — Keep the rhythm!</div>
+      </div>
+      <div class="journey-check">✓</div>
+    </div>
+
+    <div class="journey-card locked">
+      <div class="journey-icon">⚔️</div>
+      <div class="journey-body">
+        <div class="journey-name translatable" data-en="Al-Ardah Sword Dance" data-ar="العرضة النجدية">Al-Ardah Sword Dance</div>
+        <div class="journey-bar"><div class="journey-bar-fill" style="width:0%"></div></div>
+        <div class="journey-score translatable" data-en="Locked — coming soon" data-ar="مقفلة — قريباً">Locked — coming soon</div>
+      </div>
+      <div class="journey-lock">🔒</div>
+    </div>
+  </section>
+
+  <!-- MY POSTS -->
+  <section class="section">
+    <div class="section-title">
+      <span class="translatable" data-en="My Posts" data-ar="منشوراتي">My Posts</span>
+      <small class="translatable" data-en="From the community feed" data-ar="من مجتمع التطبيق">From the community feed</small>
+    </div>
+    <div class="posts-grid">
+      <div class="post-tile"><img src="mudhouse.png" alt="Post image"></div>
+      <div class="post-tile">
+        <div class="post-tile-text translatable" data-en="Hosted my first Najdi majlis last night. Uncle nodded. ☕" data-ar="ضيّفت أول مجلس نجدي أمس. العم رضى بهزة راس. ☕">Hosted my first Najdi majlis last night. Uncle nodded. ☕</div>
+      </div>
+      <div class="post-tile">
+        <div class="post-tile-text translatable" data-en="Recording oud with my father — maqams passed only by hand." data-ar="سجلت عود مع والدي — مقامات ما تنتقل إلا باليد.">Recording oud with my father — maqams passed only by hand.</div>
+      </div>
+      <div class="post-tile"><img src="dallah.png" alt="Post image"></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="section">
+    <div class="section-title">
+      <span class="translatable" data-en="Settings" data-ar="الإعدادات">Settings</span>
+    </div>
+    <div class="settings-list">
+      <button class="setting-row" onclick="toggleLanguage()">
+        <span class="setting-label translatable" data-en="Language" data-ar="اللغة">Language</span>
+        <span class="setting-value">
+          <span id="lang-value">English</span>
+          <span class="chev"></span>
+        </span>
+      </button>
+
+      <button class="setting-row" onclick="openRegionPicker()">
+        <span class="setting-label translatable" data-en="Home Region" data-ar="المنطقة الأصلية">Home Region</span>
+        <span class="setting-value">
+          <span id="region-value">Riyadh</span>
+          <span class="chev"></span>
+        </span>
+      </button>
+
+      <button class="setting-row" onclick="toggleNotifications(this)">
+        <span class="setting-label translatable" data-en="Notifications" data-ar="الإشعارات">Notifications</span>
+        <span class="setting-value">
+          <span class="toggle on" id="notif-toggle"></span>
+        </span>
+      </button>
+
+      <button class="setting-row" onclick="openAbout()">
+        <span class="setting-label translatable" data-en="About CultureLens" data-ar="عن كالتشرلينز">About CultureLens</span>
+        <span class="setting-value"><span class="chev"></span></span>
+      </button>
+
+      <button class="setting-row danger" onclick="signOut()">
+        <span class="setting-label translatable" data-en="Sign Out" data-ar="تسجيل الخروج">Sign Out</span>
+        <span class="setting-value"><span class="chev"></span></span>
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="cl-footer">
+  <div>هاكاثون نورة 2026 | CultureLens</div>
+</footer>
+
+<script>
+// ── AVATAR UPLOAD ──
+function changeAvatar(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const wrap = document.getElementById('avatar-lg');
+    wrap.innerHTML = `<img src="${ev.target.result}" alt="Profile picture">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── EDITABLE NAME → UPDATE INITIALS ──
+document.getElementById('display-name').addEventListener('blur', () => {
+  const name = document.getElementById('display-name').textContent.trim() || 'You';
+  const initials = name.split(/\s+/).map(w => w[0] || '').slice(0,2).join('').toUpperCase() || 'YO';
+  const el = document.getElementById('avatar-initials');
+  if (el) el.textContent = initials;
+});
+
+// ── SETTINGS ──
+function toggleNotifications(btn) {
+  const t = btn.querySelector('.toggle');
+  t.classList.toggle('on');
+}
+
+const regions = [
+  'Riyadh','Makkah','Madinah','Eastern Province','Asir','Tabuk',
+  'Hail','Northern Borders','Jizan','Najran','Al Bahah','Al Jawf','Qassim'
+];
+function openRegionPicker() {
+  const current = document.getElementById('region-value').textContent;
+  const choice = prompt(
+    (window.currentLang === 'ar' ? 'اكتب اسم منطقتك:\n' : 'Type your home region:\n') + regions.join(', '),
+    current
+  );
+  if (choice && regions.some(r => r.toLowerCase() === choice.trim().toLowerCase())) {
+    const matched = regions.find(r => r.toLowerCase() === choice.trim().toLowerCase());
+    document.getElementById('region-value').textContent = matched;
+  }
+}
+
+function openAbout() {
+  alert(window.currentLang === 'ar'
+    ? 'كالتشرلينز — تطبيق تفاعلي يعرّفك على ثقافات مناطق السعودية.\nهاكاثون نورة 2026'
+    : 'CultureLens — an interactive app that immerses you in the cultures of Saudi Arabia\'s regions.\nHackathon Noura 2026');
+}
+
+function signOut() {
+  if (confirm(window.currentLang === 'ar' ? 'متأكد تبغى تسجل خروج؟' : 'Are you sure you want to sign out?')) {
+    window.location.href = 'index.html';
+  }
+}
+
+// reflect current language in the settings row label
+document.addEventListener('DOMContentLoaded', () => {
+  const updateLangLabel = () => {
+    const el = document.getElementById('lang-value');
+    if (el) el.textContent = window.currentLang === 'ar' ? 'العربية' : 'English';
+  };
+  updateLangLabel();
+  // observe future lang-label changes
+  const langLabel = document.getElementById('lang-label');
+  if (langLabel) new MutationObserver(updateLangLabel).observe(langLabel, { childList: true, subtree: true });
+});
+</script>
+
+<script src="language.js"></script>
+<script src="ThemeManager.js"></script>
+<script>window.ACTIVE_NAV = 'account';</script>
+<script src="navbar.js"></script>
+</body>
+</html>
