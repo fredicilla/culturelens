@@ -7,6 +7,7 @@
   <title>Al-Samri Circle — CultureLens</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="regional-patterns.css">
+<link rel="stylesheet" href="ui.css">
   <style>
     body {
       /* Samri is an immersive 3D scene. Keep dark background for theatre feel.
@@ -435,7 +436,7 @@
         data-en="<img src='oud.png' alt='Oud' class='emoji-img'> Samri"
         data-ar="<img src='oud.png' alt='Oud' class='emoji-img'> سامري" data-html="true"><img src="oud.png" alt="Oud"
           class="emoji-img"> Samri</div>
-      <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">🇸🇦 العربية</span></button>
+      <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">العربية</span></button>
     </div>
   </header>
 
@@ -446,8 +447,7 @@
   <div id="top-hud" style="display:none">
     <div>
       <div class="hud-title translatable" data-en="السامري" data-ar="السامري">السامري</div>
-      <div class="hud-subtitle translatable" data-en="Al-Samri Circle — Hijaz" data-ar="جلسة السامري — الحجاز">Al-Samri
-        Circle — Hijaz</div>
+      <div class="hud-subtitle translatable" data-en="Al-Samri — Eastern Region" data-ar="السامري — المنطقة الشرقية">Al-Samri — Eastern Region</div>
     </div>
     <div class="look-around-hint translatable" data-en="📱 Tilt to look around" data-ar="📱 حرك جوالك لتشوف حولك">📱
       Tilt to look around</div>
@@ -866,7 +866,7 @@
       },
       {
         label: { en: 'THE CALL AND RESPONSE', ar: 'الشيلة والردية' },
-        text: { en: 'The lead poet — the figure in front of you — sings a verse. The circle responds in a low, unified hum. Back and forth. Call and response. This has been happening in the Hijaz for over 400 years.', ar: 'الشاعر — اللي قدامك — يشيل البيت. والدائرة ترد عليه بصوت واحد. أخذ وعطا... كذا الحجاز تغني من ٤٠٠ سنة.' }
+        text: { en: 'The lead poet — the figure in front of you — sings a verse. The circle responds in a low, unified hum. Back and forth. Call and response. The name comes from samar, the talk of the night.', ar: 'الشاعر — اللي قدامك — يشيل البيت. والدائرة ترد عليه بصوت واحد. أخذ وعطا... واسمه جاي من «السَّمَر»، حديث الليل.' }
       },
       {
         label: { en: 'THE TABL DRUM', ar: 'الطبل' },
@@ -922,7 +922,7 @@
         num: 1, bpm: 72, beats: 8,
         text: 'Two rows of men face each other in the firelight. The poet opens with the first verse — a tale of longing from a distant homeland.',
         ar: '"يا ليل الصب متى غده" — O night of the yearning lover, when will you end?',
-        fact: 'Al-Samri originated in the Hijaz (Makkah/Madinah) region. The poetry always speaks of love, longing, or heroism.'
+        fact: 'Al-Samri is a folk art of evening gatherings in the Eastern Region. Its name comes from samar, the talk of the night.'
       },
       {
         num: 2, bpm: 88, beats: 10,
@@ -934,7 +934,7 @@
         num: 3, bpm: 108, beats: 12,
         text: 'The final verse. The fire rises. Every man in the circle sways as one. Your drumming now carries the whole performance.',
         ar: '"والسامري يدور في الليل" — And the Samri turns through the night',
-        fact: 'At PNU, students from the Hijaz region are the keepers of this tradition. Without them, the next generation may never hear it.'
+        fact: 'Samri is still performed at evening gatherings and celebrations, sung to the beat of two drums and several tars.'
       }
     ];
 
@@ -1118,6 +1118,9 @@
     }
   </script>
   <script src="language.js"></script>
+  <script src="patterns.js"></script>
+  <script src="content.js"></script>
+  <script src="ThemeManager.js"></script>
 </body>
 
 </html>

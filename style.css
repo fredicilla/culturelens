@@ -1478,3 +1478,138 @@ a, button, [role="button"], .cat-card, .hub-card, .region-card {
 .safe-top {
   padding-top: max(16px, env(safe-area-inset-top));
 }
+/* ════════════════════════════════════════════════════════════
+   MOBILE APP SHELL (Nov 2026 UI pass)
+   CultureLens is a phone web app. On a phone it fills the screen;
+   on a laptop it shows as a phone-width column in the middle.
+   ════════════════════════════════════════════════════════════ */
+.cl-header,
+.cl-bottom-nav,
+#region-pattern-overlay,
+#region-map-screen,
+#cl-region-gate {
+  max-width: var(--app-max-width);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 520px) {
+  html { background: #070a09; }
+  body {
+    max-width: var(--app-max-width);
+    margin: 0 auto;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 0 90px rgba(0, 0, 0, 0.7);
+  }
+}
+
+/* ── Header: slim, solid, no image strip ── */
+.cl-header {
+  min-height: 0;
+  height: calc(56px + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) 12px 0;
+  gap: 8px;
+  background-color: color-mix(in srgb, var(--region-bg) 90%, transparent);
+  background-image: none;
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  border-bottom: 1px solid var(--region-border);
+}
+.cl-header .logo {
+  width: 36px;
+  height: 36px;
+  border-width: 1.5px;
+  box-shadow: none;
+}
+.cl-header > div:last-child { gap: 8px !important; }
+.cl-header .back-btn {
+  width: 36px;
+  height: 36px;
+  font-size: 22px;
+  line-height: 1;
+  padding-bottom: 2px;
+  flex-shrink: 0;
+}
+#lang-toggle,
+#region-indicator {
+  height: 36px;
+  padding: 0 12px !important;
+  margin: 0;
+  border-radius: 50px;
+  font-size: 12px !important;
+  font-weight: 600;
+  white-space: nowrap;
+}
+#lang-toggle {
+  border: 1px solid var(--region-border);
+  background: color-mix(in srgb, var(--region-text) 6%, transparent);
+  color: var(--region-text);
+}
+#lang-toggle:hover { background: color-mix(in srgb, var(--region-text) 12%, transparent); }
+#region-indicator {
+  color: var(--region-text) !important;
+  border: 1px solid var(--region-border) !important;
+  background: color-mix(in srgb, var(--region-accent) 12%, transparent) !important;
+}
+
+/* ── Category pages: compact list rows instead of tall cards ── */
+.page { padding-top: calc(56px + env(safe-area-inset-top, 0px) + 20px) !important; padding-left: 16px; padding-right: 16px; }
+.hub-page-header { text-align: start; margin: 0 0 18px; padding: 0 4px; }
+.hub-title { font-size: 28px; color: var(--region-text); margin-bottom: 4px; }
+.hub-subtitle { font-size: 13px; }
+.hub-region-note { margin-top: 12px !important; }
+.hub-container,
+.hub-container[class] { grid-template-columns: 1fr; max-width: none; gap: 10px; }
+.hub-card {
+  flex-direction: row;
+  align-items: stretch;
+  min-height: 116px;
+  border-radius: 18px;
+  background: var(--region-card);
+  border: 1px solid var(--region-border);
+  animation: fadeUp 0.4s ease both;
+}
+.hub-card:hover:not(.locked) { transform: none; box-shadow: none; border-color: var(--region-accent); }
+.hub-card:active:not(.locked) { transform: scale(0.98); }
+.hub-thumb {
+  width: 96px;
+  flex: 0 0 96px;
+  aspect-ratio: auto;
+  font-size: 0;
+  position: relative;
+  background-color: color-mix(in srgb, var(--region-accent) 10%, var(--region-card));
+  background-repeat: repeat;
+}
+.hub-thumb-img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45));
+}
+.hub-card-body { padding: 12px 14px; display: flex; flex-direction: column; min-width: 0; }
+.hub-card-title { font-size: 16px; margin: 0 0 2px; color: var(--region-text); }
+.hub-card-ar { display: none; }
+.hub-card-desc {
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 2px 0 8px;
+  flex: 0 0 auto;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.hub-card-meta { font-size: 11px; margin-top: auto; letter-spacing: 0.3px; }
+.hub-card-body .hub-status {
+  position: static;
+  align-self: flex-start;
+  margin-bottom: 6px;
+  padding: 2px 8px;
+  font-size: 10px;
+  backdrop-filter: none;
+}
+.hub-card .status-available { background: var(--region-accent); color: var(--region-bg); }
+.hub-card.locked { filter: none; }
+.hub-card.locked .hub-thumb { filter: grayscale(0.7); opacity: 0.6; }
+.hub-card.other-region { opacity: 0.55; filter: none !important; }
+.lock-icon { background: color-mix(in srgb, var(--region-bg) 45%, transparent); }
+.scan-btn-floating { display: none !important; }

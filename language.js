@@ -36,7 +36,7 @@ function applyLanguage() {
   // 3. Update toggle button label (if it exists on new page)
   const btnLabel = document.getElementById('lang-label');
   if (btnLabel) {
-    btnLabel.textContent = isAr ? '🇬🇧 English' : '🇸🇦 العربية';
+    btnLabel.textContent = isAr ? 'English' : 'العربية';
   }
   
   // 4. Handle body classes for generic CSS targetting

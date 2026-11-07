@@ -1,421 +1,115 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#14100D">
   <title>CultureLens</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="regional-patterns.css">
-  <style>
-    /* Body background is the shared patchwork (see style.css). */
-    body {
-      overflow-x: hidden;
-    }
-
-    /* ── HERO ── */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 100px 24px 40px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* background geometric pattern */
-    .hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        radial-gradient(circle at 70% 70%, rgba(201, 168, 76, 0.05) 0%, transparent 55%),
-        radial-gradient(circle at 80% 80%, rgba(26, 92, 58, 0.12) 0%, transparent 55%);
-      pointer-events: none;
-    }
-
-    /* dot grid */
-    .dot-grid {
-      position: absolute;
-      top: 80px;
-      right: 20px;
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-      opacity: 0.3;
-    }
-
-    .dot-grid span {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--gold);
-      display: block;
-    }
-
-    /* gold accent bar */
-    .accent-bar {
-      width: 3px;
-      height: 60px;
-      background: linear-gradient(to bottom, transparent, var(--gold), transparent);
-      margin-bottom: 24px;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    .hero-eyebrow {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 2.5px;
-      color: var(--gold);
-      text-transform: uppercase;
-      margin-bottom: 12px;
-      text-align: center;
-    }
-
-    .hero-title {
-      font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
-      font-size: clamp(42px, 12vw, 64px);
-      font-weight: 700;
-      color: var(--white);
-      text-align: center;
-      line-height: 1.1;
-      margin-bottom: 16px;
-    }
-
-    .hero-title span {
-      color: var(--gold);
-    }
-
-    .hero-arabic {
-      font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
-      font-size: 22px;
-      color: var(--gold-lt);
-      direction: rtl;
-      text-align: center;
-      margin-bottom: 10px;
-      font-style: italic;
-    }
-
-    .hero-sub {
-      font-size: 14px;
-      color: var(--text-light);
-      text-align: center;
-      margin-bottom: 40px;
-      font-style: italic;
-    }
-
-    /* ── TRACK BADGE ── */
-    .track-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 18px;
-      border-radius: 50px;
-      background: rgba(201, 168, 76, 0.12);
-      border: 1px solid rgba(201, 168, 76, 0.35);
-      color: var(--gold);
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 48px;
-      letter-spacing: 0.5px;
-    }
-
-    /* ── CATEGORY CARDS ── */
-    .categories {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-      width: 100%;
-      max-width: 420px;
-    }
-
-    .cat-card {
-      background: var(--card-dark);
-      border: 1px solid rgba(201, 168, 76, 0.15);
-      border-radius: 20px;
-      overflow: hidden;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }
-
-    .cat-card:hover,
-    .cat-card:active {
-      transform: translateY(-4px) scale(1.01);
-      border-color: rgba(201, 168, 76, 0.5);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-    }
-
-    .cat-card-top {
-      height: 3px;
-      background: linear-gradient(90deg, var(--gold), var(--gold-lt));
-    }
-
-    .cat-card-body {
-      padding: 20px 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      text-align: center;
-      flex: 1;
-    }
-
-    .cat-emoji {
-      font-size: 36px;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    .cat-card:nth-child(2) .cat-emoji {
-      animation-delay: 0.5s;
-    }
-
-    .cat-card:nth-child(3) .cat-emoji {
-      animation-delay: 1s;
-    }
-
-    .cat-card:nth-child(4) .cat-emoji {
-      animation-delay: 1.5s;
-    }
-
-    .cat-info {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .cat-title {
-      font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--white);
-      line-height: 1.2;
-    }
-
-    .cat-subtitle {
-      font-size: 11px;
-      color: var(--text-light);
-    }
-
-    .cat-experience {
-      font-size: 10px;
-      color: var(--gold);
-      font-weight: 600;
-      margin-top: 4px;
-    }
-
-    .cat-arrow {
-      display: none;
-    }
-
-    /* ── LOCKED CARD ── */
-    .cat-card.locked {
-      opacity: 0.5;
-      pointer-events: auto;
-      position: relative;
-    }
-
-    .cat-card.locked .cat-card-top {
-      background: linear-gradient(90deg, #555, #888);
-    }
-
-    .cat-lock-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 20px;
-      z-index: 5;
-    }
-
-    .cat-lock-icon {
-      font-size: 28px;
-      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
-    }
-
-    /* ── ABOUT STRIP ── */
-    .about-strip {
-      max-width: 420px;
-      width: 100%;
-      margin-top: 40px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .about-item {
-      text-align: center;
-      padding: 16px 8px;
-      background: rgba(18, 43, 30, 0.6);
-      border: 1px solid rgba(201, 168, 76, 0.1);
-      border-radius: 14px;
-    }
-
-    .about-num {
-      font-family: 'saudi-font', 'Segoe UI', Tahoma, sans-serif;
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--gold);
-    }
-
-    .about-label {
-      font-size: 10px;
-      color: var(--text-light);
-      margin-top: 3px;
-      line-height: 1.4;
-    }
-
-  </style>
+  <link rel="stylesheet" href="ui.css">
+<link rel="stylesheet" href="studio.css">
 </head>
 
 <body>
 
-  <!-- HEADER -->
   <header class="cl-header">
-    <div class="logo translatable" data-en="<img src='logo.png' class='logo-img'> Culture<span>Lens</span>"
-      data-ar="<img src='logo.png' class='logo-img'> عدسة <span>الثقافة</span>" data-html="true"><img src="logo.png" class="logo-img"> Culture<span>Lens</span></div>
-    <div style="display:flex;align-items:center;gap:10px;">
-      <button
-        id="region-indicator"
-        onclick="typeof resetRegion === 'function' ? resetRegion() : null"
-        title="Change your region"
-        style="
-          display: none;
-          align-items: center;
-          gap: 6px;
-          background: rgba(201,168,76,0.12);
-          border: 1px solid rgba(201,168,76,0.35);
-          border-radius: 50px;
-          padding: 5px 12px;
-          color: var(--region-accent, #C9A84C);
-          font-size: 11px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: background 0.2s;
-          font-family: inherit;
-        "
-      ></button>
-      <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">🇸🇦 العربية</span></button>
+    <div class="logo"><img src="logo.png" class="logo-img" alt="CultureLens"></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button id="region-indicator" type="button" onclick="resetRegion()" style="display:none"></button>
+      <button id="lang-toggle" type="button" onclick="toggleLanguage()"><span id="lang-label">العربية</span></button>
     </div>
   </header>
 
-  <!-- HERO -->
-  <main class="hero">
-
-    <!-- dot grid decoration -->
-    <div class="dot-grid">
-      <span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span>
-    </div>
-
-    <div class="accent-bar"></div>
-    <div class="hero-eyebrow translatable" data-en="Nourah Hackathon 2026" data-ar="هاكاثون نورة ٢٠٢٦">Nourah Hackathon
-      2026</div>
-    <img src="logo.png" class="hero-logo-img" alt="CultureLens Logo">
-    <h1 class="hero-title translatable" data-en="Culture<span>Lens</span>"
-      data-ar="عدسة <span>الثقافة</span>" data-html="true">Culture<span>Lens</span></h1>
-    <div class="hero-sub translatable" data-en="Live culture. Don't just read about it."
-      data-ar="عيش الثقافة. لا تقرأ عنها بس.">Live culture. Don't just read about it.</div>
-
-    <div class="track-badge translatable"
-      data-en="<img src='mudhouse.png' alt='Mudhouse' class='emoji-img'> &nbsp; Track: Promoting Regional Cultures"
-      data-ar="<img src='mudhouse.png' alt='Mudhouse' class='emoji-img'> &nbsp; المسار: تعزيز ثقافات المناطق"
-      data-html="true">
-      <img src="mudhouse.png" alt="Mudhouse" class="emoji-img"> &nbsp; Track: Promoting Regional Cultures
-    </div>
-
-    <!-- CATEGORY CARDS -->
-    <div class="categories">
-
-      <a href="food.html" class="cat-card glass-card">
-        <div class="cat-card-body">
-          <div class="cat-emoji"><img src="dallah.png" alt="Dallah" class="emoji-img"></div>
-          <div class="cat-info">
-            <div class="cat-title translatable" data-en="Food & Drinks" data-ar="الأكل والشرب">Food & Drinks</div>
-            <div class="cat-subtitle translatable" data-en="Hospitality & Society" data-ar="الضيافة والمجتمع">
-              Hospitality & Society</div>
-            <div class="cat-experience translatable" data-en="✦ Qahwa Ceremony" data-ar="✦ مجلس القهوة">✦ Qahwa Ceremony
-            </div>
-          </div>
+  <!-- HOME -->
+  <main class="home">
+    <section class="hx">
+      <div class="hx-band" data-motif="full" data-motif-scale="1.5" aria-hidden="true"></div>
+      <div class="hx-body">
+        <div class="kicker" data-region-text="area"></div>
+        <h1 class="hx-title" data-region-text="name">CultureLens</h1>
+        <p class="hx-welcome translatable" data-dialect="welcome" data-en="Welcome" data-ar="حيّاك الله">Welcome</p>
+        <div class="hx-actions">
+          <button type="button" class="btn btn-outline" onclick="resetRegion()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg><span class="translatable" data-dialect="change" data-en="Change region" data-ar="غيّر المنطقة">Change region</span></button>
         </div>
-      </a>
+        <p class="hx-motif"><span class="translatable" data-en="Pattern:" data-ar="النقش:">Pattern:</span> <span data-region-text="motif"></span></p>
+      </div>
+    </section>
 
-      <a href="#" class="cat-card locked glass-card"
-        onclick="event.preventDefault(); alert(window.currentLang === 'ar' ? 'قريباً في التحديث القادم!' : 'Coming in the next update!')">
-        <div class="cat-lock-overlay"><span class="cat-lock-icon">🔒</span></div>
-        <div class="cat-card-body">
-          <div class="cat-emoji">🧵</div>
-          <div class="cat-info">
-            <div class="cat-title translatable" data-en="Fabrics" data-ar="الأزياء والثياب">Fabrics</div>
-            <div class="cat-subtitle translatable" data-en="Identity & Region" data-ar="الهوية والمنطقة">Identity &
-              Region</div>
-            <div class="cat-experience translatable" data-en="✦ Coming Soon" data-ar="✦ قريباً">✦ Coming Soon</div>
-          </div>
-        </div>
-      </a>
+    <section class="home-section">
+      <h2 class="sec-label translatable" data-en="Featured" data-ar="مختارة لك">Featured</h2>
+      <div id="home-featured"></div>
 
-      <a href="music.html" class="cat-card glass-card">
-        <div class="cat-card-body">
-          <div class="cat-emoji"><img src="oud.png" alt="Oud" class="emoji-img"></div>
-          <div class="cat-info">
-            <div class="cat-title translatable" data-en="Music" data-ar="الفن والطرب">Music</div>
-            <div class="cat-subtitle translatable" data-en="Celebration & Story" data-ar="الفرح والقصص">Celebration &
-              Story</div>
-            <div class="cat-experience translatable" data-en="✦ Al-Samri 3D" data-ar="✦ السامري">✦ Al-Samri 3D</div>
-          </div>
-        </div>
-      </a>
-
-      <a href="#" class="cat-card locked glass-card"
-        onclick="event.preventDefault(); alert(window.currentLang === 'ar' ? 'قريباً في التحديث القادم!' : 'Coming in the next update!')">
-        <div class="cat-lock-overlay"><span class="cat-lock-icon">🔒</span></div>
-        <div class="cat-card-body">
-          <div class="cat-emoji"><img src="mudhouse.png" alt="Mudhouse" class="emoji-img"></div>
-          <div class="cat-info">
-            <div class="cat-title translatable" data-en="Heritage & Landmarks" data-ar="التراث والمعالم">Heritage &
-              Landmarks</div>
-            <div class="cat-subtitle translatable" data-en="Ancient Roots" data-ar="الجذور القديمة">Ancient Roots</div>
-            <div class="cat-experience translatable" data-en="✦ Coming Soon" data-ar="✦ قريباً">✦ Coming Soon</div>
-          </div>
-        </div>
-      </a>
-
-    </div>
-
-
-
+      <h2 class="sec-label translatable" data-en="Explore" data-ar="استكشف">Explore</h2>
+      <nav class="cat-list" aria-label="Categories">
+        <a class="cat-row" href="food.html" data-category="food">
+          <span class="cat-num">01</span>
+          <span><span class="cat-title translatable" data-en="Food &amp; Drinks" data-ar="المأكولات والمشروبات">Food &amp; Drinks</span><span class="cat-sub translatable" data-en="Dishes, drinks, and the customs around them" data-ar="أكلات ومشروبات وسلومها">Dishes, drinks, and the customs around them</span></span>
+          <span class="cat-meta"></span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
+        <a class="cat-row" href="music.html" data-category="music">
+          <span class="cat-num">02</span>
+          <span><span class="cat-title translatable" data-en="Music &amp; Performances" data-ar="الفنون والعروض">Music &amp; Performances</span><span class="cat-sub translatable" data-en="Folk arts, instruments, and performances" data-ar="الفنون الشعبية وآلاتها">Folk arts, instruments, and performances</span></span>
+          <span class="cat-meta"></span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
+        <a class="cat-row" href="games.html" data-category="games">
+          <span class="cat-num">03</span>
+          <span><span class="cat-title translatable" data-en="Traditional Games" data-ar="الألعاب القديمة">Traditional Games</span><span class="cat-sub translatable" data-en="The games of the old neighborhoods" data-ar="ألعاب الحواري القديمة">The games of the old neighborhoods</span></span>
+          <span class="cat-meta"></span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
+        <a class="cat-row" href="clothing.html" data-category="clothing">
+          <span class="cat-num">04</span>
+          <span><span class="cat-title translatable" data-en="Fabrics &amp; Clothing" data-ar="الأزياء والثياب">Fabrics &amp; Clothing</span><span class="cat-sub translatable" data-en="What we wear and where it comes from" data-ar="وش نلبس ومن وين جا">What we wear and where it comes from</span></span>
+          <span class="cat-meta"></span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
+      </nav>
+    </section>
   </main>
 
-  <footer class="cl-footer">
-    <div>هاكاثون نورة 2026 &nbsp;|&nbsp; تعزيز ثقافات المناطق &nbsp;|&nbsp; CultureLens</div>
-  </footer>
-
-  <!-- 5-REGION SELECTOR MODAL -->
-  <div id="region-modal" role="dialog" aria-modal="true" aria-label="Select Your Region">
-    <div class="modal-header">
-      <div class="modal-eyebrow">✦ Choose Your Region — اختر منطقتك ✦</div>
-      <div class="modal-title">Where are you<br><span style="color:var(--region-accent,#C9A84C)">from?</span></div>
-      <div class="modal-sub">من أي منطقة أنت؟</div>
+  <!-- REGION MAP: opening screen. Tap a region to enter it. -->
+  <section id="region-map-screen" aria-hidden="true" aria-labelledby="rm-title">
+    <div class="rm-lockup"><img src="logo-mark.png" alt=""><div class="rm-name">CultureLens<small>عدسة ثقافية</small></div></div>
+    <div class="kicker translatable" data-en="CultureLens" data-ar="عدسة ثقافية">CultureLens</div>
+    <h1 class="rm-title translatable" id="rm-title" data-en="Where do you want to start?" data-ar="من وين تبي تبدأ؟">Where do you want to start?</h1>
+    <p class="rm-sub translatable" data-en="Pick a region. The app takes on its patterns, its colors, and the way people there speak." data-ar="اختر منطقة، والتطبيق ياخذ نقوشها وألوانها وطريقة كلام أهلها.">Pick a region. The app takes on its patterns, its colors, and the way people there speak.</p>
+    <div class="rm-map">
+      <svg viewBox="-6 -6 742 612" role="group" aria-label="Map of Saudi Arabia by region">
+        <g>
+          <path class="rm-region" data-region-key="northern" data-c="#D9824F" role="button" tabindex="0" aria-pressed="false" aria-label="Northern Region / المنطقة الشمالية" d="M4.4,165.2 4.8,168.6 6.2,167.0 5.6,165.9 6.8,164.3 9.2,165.5 8.8,167.2 9.7,167.1 9.3,165.9 11.0,166.8 12.0,164.6 12.5,166.8 19.7,165.2 21.4,166.9 26.7,168.0 23.3,169.0 23.5,169.6 26.8,171.3 29.9,174.9 30.1,177.4 32.8,178.9 38.1,191.5 40.7,194.4 43.2,195.7 45.5,199.5 45.3,203.8 53.6,212.1 55.5,218.1 57.3,219.0 63.0,227.7 69.3,242.0 71.9,244.2 76.5,245.5 76.1,249.7 74.5,252.3 77.9,256.5 79.3,257.5 81.0,257.0 82.4,259.0 84.5,259.9 85.8,263.6 86.7,263.8 86.6,265.6 89.3,267.8 90.6,272.9 95.3,278.1 95.9,280.7 95.1,282.2 96.5,285.0 95.2,288.1 95.9,289.6 94.6,291.0 92.0,291.2 94.3,295.6 97.0,297.1 99.9,302.0 101.4,297.3 109.4,295.9 111.9,292.7 118.4,292.7 120.0,291.9 121.1,288.8 120.8,275.3 122.0,267.5 120.9,266.1 117.0,265.7 113.4,255.5 107.5,250.3 106.3,246.4 99.3,242.1 95.8,244.0 92.4,234.5 92.5,232.2 95.7,226.6 95.6,223.7 87.7,220.1 86.0,215.9 86.8,206.9 85.8,202.7 84.4,201.4 78.9,201.4 79.8,199.2 84.5,198.0 95.0,193.4 101.3,196.8 103.7,197.1 112.8,192.9 114.7,194.7 116.1,199.5 119.6,205.4 127.3,206.4 128.3,207.7 128.3,210.0 132.0,212.5 131.7,215.6 132.7,216.7 139.8,212.5 146.0,215.1 146.8,214.4 146.0,211.4 147.1,210.6 149.4,214.9 154.1,216.3 160.3,220.8 169.1,220.7 179.6,218.6 181.9,219.0 184.3,222.9 184.6,225.6 182.2,231.9 184.2,233.6 187.4,232.8 188.5,233.8 186.5,248.9 188.6,258.7 188.1,268.8 190.0,271.9 191.6,272.6 202.5,269.4 210.5,269.0 212.9,267.8 216.8,263.2 220.1,262.0 226.8,261.8 238.6,264.1 239.8,262.7 244.7,262.0 250.7,258.4 257.5,257.0 255.1,251.4 255.5,249.0 257.6,247.3 264.0,248.9 263.6,241.8 265.5,237.0 271.2,236.4 272.1,232.1 276.8,227.2 288.7,218.0 300.0,212.8 302.8,207.0 305.5,204.2 324.1,195.5 326.5,196.3 330.9,200.8 336.9,204.9 344.4,205.5 349.5,199.6 348.8,196.2 352.2,189.7 355.4,188.1 358.8,190.7 360.6,189.9 361.9,187.6 360.1,184.3 361.4,179.6 370.5,167.5 383.2,143.8 391.4,135.1 403.9,130.7 351.8,122.0 193.6,11.4 187.5,8.5 169.0,3.1 165.5,0.2 165.9,2.2 155.4,11.3 86.7,31.5 121.0,71.3 109.6,78.0 103.9,91.2 78.1,96.4 69.3,111.2 54.6,123.2 16.4,116.4 15.2,119.1 15.7,121.0 14.7,121.7 12.5,129.1 11.9,138.0 9.9,143.7 11.0,149.2 6.5,159.1 5.9,163.2 5.0,162.8 3.0,166.1ZM0.5,171.3 2.3,173.0 4.7,172.6 3.6,170.7Z"/>
+          <path class="rm-region" data-region-key="hejaz" data-c="#3FB3A5" role="button" tabindex="0" aria-pressed="false" aria-label="Hejaz / الحجاز" d="M101.6,306.4 101.3,308.2 104.6,312.0 107.9,312.9 108.5,311.5 110.4,310.7 116.3,316.4 118.2,316.2 122.4,319.5 124.6,318.7 124.0,319.7 128.9,324.4 131.3,324.9 137.1,330.4 138.0,334.8 139.5,336.0 139.9,339.4 140.7,339.9 141.5,339.1 143.1,340.7 145.7,350.6 147.4,353.1 148.2,352.3 149.1,356.9 148.3,358.6 149.8,360.9 152.9,360.9 154.5,364.6 154.0,365.3 152.8,365.1 151.7,362.4 150.4,361.9 158.5,376.0 158.2,381.8 159.6,382.8 156.7,389.8 156.2,393.2 158.6,394.3 156.2,394.3 156.0,397.0 154.4,396.7 155.2,395.2 153.8,395.5 153.4,398.2 158.4,407.4 159.3,413.5 161.6,415.6 160.7,415.7 160.9,417.3 162.1,418.3 161.4,420.1 159.1,422.2 161.2,425.4 162.1,429.7 163.8,430.7 166.2,436.1 168.3,437.0 168.0,438.3 170.2,440.1 171.1,442.6 172.6,443.1 175.6,449.4 177.3,451.4 178.3,451.0 178.1,452.1 179.2,452.9 178.6,453.4 180.4,455.4 188.2,460.5 187.5,458.8 189.6,460.4 192.2,459.5 193.8,460.1 195.8,463.1 198.1,463.0 198.0,464.2 199.8,466.3 202.8,467.3 208.5,471.2 208.5,473.6 209.8,474.1 210.1,476.1 211.5,476.8 212.0,478.3 213.3,479.2 212.2,478.2 215.4,477.4 216.8,479.0 217.9,482.1 217.6,484.2 216.6,483.3 216.8,484.3 223.1,488.3 222.8,493.5 225.8,496.3 226.9,501.9 230.0,503.2 228.9,507.9 230.1,510.6 232.8,511.9 231.6,516.8 233.5,520.6 236.8,521.5 238.9,523.9 240.2,530.1 241.7,532.8 241.4,533.9 242.3,533.4 244.5,538.4 246.5,535.2 250.0,533.2 252.5,524.8 249.6,515.7 247.4,514.5 240.7,514.2 238.3,512.3 238.2,499.3 240.9,501.1 244.8,498.3 251.7,498.4 253.3,497.6 255.3,491.6 253.1,487.2 254.2,478.7 252.3,476.8 250.1,476.7 247.8,477.9 241.6,478.6 239.2,483.0 236.6,492.0 231.8,493.1 228.2,489.0 223.2,485.3 222.9,471.7 221.9,470.2 217.6,468.4 217.4,467.0 221.4,462.9 229.1,461.0 233.2,452.8 232.2,445.9 232.9,443.8 234.3,442.4 238.0,442.7 240.5,447.9 242.4,449.4 247.0,447.6 251.1,447.8 256.6,445.0 258.0,445.2 260.0,447.2 264.7,456.2 268.4,457.5 270.7,456.4 280.8,447.1 287.2,444.1 291.5,440.3 296.0,440.0 301.4,438.2 306.7,439.5 312.4,435.7 316.4,434.3 306.7,419.4 308.5,410.9 307.9,404.0 310.9,398.2 309.1,385.1 309.8,377.3 303.3,375.9 297.7,377.4 294.0,376.1 292.7,373.8 293.9,365.6 292.0,363.7 274.8,362.2 271.8,360.6 266.7,349.3 265.8,343.7 262.5,334.1 258.4,330.8 258.4,315.1 259.8,310.2 258.9,306.6 261.9,302.4 262.3,299.2 258.2,295.8 255.0,285.0 248.3,282.5 246.6,280.5 246.9,267.2 245.5,266.0 238.6,264.2 226.8,261.9 220.1,262.1 216.8,263.3 213.0,267.9 210.6,269.1 202.5,269.5 193.1,272.8 190.0,272.0 188.1,268.9 188.6,258.8 186.5,249.0 188.5,233.9 187.5,232.9 184.2,233.7 182.2,232.0 184.6,225.7 184.4,223.0 181.9,219.0 179.6,218.6 169.2,220.7 160.3,220.8 154.1,216.3 149.4,214.9 147.2,210.6 146.0,211.4 146.8,214.4 146.0,215.0 139.9,212.5 132.7,216.7 131.7,215.6 132.0,212.5 128.3,210.0 128.3,207.6 127.3,206.4 119.6,205.3 113.6,193.1 111.3,193.3 103.7,197.0 101.3,196.7 94.9,193.3 93.4,193.7 84.5,198.0 79.8,199.1 78.9,201.3 84.3,201.3 85.8,202.7 86.8,206.9 85.9,215.8 86.6,218.5 89.2,221.3 95.6,223.6 95.7,226.6 92.5,232.1 92.3,234.5 95.8,244.0 99.3,242.0 106.2,246.3 107.5,250.2 113.3,255.4 116.9,265.6 120.8,266.0 122.0,267.4 120.8,275.3 120.9,290.3 118.4,292.6 111.9,292.6 109.4,295.9 107.0,296.8 101.4,297.2 99.9,302.0 104.2,307.8Z"/>
+          <path class="rm-region" data-region-key="najd" data-c="#C9A84C" role="button" tabindex="0" aria-pressed="false" aria-label="Najd / نجد" d="M245.5,265.9 246.8,267.1 247.1,269.1 246.5,280.4 248.3,282.4 255.0,284.9 258.1,295.7 262.2,299.1 261.8,302.3 258.9,306.5 259.8,310.1 258.4,315.0 258.4,330.8 262.5,334.1 265.8,343.7 266.7,349.3 271.8,360.6 274.8,362.2 292.0,363.7 293.9,365.6 292.7,373.8 294.0,376.1 297.7,377.4 303.3,375.9 309.8,377.3 309.1,385.1 310.9,398.2 307.9,403.9 308.4,410.9 306.7,419.4 316.4,434.3 322.1,439.3 329.9,449.5 329.8,452.5 326.4,458.6 325.2,464.7 325.4,466.3 332.1,475.6 345.6,487.7 354.1,493.3 362.6,496.4 371.5,497.1 430.3,492.1 446.7,489.7 456.8,487.0 476.3,334.2 476.3,326.4 475.0,319.6 470.4,311.7 461.2,302.6 451.7,296.3 448.3,292.7 447.3,281.6 447.5,243.9 446.0,236.3 433.3,231.1 431.8,228.6 425.4,222.5 417.0,223.2 404.7,215.1 393.7,213.6 386.2,206.0 380.4,204.9 370.0,198.8 367.4,192.2 361.9,187.6 360.6,189.9 358.8,190.7 355.4,188.1 352.2,189.7 349.8,193.1 348.8,196.2 349.5,199.6 344.4,205.5 336.9,204.9 330.9,200.8 326.5,196.3 324.1,195.5 305.5,204.2 302.8,207.0 300.0,212.8 288.7,218.0 276.8,227.2 272.1,232.1 271.2,236.4 265.5,237.0 263.6,241.8 264.0,248.9 257.6,247.3 255.5,249.0 255.1,251.4 257.5,257.0 250.7,258.4 244.7,262.0 239.8,262.7 238.6,264.1Z"/>
+          <path class="rm-region" data-region-key="eastern" data-c="#4A9FC9" role="button" tabindex="0" aria-pressed="false" aria-label="Eastern Region / المنطقة الشرقية" d="M455.5,149.2 452.2,143.8 451.3,136.6 447.1,130.6 415.8,126.5 409.0,130.9 403.9,130.8 391.5,135.2 383.2,143.9 370.6,167.6 361.4,179.7 360.1,184.4 362.0,187.7 367.4,192.3 370.1,198.9 380.5,205.0 386.2,206.0 393.7,213.6 404.7,215.2 417.1,223.3 425.4,222.6 431.8,228.7 433.3,231.2 446.0,236.4 447.6,243.9 447.3,281.6 448.3,292.7 451.7,296.3 461.2,302.6 470.4,311.8 475.0,319.6 476.4,326.5 476.3,334.3 446.3,575.0 447.8,574.1 452.7,561.9 473.6,536.3 505.7,520.6 563.5,514.3 603.5,506.4 706.9,470.0 729.9,396.7 714.2,370.7 707.1,378.2 623.6,359.7 589.3,318.1 589.8,313.8 589.1,312.6 587.5,312.7 586.0,310.6 584.3,309.9 582.3,310.1 581.4,311.3 579.1,310.9 580.1,306.0 583.2,303.5 583.6,302.0 586.4,300.5 585.7,299.8 584.7,300.4 584.2,298.7 582.8,298.6 580.9,302.3 579.5,303.1 580.0,299.4 579.3,299.8 578.8,298.8 576.6,298.8 572.5,301.5 567.9,300.7 564.3,296.3 563.4,293.7 561.8,294.0 561.2,295.9 559.7,289.3 558.2,288.6 557.2,285.3 554.7,281.8 554.4,282.5 551.6,269.1 548.3,266.6 547.7,265.0 546.7,265.7 546.3,263.1 545.1,262.6 545.0,263.7 544.0,263.4 541.8,260.6 543.7,259.0 539.4,253.2 538.1,250.3 539.2,249.1 538.2,247.0 536.0,246.2 534.6,247.8 535.1,243.2 534.2,241.9 535.3,239.1 536.6,239.4 539.2,245.3 540.5,241.3 542.1,239.6 542.6,233.3 541.0,229.0 541.9,227.2 541.2,226.4 541.1,228.5 539.1,231.5 539.2,227.5 537.1,228.9 534.9,224.5 537.6,225.9 536.7,223.6 535.1,224.1 534.6,218.7 536.0,221.0 538.7,220.7 540.6,222.4 533.1,214.0 530.1,213.7 523.3,209.0 524.0,207.1 522.5,207.4 521.5,206.2 524.9,204.9 523.9,204.5 521.5,205.9 519.8,203.2 519.6,203.9 518.9,199.3 517.8,199.2 517.1,196.4 518.2,195.2 519.9,196.0 519.0,196.5 519.5,197.1 522.6,196.1 518.4,194.5 517.0,194.8 515.8,197.2 516.8,198.3 516.1,199.3 518.5,200.8 517.3,202.1 518.2,203.8 515.5,203.9 514.5,200.9 511.8,200.6 511.2,199.5 511.2,195.8 508.7,195.7 508.2,194.2 509.5,193.3 508.2,192.6 508.2,193.6 507.2,193.8 505.5,192.4 506.5,191.1 510.9,191.9 510.7,190.1 509.0,188.1 503.7,187.4 499.0,184.3 496.5,185.6 497.2,184.2 495.9,185.3 494.7,184.8 495.9,182.6 494.9,182.9 494.8,181.0 494.2,182.0 493.7,178.7 495.3,178.8 495.3,179.7 496.2,179.1 496.2,176.1 491.5,171.6 491.4,170.5 493.0,169.7 489.1,168.6 487.1,166.2 486.9,162.6 487.6,162.0 483.4,156.8 484.4,153.8 482.9,152.6 483.0,150.4 480.5,148.8Z"/>
+          <path class="rm-region" data-region-key="southern" data-c="#D1495B" role="button" tabindex="0" aria-pressed="false" aria-label="Southern Region / المنطقة الجنوبية" d="M247.0,542.9 251.3,547.5 251.1,548.3 254.9,549.7 262.8,555.9 263.8,558.3 264.8,558.3 268.4,562.3 269.8,562.6 269.4,566.4 271.7,577.8 272.7,574.1 274.4,576.5 277.9,578.3 278.2,581.5 277.1,582.5 278.7,584.3 280.7,584.8 283.2,587.9 284.0,590.3 283.5,593.8 285.5,597.2 285.3,599.7 291.8,599.8 291.4,597.1 297.5,594.7 298.4,590.9 297.6,589.3 301.6,590.8 301.1,588.2 302.8,587.3 302.6,585.2 298.2,581.6 299.8,580.3 299.5,577.5 301.8,577.8 302.3,576.9 301.5,575.2 299.9,574.7 297.1,575.9 296.7,575.0 299.5,573.6 299.4,572.1 301.0,570.8 300.5,568.9 305.0,567.5 302.4,564.9 302.3,562.5 304.2,559.6 303.3,558.2 305.2,557.3 307.6,557.6 315.3,563.3 315.3,562.5 317.9,565.2 319.9,564.9 322.6,566.0 326.8,566.3 328.2,564.4 331.1,563.9 332.2,565.2 333.0,563.7 341.8,562.6 344.5,562.5 347.1,563.8 350.5,562.6 370.2,562.6 376.5,566.6 399.9,569.4 412.9,569.8 423.6,568.3 431.7,579.3 438.8,579.7 446.2,575.0 456.8,487.0 446.7,489.7 430.3,492.1 371.5,497.1 362.6,496.4 354.1,493.3 345.6,487.7 332.1,475.6 325.4,466.3 325.2,464.7 326.4,458.6 329.8,452.5 329.9,449.5 322.1,439.3 316.4,434.3 312.4,435.7 306.6,439.5 301.4,438.2 296.0,439.9 291.5,440.2 287.2,444.0 280.8,447.1 270.7,456.3 268.4,457.5 264.7,456.2 260.0,447.1 258.0,445.2 256.5,445.0 251.1,447.7 247.0,447.5 242.4,449.3 240.4,447.8 237.9,442.6 234.3,442.3 232.2,445.8 233.2,452.7 229.1,460.9 221.4,462.8 217.4,466.9 218.2,469.0 221.9,470.1 222.9,471.6 223.2,485.2 228.2,488.9 231.8,493.0 236.6,491.9 239.2,482.9 241.6,478.5 247.7,477.9 250.0,476.6 252.3,476.7 254.2,478.6 253.1,487.1 255.3,491.5 253.2,497.5 251.7,498.3 244.7,498.2 240.9,501.0 238.1,499.2 238.3,512.2 240.7,514.1 247.4,514.3 249.5,515.5 252.5,524.7 250.0,533.2 246.5,535.3 244.5,538.4 245.3,540.2 246.7,540.7ZM250.6,582.1 251.6,584.0 251.2,585.2 252.5,585.3 254.6,588.2 257.7,590.1 260.8,589.2 262.6,589.7 262.7,590.9 261.4,591.5 265.4,593.2 265.0,590.2 265.7,588.6 263.3,587.5 262.3,585.0 260.7,585.5 259.9,587.5 257.0,584.5 258.4,584.4 258.6,582.9 256.6,581.6 256.8,579.0 255.1,578.4 256.3,579.5 255.1,581.2 253.5,581.4 255.0,584.7ZM259.2,587.4 255.2,587.1 254.1,584.7 258.3,586.1Z"/>
+        </g>
+        <g aria-hidden="true">
+          <text class="rm-label translatable" x="191.8" y="153.8" data-en="Northern" data-ar="الشمال">Northern</text>
+          <text class="rm-label translatable" x="201.0" y="356.2" data-en="Hejaz" data-ar="الحجاز">Hejaz</text>
+          <text class="rm-label translatable" x="370.7" y="351.3" data-en="Najd" data-ar="نجد">Najd</text>
+          <text class="rm-label translatable" x="538.5" y="369.2" data-en="Eastern" data-ar="الشرقية">Eastern</text>
+          <text class="rm-label translatable" x="334.0" y="526.6" data-en="Southern" data-ar="الجنوب">Southern</text>
+        </g>
+      </svg>
     </div>
-    <div id="region-grid"></div>
-  </div>
+    <div class="rm-legend">
+        <button type="button" data-region-key="najd"><span class="sw" aria-hidden="true"></span><span><b class="translatable" data-en="Najd" data-ar="نجد">Najd</b><small class="translatable" data-en="Riyadh and Al-Qassim" data-ar="الرياض والقصيم">Riyadh and Al-Qassim</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button type="button" data-region-key="hejaz"><span class="sw" aria-hidden="true"></span><span><b class="translatable" data-en="Hejaz" data-ar="الحجاز">Hejaz</b><small class="translatable" data-en="Makkah and Madinah" data-ar="مكة المكرمة والمدينة المنورة">Makkah and Madinah</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button type="button" data-region-key="eastern"><span class="sw" aria-hidden="true"></span><span><b class="translatable" data-en="Eastern Region" data-ar="المنطقة الشرقية">Eastern Region</b><small class="translatable" data-en="Al-Ahsa and the Gulf coast" data-ar="الأحساء وساحل الخليج">Al-Ahsa and the Gulf coast</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button type="button" data-region-key="southern"><span class="sw" aria-hidden="true"></span><span><b class="translatable" data-en="Southern Region" data-ar="المنطقة الجنوبية">Southern Region</b><small class="translatable" data-en="Asir, Jazan, Najran, and Al-Baha" data-ar="عسير وجازان ونجران والباحة">Asir, Jazan, Najran, and Al-Baha</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button type="button" data-region-key="northern"><span class="sw" aria-hidden="true"></span><span><b class="translatable" data-en="Northern Region" data-ar="المنطقة الشمالية">Northern Region</b><small class="translatable" data-en="Ha'il, Al-Jawf, Tabuk, and the Northern Borders" data-ar="حائل والجوف وتبوك والحدود الشمالية">Ha'il, Al-Jawf, Tabuk, and the Northern Borders</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+    <div class="rm-credit">Map outline: MapSVG, CC BY 4.0</div>
+  </section>
 
   <script src="language.js"></script>
-  <script src="ThemeManager.js"></script>
+  <script src="patterns.js"></script>
+  <script src="content.js"></script>
+  <script src="keyart.js"></script>
+<script src="ThemeManager.js"></script>
   <script>window.ACTIVE_NAV = 'explore';</script>
   <script src="navbar.js"></script>
 </body>
 
 </html>
-

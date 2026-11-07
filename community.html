@@ -6,6 +6,7 @@
 <title>Community — CultureLens</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="regional-patterns.css">
+<link rel="stylesheet" href="ui.css">
 <style>
   .page-wrap {
     max-width: 460px;
@@ -360,15 +361,15 @@
   .composer-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(201,168,76,0.45); }
   .composer-submit:disabled { opacity: 0.4; cursor: not-allowed; transform:none; box-shadow:none; }
 </style>
+<link rel="stylesheet" href="studio.css">
 </head>
 <body>
 
 <header class="cl-header">
   <a href="index.html" class="back-btn">‹</a>
-  <div class="logo translatable" data-en="<img src='logo.png' class='logo-img'> Culture<span>Lens</span>" data-ar="<img src='logo.png' class='logo-img'> عدسة <span>الثقافة</span>" data-html="true"><img src="logo.png" class="logo-img"> Culture<span>Lens</span></div>
+  <div class="logo translatable" data-en="<img src='logo.png' class='logo-img'> Culture<span>Lens</span>" data-ar="<img src='logo.png' class='logo-img'> عدسة <span>ثقافية</span>" data-html="true"><img src="logo.png" class="logo-img"> Culture<span>Lens</span></div>
   <div style="display:flex;align-items:center;gap:12px;">
-    <div style="font-size:10px;color:var(--text-light);text-align:right" class="translatable" data-en="✦ Community" data-ar="✦ المجتمع">✦ Community</div>
-    <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">🇸🇦 العربية</span></button>
+    <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">العربية</span></button>
   </div>
 </header>
 
@@ -447,9 +448,6 @@
   </div>
 </div>
 
-<footer class="cl-footer">
-  <div>هاكاثون نورة 2026 | CultureLens</div>
-</footer>
 
 <script>
 // ── SAMPLE SEED DATA ──
@@ -711,6 +709,9 @@ renderFeed();
 </script>
 
 <script src="language.js"></script>
+<script src="patterns.js"></script>
+<script src="content.js"></script>
+<script src="keyart.js"></script>
 <script src="ThemeManager.js"></script>
 <script>window.ACTIVE_NAV = 'community';</script>
 <script src="navbar.js"></script>

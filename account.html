@@ -6,6 +6,7 @@
 <title>My Account — CultureLens</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="regional-patterns.css">
+<link rel="stylesheet" href="ui.css">
 <style>
   .page-wrap {
     max-width: 460px;
@@ -245,15 +246,15 @@
   .setting-row.danger .setting-label { color: #E8695B; }
   .setting-row.danger:hover { background: rgba(232,105,91,0.08); }
 </style>
+<link rel="stylesheet" href="studio.css">
 </head>
 <body>
 
 <header class="cl-header">
   <a href="index.html" class="back-btn">‹</a>
-  <div class="logo translatable" data-en="<img src='logo.png' class='logo-img'> Culture<span>Lens</span>" data-ar="<img src='logo.png' class='logo-img'> عدسة <span>الثقافة</span>" data-html="true"><img src="logo.png" class="logo-img"> Culture<span>Lens</span></div>
+  <div class="logo translatable" data-en="<img src='logo.png' class='logo-img'> Culture<span>Lens</span>" data-ar="<img src='logo.png' class='logo-img'> عدسة <span>ثقافية</span>" data-html="true"><img src="logo.png" class="logo-img"> Culture<span>Lens</span></div>
   <div style="display:flex;align-items:center;gap:12px;">
-    <div style="font-size:10px;color:var(--text-light);text-align:right" class="translatable" data-en="✦ Account" data-ar="✦ الحساب">✦ Account</div>
-    <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">🇸🇦 العربية</span></button>
+    <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">العربية</span></button>
   </div>
 </header>
 
@@ -276,46 +277,18 @@
       <div class="bio translatable" id="bio" contenteditable="true" spellcheck="false" data-en="Curious about Saudi heritage — always learning." data-ar="مهتم بالتراث السعودي — دايماً أتعلم.">Curious about Saudi heritage — always learning.</div>
     </div>
     <div>
-      <span class="region-pill translatable" data-en="🏜️ Riyadh — الرياض" data-ar="🏜️ الرياض">🏜️ Riyadh — الرياض</span>
+      <span class="region-pill translatable" data-en="Najd" data-ar="نجد">Najd</span>
     </div>
+    <div class="player-level" id="player-level"></div>
   </section>
 
-  <!-- MY JOURNEY -->
+  <!-- YOUR COLLECTION: a medal for each full experience, from real progress -->
   <section class="section">
     <div class="section-title">
-      <span class="translatable" data-en="My Journey" data-ar="رحلتي">My Journey</span>
-      <small class="translatable" data-en="Your experience progress" data-ar="تقدمك في التجارب">Your experience progress</small>
+      <span class="translatable" data-en="Your collection" data-ar="مجموعتك">Your collection</span>
+      <small class="translatable" data-en="A medal for every experience you play" data-ar="ميدالية لكل تجربة تلعبها">A medal for every experience you play</small>
     </div>
-
-    <div class="journey-card">
-      <div class="journey-icon"><img src="dallah.png" alt="Dallah" class="emoji-img"></div>
-      <div class="journey-body">
-        <div class="journey-name translatable" data-en="Najdi Qahwa Ceremony" data-ar="مجلس القهوة النجدية">Najdi Qahwa Ceremony</div>
-        <div class="journey-bar"><div class="journey-bar-fill" style="width:100%"></div></div>
-        <div class="journey-score translatable" data-en="Score: 4 / 4 — Master of the Majlis" data-ar="النتيجة: ٤ / ٤ — راعي المجلس">Score: 4 / 4 — Master of the Majlis</div>
-      </div>
-      <div class="journey-check">✓</div>
-    </div>
-
-    <div class="journey-card">
-      <div class="journey-icon">🥁</div>
-      <div class="journey-body">
-        <div class="journey-name translatable" data-en="Al-Samri Circle" data-ar="جلسة السامري">Al-Samri Circle</div>
-        <div class="journey-bar"><div class="journey-bar-fill" style="width:75%"></div></div>
-        <div class="journey-score translatable" data-en="Score: 3 / 4 — Keep the rhythm!" data-ar="النتيجة: ٣ / ٤ — حافظ على الإيقاع!">Score: 3 / 4 — Keep the rhythm!</div>
-      </div>
-      <div class="journey-check">✓</div>
-    </div>
-
-    <div class="journey-card locked">
-      <div class="journey-icon">⚔️</div>
-      <div class="journey-body">
-        <div class="journey-name translatable" data-en="Al-Ardah Sword Dance" data-ar="العرضة النجدية">Al-Ardah Sword Dance</div>
-        <div class="journey-bar"><div class="journey-bar-fill" style="width:0%"></div></div>
-        <div class="journey-score translatable" data-en="Locked — coming soon" data-ar="مقفلة — قريباً">Locked — coming soon</div>
-      </div>
-      <div class="journey-lock">🔒</div>
-    </div>
+    <div class="collection" id="collection"></div>
   </section>
 
   <!-- MY POSTS -->
@@ -379,9 +352,6 @@
 
 </main>
 
-<footer class="cl-footer">
-  <div>هاكاثون نورة 2026 | CultureLens</div>
-</footer>
 
 <script>
 // ── AVATAR UPLOAD ──
@@ -428,8 +398,8 @@ function openRegionPicker() {
 
 function openAbout() {
   alert(window.currentLang === 'ar'
-    ? 'كالتشرلينز — تطبيق تفاعلي يعرّفك على ثقافات مناطق السعودية.\nهاكاثون نورة 2026'
-    : 'CultureLens — an interactive app that immerses you in the cultures of Saudi Arabia\'s regions.\nHackathon Noura 2026');
+    ? 'عدسة ثقافية — تطبيق تفاعلي يعرّفك على ثقافات مناطق السعودية.'
+    : 'CultureLens — an interactive app that immerses you in the cultures of Saudi Arabia\'s regions.');
 }
 
 function signOut() {
@@ -452,8 +422,43 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <script src="language.js"></script>
+<script src="patterns.js"></script>
+<script src="content.js"></script>
+<script src="keyart.js"></script>
 <script src="ThemeManager.js"></script>
 <script>window.ACTIVE_NAV = 'account';</script>
 <script src="navbar.js"></script>
+<script>
+// Your collection and level, from the progress the experiences save (cl_progress)
+(function () {
+  var TM = window.ThemeManager, KA = window.CLKeyArt;
+  if (!TM || !KA || !document.getElementById('collection')) return;
+  var CAT = TM.CATALOG, R = TM.REGIONS;
+  function prog() { try { return JSON.parse(localStorage.getItem('cl_progress') || '{}'); } catch (e) { return {}; } }
+  function ar() { return window.currentLang === 'ar'; }
+  function n(x) { return ar() ? String(x).replace(/\d/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'[d]; }) : String(x); }
+  function stars(k) { var h = '<span class="xp-stars">'; for (var i = 0; i < 3; i++) h += '<i class="' + (i < k ? 'on' : '') + '"></i>'; return h + '</span>'; }
+  function render() {
+    var p = prog(), ids = Object.keys(CAT).filter(function (id) { return CAT[id].page; }), total = 0;
+    document.getElementById('collection').innerHTML = ids.map(function (id) {
+      var it = CAT[id], st = p[id] ? (p[id].stars || 0) : 0, home = it.regions[0] === 'all' ? 'najd' : it.regions[0];
+      total += st;
+      var where = R[home] ? (ar() ? R[home].nameAr : R[home].nameEn) : '';
+      var status = p[id] ? stars(st) : '<small>' + (ar() ? 'ما لعبتها للحين' : 'Not played yet') + '</small>';
+      return '<a class="coll-item' + (p[id] ? ' is-earned' : '') + '" href="experience.html?x=' + id + '">' + KA.medal(it.cat, home, !!p[id]) +
+        '<b>' + (ar() ? it.name.ar : it.name.en) + '</b><small>' + where + '</small>' + status + '</a>';
+    }).join('');
+    var max = ids.length * 3, lvl = 1 + Math.floor(total / 2);
+    document.getElementById('player-level').innerHTML =
+      '<span class="pl-num">' + (ar() ? 'المستوى ' : 'Level ') + n(lvl) + '</span>' +
+      '<span class="pl-bar"><i style="width:' + Math.round(total / Math.max(1, max) * 100) + '%"></i></span>' +
+      '<span class="pl-num">' + n(total) + '/' + n(max) + (ar() ? ' نجوم' : ' stars') + '</span>';
+    var key = TM.current(), pill = document.querySelector('.region-pill');
+    if (pill && key && R[key]) { pill.setAttribute('data-en', R[key].nameEn); pill.setAttribute('data-ar', R[key].nameAr); pill.textContent = ar() ? R[key].nameAr : R[key].nameEn; }
+  }
+  render();
+  document.addEventListener('languageChanged', render);
+})();
+</script>
 </body>
 </html>

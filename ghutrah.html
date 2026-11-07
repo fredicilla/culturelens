@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>Iqal & Ghutrah — CultureLens</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="regional-patterns.css">
+<link rel="stylesheet" href="ui.css">
 <style>
 .phase { display:none; min-height:100vh; padding:80px 20px 40px; flex-direction:column; }
 .phase.active { display:flex; }
@@ -126,7 +128,7 @@
   <div class="logo translatable" data-en="<img src='logo.png' class='logo-img'> Culture<span>Lens</span>" data-ar="<img src='logo.png' class='logo-img'> عدسة <span>الثقافة</span>" data-html="true"><img src="logo.png" class="logo-img"> Culture<span>Lens</span></div>
   <div style="display:flex;align-items:center;gap:12px;">
     <div style="font-size:10px;color:var(--text-light);text-align:right" class="translatable" data-en="🧵 Ghutrah" data-ar="🧵 الغترة">🧵 Ghutrah</div>
-    <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">🇸🇦 العربية</span></button>
+    <button id="lang-toggle" onclick="toggleLanguage()"><span id="lang-label">العربية</span></button>
   </div>
 </header>
 
@@ -322,7 +324,7 @@
     <div id="verdict-text" style="font-size:16px;color:var(--cream);margin-bottom:20px"></div>
     <div class="fact-box">
       <div class="fact-label translatable" data-en="🧵 Cultural Insight Unlocked" data-ar="🧵 معلومة ثقافية انفتحت">🧵 Cultural Insight Unlocked</div>
-      <div class="fact-text translatable" data-en="In Najdi culture, clothing is a social contract. The Iqal alone can tell a stranger your region, your status, and whether you are dressed for war, celebration, or mourning. Across PNU's 13 regions, every student carries a different dress code — each as rich as the next." data-ar="بنجد، اللبس رسالة. العقال لحاله يعلمك وش حالة الرجال، زواج ولا حرب ولا حزن. وكل منطقة لها لبس، من الشمال للجنوب، وكل طالبة بجامعة نورة تمثل جزء من هذا التنوع العظيم.">In Najdi culture, clothing is a social contract. The Iqal alone can tell a stranger your region, your status, and whether you are dressed for war, celebration, or mourning. Across PNU's 13 regions, every student carries a different dress code — each as rich as the next.</div>
+      <div class="fact-text translatable" data-en="In Najdi culture, clothing is a social contract. The Iqal alone can tell a stranger your region, your status, and whether you are dressed for war, celebration, or mourning. Every region of Saudi Arabia has its own dress code, each as rich as the next." data-ar="بنجد، اللبس رسالة. العقال لحاله يعلمك وش حالة الرجال، زواج ولا حرب ولا حزن. وكل منطقة لها لبسها، من الشمال للجنوب، وكلها جزء من هذا التنوع العظيم.">In Najdi culture, clothing is a social contract. The Iqal alone can tell a stranger your region, your status, and whether you are dressed for war, celebration, or mourning. Every region of Saudi Arabia has its own dress code, each as rich as the next.</div>
       <div style="margin-top:12px;direction:rtl;text-align:right;font-size:12px;color:var(--gold)">"الزي هو الهوية قبل الكلام"</div>
       <div style="font-size:11px;color:var(--text-light)" class="translatable" data-en="Clothing is identity before words are spoken" data-ar='"اللبس يعلم بالهوية قبل النطق"'>Clothing is identity before words are spoken</div>
     </div>
@@ -331,7 +333,6 @@
       <a href="index.html" class="btn-gold translatable" style="flex:1;text-decoration:none" data-en="← Back Home" data-ar="← الرئيسية">← Back Home</a>
     </div>
   </div>
-  <div class="cl-footer">هاكاثون نورة 2026 | CultureLens</div>
 </section>
 
 <div class="feedback-popup" id="feedback">
@@ -515,6 +516,9 @@ function showFeedback(emoji,label,sub){
 }
 </script>
 <script src="language.js"></script>
+<script src="patterns.js"></script>
+<script src="content.js"></script>
+<script src="ThemeManager.js"></script>
 </body>
 </html>
 
