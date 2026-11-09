@@ -28,7 +28,7 @@ Then open `http://localhost:8080` in Chrome.
    - Windows: `ipconfig` → look for IPv4 Address
 2. On your phone, open Chrome
 3. Go to `http://192.168.x.x:5500` (or 8080)
-4. For the Samri gyroscope — **must use phone**, not laptop
+4. AR (Masaqil, Al-Sadu, Al-Samri) needs a phone and an https link, so use the Netlify link below for it. Everything else works over plain http
 
 ---
 
@@ -48,8 +48,9 @@ Then open `http://localhost:8080` in Chrome.
 culturelens/
 ├── index.html      — Home menu (3 category cards)
 ├── qahwa.html      — ☕ Najdi Qahwa experience + mini-game
-├── ghutrah.html    — 🧵 Iqal & Ghutrah experience + mini-game
-├── samri.html      — 🎶 Al-Samri 3D circle + rhythm game
+├── masaqeel.html   — Al-Masaqil: 3D marble game with AR
+├── sadu.html       — Al-Sadu: Bedouin weaving, 3D loom with AR + weaving race
+├── samri.html      — Al-Samri: a Samri night in 3D with AR + rhythm game
 └── style.css       — Shared styles
 ```
 
@@ -64,21 +65,20 @@ culturelens/
 - Pour the correct amount (¼ cup only)
 - Rules revealed as you serve correctly
 
-### 🧵 Ghutrah (ghutrah.html)
-- Story: Grandfather teaching Eid dressing ritual
-- CSS animated figure that dresses up as story progresses
-- Mini-game: Choose correct outfit for 3 occasions
-  - Eid prayer, job interview, wedding
-- Cultural facts unlocked per correct answer
+### Al-Sadu (sadu.html)
+- One live 3D scene: a Bedouin house of hair at dusk with a ground loom on the sand
+- History: the fibers, the colors, the patterns and their names, UNESCO
+- How it's made, done with your fingers on the scene: pick the thorns out of the wool (tap), comb it with the kirdash (swipe left and right), spin it (roll the spindle up, let it drop), dye it (drag white yarn into the pot, lift it at the right shade), drive the stakes (tap), lay the warp (drag the ball beam to beam), weave (up to open, across to pass the mishaʿ, down to beat with the minshaza), and pick up the tree thread by thread in a close-up of the warp (AR on Android, Quick Look on iPhone)
+- Game: round 1 reads a Sadu (4 questions); round 2 races Grandma Haya to the end of a band with the real weaving rhythm, faster each time you win
 
-### 🎶 Al-Samri (samri.html)
-- **3D IMMERSIVE**: Three.js scene — you stand in center of Samri circle
-- 12 animated figures swaying around a bonfire
-- Tilt phone to look 360° around the circle (gyroscope)
-- Drag finger to look around (touch fallback)
-- 3 narrator panels tell the Al-Samri story
-- Rhythm mini-game: Tap drum in time with the Tabl beat
-- 3 verses, each faster — "Perfect / Good / Miss" timing
+### Al-Samri (samri.html)
+- One live 3D scene: a Samri night in the dunes, two rows of nine kneeling face to face on rugs, a mu'allim at the center of each, a fire at one end
+- All the sound is made in code (samri-music.js): frame drums, claps, the slap of the drums thrown down, and hummed lines for the two rows. The beat runs on the audio clock, so the dancers, the cues and the scoring stay with what you hear
+- History: where it began (Al-Qassim and Najd, and the Hasawi Samri of the Eastern Region), the two rows, the tar, the call and answer of the poetry (waneen, yisheel, marrad), and where it is sung today
+- How it's performed, done with your fingers on the scene: take your seat at the end of the row (drag), tune your drum by wetting the skin (tap, rub), answer the first row (hold through your line), keep the beat (tap), sway right and left (swipe), then lift and lower the drums and slap them down with everyone
+- Game: round 1 asks the mu'allim's 4 questions; round 2 is a whole Samri (heavy, then light and fast) where every passage you keep up with moves you one seat closer to the mu'allim
+- AR on Android, Quick Look on iPhone
+- Sources: Saudipedia; the Samri booklet of the Royal Institute of Traditional Arts (Wrth); Aramco World, "Saudi Folk Music: Alive and Well" (2007)
 
 ---
 
@@ -91,10 +91,9 @@ culturelens/
 ---
 
 ## 📱 DEVICE REQUIREMENTS
-- **Chrome on Android**: Full support including gyroscope
-- **Chrome on iOS**: Works, gyroscope requires permission prompt (tap OK)
-- **Safari on iOS**: Works but gyroscope less reliable
-- **Desktop laptop**: Works for Qahwa + Ghutrah; Samri 3D works but no gyroscope (drag to look)
+- **Chrome on Android**: Full support, including AR
+- **iPhone**: Works; AR opens in AR Quick Look
+- **Desktop laptop**: Everything except AR (drag to look around the 3D scenes)
 
 ---
 
@@ -102,7 +101,7 @@ culturelens/
 
 | Issue | Fix |
 |-------|-----|
-| Gyroscope not working | Tap screen first, check Chrome settings |
+| AR button greyed out | AR needs a phone and an https link |
 | Audio not playing | Tap/interact with page first — browser requires user gesture |
 | 3D not loading | Check internet connection (Three.js loads from CDN) |
 | Page blank | Open browser console (F12) — check for errors |
@@ -115,8 +114,8 @@ culturelens/
 **Recommended demo flow:**
 1. Show home screen — explain the 3 categories
 2. Open Qahwa — tap through 2 story panels, do the mini-game
-3. Open Ghutrah — show the dressed figure, do 1 occasion
-4. Open Samri — enter the 3D circle, look around, play verse 1
+3. Open Al-Sadu (Northern Region) — weave a few rows and pick up the tree, then race Grandma Haya
+4. Open Al-Samri (Eastern Region): answer the first row, slap the drums down, then play a whole Samri and move up the row
 
 **Talking point:** "PNU has students from all 13 regions of Saudi Arabia — CultureLens lets a student from Asir and a student from Najd learn each other's heritage through experience, not just text."
 

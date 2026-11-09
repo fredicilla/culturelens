@@ -1,0 +1,254 @@
+/* ════════════════════════════════════════════════════════════
+   samri.css — Al-Samri. Builds on qahwa.css (qx-) and masaqeel.css (mq-):
+   the same live scene with words over it, plus the Samri pieces:
+   place chips, the mu'allim, the gesture guides and timing cues for
+   How it's performed, the drum's tension meter, the call-and-answer bar,
+   and the rhythm game's track and seats.
+   ════════════════════════════════════════════════════════════ */
+body.sm { background: #070A16; }
+body.sm .mq-stage, body.sm .mq-loading { background: #070A16; }
+body.sm .mq-stage::before { background: linear-gradient(rgba(7, 10, 22, 0.82), rgba(7, 10, 22, 0)); }
+body.sm .mq-stage::after { background: linear-gradient(rgba(7, 10, 22, 0), rgba(7, 10, 22, 0.72) 40%, rgba(7, 10, 22, 0.95) 76%); height: 56%; }
+body.sm[data-part="play"] .mq-stage::after { height: 64%; }
+body.sm.sm-playing .mq-stage::after { height: 40%; }
+
+body.sm .mq-panel { max-height: calc(100dvh - var(--qx-top) - var(--qx-parts) - var(--qx-bar) - 64px - env(safe-area-inset-top, 0px)); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+body.sm .mq-panel::-webkit-scrollbar { display: none; }
+html.mq-in-ar body.sm .mq-panel { max-height: 46dvh; }
+body.sm .mq-panel .mq-p { font-size: 15px; }
+body.sm .mq-panel.sm-how .mq-p { font-size: 14.5px; line-height: 1.6; }
+/* nothing in these panels is tapped, so gestures that start on the words still reach the scene */
+body.sm .mq-panel.sm-how > * { pointer-events: none; }
+body.sm .mq-panel.is-game .mq-title { font-size: 25px; margin: 4px 0 12px; }
+
+/* chips: places, the leader and the beginner, listening */
+.sm-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+.sm-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 13px; border-radius: 999px;
+  font: 600 13px var(--font-ui, sans-serif); color: var(--qx-ink);
+  background: rgba(7, 10, 22, 0.55); border: 1px solid rgba(244, 236, 224, 0.16);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+.sm-chip svg { width: 15px; height: 15px; }
+.sm-chip.is-on { background: var(--qx-accent); border-color: var(--qx-accent); color: var(--qx-on-accent); }
+.sm-info { margin-top: 10px; font-size: 14px; line-height: 1.6; color: var(--qx-ink-2); text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7); }
+.sm-info:empty { display: none; }
+.sm-info b { display: block; font-family: var(--qx-serif); font-size: 19px; color: var(--qx-accent-lt); margin-bottom: 2px; }
+.sm-note { margin: 10px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--qx-ink-3); }
+
+/* the timeline over the scene */
+.sm-timeline { margin: 14px 0 0; }
+.sm-timeline .qx-tl { padding-bottom: 14px; }
+.sm-timeline .qx-tl-year { font-size: 22px; }
+.sm-timeline .qx-tl-text { font-size: 14px; line-height: 1.6; margin-top: 3px; }
+.sm-timeline .qx-tl::before { background: #070A16; }
+body.sm .mq-panel .qx-sources { margin: 2px 0 0; }
+
+/* the mu'allim */
+.sm-face { width: 56px; height: 56px; flex-shrink: 0; border-radius: 50%; box-shadow: 0 0 0 2px rgba(180, 35, 43, 0.7); }
+.sm-lead { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.sm-lead-name { font-family: var(--qx-serif); font-size: 24px; font-weight: 700; line-height: 1.15; }
+.sm-lead-role { font-size: 12.5px; color: var(--qx-ink-3); }
+.sm-bubble { display: flex; gap: 10px; align-items: flex-start; margin-top: 10px; }
+.sm-bubble .sm-face { width: 44px; height: 44px; }
+.sm-bubble p {
+  margin: 0; padding: 10px 14px; border-radius: 4px 18px 18px 18px;
+  background: rgba(244, 236, 224, 0.94); color: #1D1A26;
+  font-size: 14.5px; line-height: 1.55; font-weight: 600;
+}
+[dir="rtl"] .sm-bubble p { border-radius: 18px 4px 18px 18px; }
+
+/* quiz options */
+.sm-q { text-wrap: balance; }
+.sm-opts { display: grid; gap: 9px; margin-top: 4px; grid-template-columns: 1fr; }
+.sm-opt {
+  display: flex; align-items: center; justify-content: center; gap: 9px; text-align: center;
+  min-height: 50px; padding: 8px 14px; border-radius: 16px;
+  font: 700 15px var(--font-ui, sans-serif); color: var(--qx-ink);
+  background: rgba(7, 10, 22, 0.62); border: 1px solid rgba(244, 236, 224, 0.16);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  cursor: pointer; transition: transform 0.15s, border-color 0.2s, opacity 0.2s;
+}
+.sm-opt:active { transform: scale(0.98); }
+.sm-opt.is-right { border-color: rgba(156, 196, 138, 0.9); box-shadow: 0 0 0 1px rgba(156, 196, 138, 0.5), 0 0 22px rgba(156, 196, 138, 0.2); }
+.sm-opt.is-wrong { border-color: rgba(228, 135, 122, 0.9); }
+.sm-opt.is-dim { opacity: 0.45; }
+.sm-opt[disabled] { cursor: default; }
+body.sm .qx-feedback { margin-top: 12px; }
+
+.sm-marks { display: grid; gap: 8px; margin-top: 14px; }
+.sm-marks div { display: flex; gap: 9px; align-items: flex-start; font-size: 14.5px; line-height: 1.5; color: var(--qx-ink-2); }
+.sm-marks svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; }
+.sm-marks .y svg { color: var(--qx-good); }
+.sm-marks .n svg { color: var(--qx-bad); }
+.sm-marks b { color: var(--qx-ink); font-weight: 700; }
+.sm-marks small { color: var(--qx-ink-3); }
+.sm-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(72px, 1fr)); gap: 8px; margin-top: 12px; }
+.sm-stats div { padding: 8px 10px; border-radius: 14px; background: rgba(7, 10, 22, 0.55); border: 1px solid rgba(244, 236, 224, 0.12); }
+.sm-stats small { display: block; font-size: 11px; color: var(--qx-ink-3); white-space: nowrap; }
+.sm-stats b { font-size: 19px; }
+.sm-split { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px; font-size: 13px; color: var(--qx-ink-3); }
+.sm-split b { color: var(--qx-ink); }
+
+/* ── How it's performed ── */
+.qx-btn.sm-hintpill[disabled] { opacity: 1; border-style: dashed; border-color: rgba(255, 214, 140, 0.45); color: var(--qx-ink-2); font-size: 14.5px; font-weight: 600; }
+.qx-btn.sm-hintpill svg { color: #FFD27A; width: 20px; height: 20px; }
+.qx-btn.sm-skip { flex: 0 0 auto; padding: 0 18px; }
+
+/* the hand that shows the gesture (real screen directions: never mirrored) */
+.sm-guide { position: fixed; z-index: 44; width: 0; height: 0; pointer-events: none; direction: ltr; --gx: 0px; --gy: -60px; animation: smFadeIn 0.35s ease both; }
+.sm-guide[hidden] { display: none; }
+.sm-g-icon { position: absolute; left: -29px; top: -29px; width: 58px; height: 58px; }
+.sm-g-icon svg { width: 100%; height: 100%; overflow: visible; }
+.sm-g-icon .bg { fill: rgba(7, 10, 22, 0.42); stroke: rgba(255, 255, 255, 0.55); stroke-width: 2.5; }
+.sm-g-icon .ar { fill: none; stroke: #fff; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.sm-g-icon .ring { fill: none; stroke: #FFD27A; stroke-width: 3; transform-origin: 48px 44px; animation: smRing 1.1s ease-out infinite; }
+.sm-guide.g-down .sm-g-icon { transform: rotate(180deg); }
+.sm-guide.g-left .sm-g-icon { transform: rotate(-90deg); }
+.sm-guide.g-right .sm-g-icon { transform: rotate(90deg); }
+.sm-guide.g-tap .sm-g-icon { left: -22px; top: -10px; width: 44px; height: 44px; animation: smTap 1.1s ease-in-out infinite; }
+.sm-guide.g-tap .sm-g-icon .bg, .sm-guide.g-hold .sm-g-icon .bg { fill: none; stroke: none; }
+.sm-guide.g-hold .sm-g-icon { left: -22px; top: -10px; width: 44px; height: 44px; }
+.sm-g-dot { position: absolute; left: -11px; top: -11px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.22), 0 4px 14px rgba(0, 0, 0, 0.45); opacity: 0; }
+.sm-g-label { position: absolute; left: 0; top: 36px; transform: translateX(-50%); white-space: nowrap; font: 800 13.5px var(--font-ui, sans-serif); color: #fff; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85); }
+.g-up .sm-g-dot { animation: smGUp 1.5s ease-in-out infinite; }
+.g-down .sm-g-dot { animation: smGDown 1.5s ease-in-out infinite; }
+.g-left .sm-g-dot { animation: smGLeft 1.5s ease-in-out infinite; }
+.g-right .sm-g-dot { animation: smGRight 1.5s ease-in-out infinite; }
+.g-lr .sm-g-dot { opacity: 1; animation: smGLR 0.9s ease-in-out infinite alternate; }
+.g-drag .sm-g-dot { animation: smGDrag 1.9s ease-in-out infinite; }
+.g-tap .sm-g-dot, .g-hold .sm-g-dot { display: none; }
+@keyframes smGUp { 0% { transform: translate(0, 36px); opacity: 0; } 20% { opacity: 1; } 75% { transform: translate(0, -44px); opacity: 1; } 100% { transform: translate(0, -44px); opacity: 0; } }
+@keyframes smGDown { 0% { transform: translate(0, -36px); opacity: 0; } 20% { opacity: 1; } 75% { transform: translate(0, 44px); opacity: 1; } 100% { transform: translate(0, 44px); opacity: 0; } }
+@keyframes smGLeft { 0% { transform: translate(36px, 0); opacity: 0; } 20% { opacity: 1; } 75% { transform: translate(-44px, 0); opacity: 1; } 100% { transform: translate(-44px, 0); opacity: 0; } }
+@keyframes smGRight { 0% { transform: translate(-36px, 0); opacity: 0; } 20% { opacity: 1; } 75% { transform: translate(44px, 0); opacity: 1; } 100% { transform: translate(44px, 0); opacity: 0; } }
+@keyframes smGLR { from { transform: translateX(-46px); } to { transform: translateX(46px); } }
+@keyframes smGDrag { 0% { transform: translate(0, 0) scale(0.5); opacity: 0; } 15% { transform: translate(0, 0) scale(1); opacity: 1; } 78% { transform: translate(var(--gx), var(--gy)); opacity: 1; } 100% { transform: translate(var(--gx), var(--gy)); opacity: 0; } }
+@keyframes smTap { 0%, 100% { transform: translateY(0) scale(1); } 45% { transform: translateY(5px) scale(0.92); } }
+@keyframes smRing { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+@keyframes smFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* rings on the things to tap */
+.sm-markl i { position: fixed; z-index: 43; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; pointer-events: none;
+  border: 2px solid rgba(255, 214, 140, 0.95); box-shadow: 0 0 12px rgba(255, 196, 107, 0.6), inset 0 0 8px rgba(255, 196, 107, 0.35); }
+.sm-markl i::after { content: ''; position: absolute; inset: -2px; border-radius: 50%; border: 2px solid rgba(255, 214, 140, 0.8); animation: smRing 1.4s ease-out infinite; }
+
+/* the token you drag to your seat */
+.sm-token { position: fixed; z-index: 46; width: 58px; height: 58px; margin: -29px 0 0 -29px; border-radius: 50%; touch-action: none; cursor: grab;
+  background: radial-gradient(circle at 40% 35%, #FFE7B0, #F3B23C 60%, #B8742A); box-shadow: 0 0 0 4px rgba(255, 214, 140, 0.35), 0 10px 26px rgba(0, 0, 0, 0.5);
+  display: flex; align-items: center; justify-content: center; color: #2A1A08; font: 800 12px var(--font-ui, sans-serif); }
+.sm-token[hidden] { display: none; }
+.sm-token svg { width: 26px; height: 26px; }
+.sm-token.is-drag { cursor: grabbing; transform: scale(1.08); }
+.sm-token.back { transition: left 0.35s var(--qx-ease), top 0.35s var(--qx-ease); }
+
+/* the timing cue: a ring that closes on the beat around the next move */
+.sm-cue { position: fixed; z-index: 44; width: 92px; height: 92px; margin: -46px 0 0 -46px; pointer-events: none; direction: ltr; }
+.sm-cue[hidden] { display: none; }
+.sm-cue-i { position: absolute; inset: 14px; }
+.sm-cue-i svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.5)); }
+.sm-cue .bg { fill: rgba(7, 10, 22, 0.5); stroke: rgba(255, 214, 140, 0.9); stroke-width: 3; }
+.sm-cue .ar { fill: none; stroke: #fff; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.sm-cue .ring { fill: none; stroke: #FFD27A; stroke-width: 3; }
+.sm-cue-r { position: absolute; inset: 14px; border-radius: 50%; border: 3px solid #FFD27A; box-shadow: 0 0 14px rgba(255, 210, 122, 0.6); transform: scale(var(--s, 1.8)); opacity: var(--o, 0.9); }
+.sm-cue.c-down .sm-cue-i svg { transform: rotate(180deg); }
+.sm-cue.c-left .sm-cue-i svg { transform: rotate(-90deg); }
+.sm-cue.c-right .sm-cue-i svg { transform: rotate(90deg); }
+.sm-cue-l { position: absolute; left: 50%; top: 96px; transform: translateX(-50%); white-space: nowrap; font: 800 15px var(--font-ui, sans-serif); color: #fff; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85); }
+
+/* how a tap or swipe landed */
+.sm-judge { position: fixed; z-index: 45; left: 0; right: 0; max-width: 430px; margin: 0 auto; text-align: center; pointer-events: none;
+  font: 800 20px var(--font-ui, sans-serif); color: #fff; text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85); opacity: 0; }
+.sm-judge.show { animation: smJudge 0.7s var(--qx-ease) forwards; }
+.sm-judge.perfect { color: #FFE2A8; }
+.sm-judge.good { color: #D9F0CC; }
+.sm-judge.miss { color: #F2C1B9; }
+@keyframes smJudge { 0% { opacity: 0; transform: translateY(8px) scale(0.85); } 18% { opacity: 1; transform: translateY(0) scale(1.06); } 30% { transform: scale(1); } 75% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
+
+/* the drum's tension: tight, right, slack */
+.sm-meter { margin-top: 12px; }
+.sm-meter-bar { position: relative; height: 12px; border-radius: 99px; background: linear-gradient(90deg, #6F5B88, #C9A96E 50%, #E4877A); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18); direction: ltr; }
+.sm-meter-bar .z { position: absolute; top: -5px; bottom: -5px; left: 32%; width: 22%; border: 2px solid rgba(255, 255, 255, 0.85); border-radius: 9px; }
+.sm-meter-bar .m { position: absolute; top: -7px; width: 5px; height: 26px; margin-left: -2.5px; border-radius: 3px; background: #fff; box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5); transition: left 0.25s var(--qx-ease); }
+.sm-meter-k { position: relative; height: 14px; margin-top: 6px; font-size: 11px; color: var(--qx-ink-3); direction: ltr; }
+.sm-meter-k span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.sm-meter-k span:nth-child(1) { left: 6%; }
+.sm-meter-k span:nth-child(2) { left: 43%; color: var(--qx-ink-2); font-weight: 700; }
+.sm-meter-k span:nth-child(3) { left: 92%; }
+
+/* call and answer: the first row's line, then yours */
+.sm-phrase { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.sm-phrase div { position: relative; overflow: hidden; padding: 8px 10px; border-radius: 12px; background: rgba(7, 10, 22, 0.55); border: 1px solid rgba(244, 236, 224, 0.12); }
+.sm-phrase small { position: relative; z-index: 1; display: block; font-size: 11px; color: var(--qx-ink-3); }
+.sm-phrase b { position: relative; z-index: 1; font-size: 14px; }
+.sm-phrase i { position: absolute; inset: 0 auto 0 0; width: 0; background: rgba(255, 210, 122, 0.22); }
+[dir="rtl"] .sm-phrase i { inset: 0 0 0 auto; }
+.sm-phrase .on { border-color: rgba(255, 210, 122, 0.7); }
+.sm-phrase .me.on { box-shadow: 0 0 18px rgba(255, 210, 122, 0.25); }
+
+/* ── the game ── */
+.sm-moves { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-top: 12px; }
+.sm-move { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px 7px; border-radius: 14px; background: rgba(7, 10, 22, 0.55); border: 1px solid rgba(244, 236, 224, 0.12); text-align: center; }
+.sm-move b { font-size: 12px; line-height: 1.25; }
+.sm-move-i { width: 32px; height: 32px; direction: ltr; }
+.sm-move-i svg { width: 100%; height: 100%; }
+.sm-move-i .bg { fill: rgba(255, 214, 140, 0.1); stroke: rgba(255, 214, 140, 0.5); stroke-width: 3; }
+.sm-move-i .ar { fill: none; stroke: #FFD27A; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.sm-move-i .ring { fill: none; stroke: rgba(255, 214, 140, 0.6); stroke-width: 3; }
+.sm-tip { margin: 10px 0 0; font-size: 13px; line-height: 1.55; color: var(--qx-ink-3); }
+
+/* the row of seats: where you are, where the mu'allim sits */
+.sm-hud { position: fixed; z-index: 30; top: calc(var(--qx-top) + var(--qx-parts) + env(safe-area-inset-top, 0px) + 6px);
+  left: 0; right: 0; margin: 0 auto; width: min(406px, calc(100vw - 24px)); box-sizing: border-box; pointer-events: none;
+  display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: stretch; }
+.sm-hud[hidden] { display: none; }
+.sm-hud > div { padding: 8px 12px 9px; border-radius: 16px; background: rgba(7, 10, 22, 0.6); border: 1px solid rgba(244, 236, 224, 0.12); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.sm-hud small { display: block; font-size: 11px; color: var(--qx-ink-3); margin-bottom: 5px; }
+.sm-seats { display: flex; gap: 5px; align-items: center; direction: ltr; }
+.sm-seats i { width: 15px; height: 15px; border-radius: 50%; background: rgba(244, 236, 224, 0.2); box-shadow: inset 0 0 0 1px rgba(244, 236, 224, 0.2); transition: background 0.3s, transform 0.3s; }
+.sm-seats i.lead { background: #3A2A20; box-shadow: inset 0 0 0 2px #C9A04E; }
+.sm-seats i.me { background: #FFD27A; transform: scale(1.25); box-shadow: 0 0 10px rgba(255, 210, 122, 0.8); }
+.sm-hud .sm-combo { min-width: 64px; text-align: center; }
+.sm-hud .sm-combo b { font-size: 22px; line-height: 1; color: #FFD27A; }
+
+/* the notes coming toward the hit circle */
+.sm-track { position: fixed; z-index: 41; left: 0; right: 0; margin: 0 auto; width: min(406px, calc(100vw - 24px)); height: 64px;
+  bottom: calc(var(--qx-bar) + env(safe-area-inset-bottom, 0px) + 92px); pointer-events: none; direction: ltr;
+  border-radius: 32px; background: rgba(7, 10, 22, 0.62); border: 1px solid rgba(244, 236, 224, 0.14); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); overflow: hidden; }
+.sm-track[hidden] { display: none; }
+.sm-hit { position: absolute; left: 14px; top: 8px; width: 46px; height: 46px; border-radius: 50%; border: 3px solid rgba(255, 210, 122, 0.95); box-shadow: 0 0 18px rgba(255, 210, 122, 0.4), inset 0 0 12px rgba(255, 210, 122, 0.25); }
+.sm-hit.flash { animation: smHit 0.25s ease-out; }
+@keyframes smHit { from { box-shadow: 0 0 30px rgba(255, 230, 160, 0.95), inset 0 0 20px rgba(255, 230, 160, 0.7); transform: scale(1.12); } to { transform: none; } }
+.sm-bar-line { position: absolute; top: 12px; bottom: 12px; width: 2px; margin-left: -1px; background: rgba(244, 236, 224, 0.14); }
+.sm-n { position: absolute; top: 10px; width: 42px; height: 42px; margin-left: -21px; border-radius: 50%; will-change: transform; }
+.sm-n svg { width: 100%; height: 100%; overflow: visible; }
+.sm-n .bg { fill: #1A1F38; stroke: #fff; stroke-width: 3; }
+.sm-n .ar { fill: none; stroke: #fff; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.sm-n .ring { fill: none; stroke: #FFD27A; stroke-width: 3; }
+.sm-n.k-tap .bg { fill: #6B3A12; stroke: #FFD27A; }
+.sm-n.k-khallu .bg { fill: #7A1E22; stroke: #FFD27A; }
+.sm-n.k-down svg { transform: rotate(180deg); }
+.sm-n.k-left svg { transform: rotate(-90deg); }
+.sm-n.k-right svg { transform: rotate(90deg); }
+.sm-n.done { opacity: 0; transition: opacity 0.2s; }
+.sm-n.miss { opacity: 0.25; }
+
+/* while the Samri plays, nothing sits under the track: bring it down toward the thumbs */
+body.sm.sm-playing .sm-track { bottom: calc(env(safe-area-inset-bottom, 0px) + 34px); }
+
+@media (max-height: 700px) {
+  body.sm:has(.mq-panel.mq-results) .mq-ar-btn { display: none; }
+  body.sm .mq-panel.sm-how .mq-steps { display: none; }
+  body.sm .mq-panel.sm-how .mq-title { font-size: 24px; margin: 2px 0 6px; }
+  body.sm .mq-panel.sm-how .mq-p { font-size: 13.5px; line-height: 1.5; }
+  body.sm .mq-panel.sm-how .mq-status { margin-top: 8px; padding: 7px 10px; }
+  .sm-tip { display: none; }
+  .sm-track { bottom: calc(var(--qx-bar) + env(safe-area-inset-bottom, 0px) + 72px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sm-opt { transition: none; }
+  .sm-g-dot, .sm-g-icon, .sm-g-icon .ring, .sm-markl i::after { animation: none !important; }
+  .g-up .sm-g-dot, .g-down .sm-g-dot, .g-left .sm-g-dot, .g-right .sm-g-dot, .g-drag .sm-g-dot { opacity: 1; }
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0E0A10">
+<title>Al-Sadu — CultureLens</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="ui.css">
+<link rel="stylesheet" href="qahwa.css">
+<link rel="stylesheet" href="masaqeel.css">
+<link rel="stylesheet" href="sadu.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<link rel="stylesheet" href="studio.css">
+</head>
+<body class="qx mq sd">
+
+<!-- Al-Sadu (Bedouin weaving). One live 3D scene (sadu-world.js) carries the whole experience,
+     run by sadu.js: 1. History (#story)  2. How it's made (#how)  3. The game (#play).
+     On Android the loom stands on your floor in AR. -->
+<div class="mq-stage" id="mq-stage"><canvas id="mq-canvas"></canvas></div>
+
+<div id="mq-root">
+  <header class="qx-top">
+    <a class="qx-icon-btn" id="qx-close" href="experience.html?x=sadu" aria-label="Close"></a>
+    <div class="qx-top-title translatable" data-en="Al-Sadu" data-ar="السدو">Al-Sadu</div>
+    <div class="qx-top-actions">
+      <button class="qx-icon-btn" id="qx-sound" type="button" aria-label="Sound"></button>
+      <button id="lang-toggle" type="button" onclick="toggleLanguage()"><span id="lang-label">العربية</span></button>
+    </div>
+  </header>
+
+  <nav class="qx-parts" id="qx-parts" aria-label="Experience parts">
+    <button class="qx-part" type="button" data-part="story"><span class="n">1</span><span class="translatable" data-en="History" data-ar="القصة">History</span><i class="bar"><b></b></i></button>
+    <button class="qx-part" type="button" data-part="how"><span class="n">2</span><span class="translatable" data-en="How it's made" data-ar="طريقة الصنع">How it's made</span><i class="bar"><b></b></i></button>
+    <button class="qx-part" type="button" data-part="play"><span class="n">3</span><span class="translatable" data-en="The game" data-ar="اللعبة">The game</span><i class="bar"><b></b></i></button>
+  </nav>
+
+  <div class="mq-touch" id="mq-touch"></div>
+  <button class="mq-ar-btn" id="mq-ar" type="button" hidden></button>
+  <div class="mq-callout" id="mq-callout" aria-live="polite"></div>
+  <section class="mq-panel" id="mq-panel"></section>
+  <div class="qx-bar" id="qx-bar"></div>
+  <div class="qx-toast" id="qx-toast" role="status"></div>
+  <div class="mq-loading" id="mq-loading"><i class="qx-spinner"></i><span></span></div>
+</div>
+
+<script src="language.js"></script>
+<script src="patterns.js"></script>
+<script src="content.js"></script>
+<script src="ThemeManager.js"></script>
+<script type="module" src="sadu.js"></script>
+</body>
+</html>

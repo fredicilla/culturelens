@@ -306,7 +306,7 @@ function wireHold(btn, h) {
   btn.addEventListener('lostpointercapture', stop);
   btn.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 }
-function holdFill(btn, p) { if (btn) btn.style.setProperty('--p', (clamp(p, 0, 1) * 100).toFixed(1) + '%'); }
+function holdFill(btn, p) { if (btn) btn.style.setProperty('--p', clamp(p, 0, 1).toFixed(3)); }
 
 function renderParts() {
   var prog = {

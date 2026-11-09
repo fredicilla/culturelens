@@ -35,13 +35,13 @@ window.CL_CONTENT = {
     food:  { en: 'How it is made', ar: 'طريقة التحضير' },
     music: { en: 'How it is performed', ar: 'طريقة الأداء' },
     games: { en: 'How to play', ar: 'طريقة اللعب' },
-    clothing: { en: 'How it is worn', ar: 'طريقة اللبس' }
+    clothing: { en: 'How it is made', ar: 'طريقة الصنع' }
   },
   MATERIALS: {
     food:  { en: 'Ingredients', ar: 'المكونات' },
     music: { en: 'Instruments and dress', ar: 'الآلات والأزياء' },
     games: { en: 'What you need', ar: 'الأدوات' },
-    clothing: { en: 'Pieces', ar: 'القطع' }
+    clothing: { en: 'Materials and tools', ar: 'الخامات والأدوات' }
   },
 
   ITEMS: {
@@ -65,19 +65,19 @@ window.CL_CONTENT = {
       place: { ar: 'المنطقة الشرقية', en: 'Eastern Region' }
     },
     samri: {
-      cat: 'music', regions: ['eastern'], page: 'samri.html', mins: 4,
+      cat: 'music', regions: ['eastern'], page: 'samri.html', mins: 8,
       name: { en: 'Al-Samri', ar: 'السامري' },
       story: {
-        ar: 'فن شعبي يزيّن مجالس السمر، واسمه مأخوذ من «السَّمَر» وهو حديث الليل.',
-        en: 'A folk art that livens up evening gatherings. Its name comes from "samar," the talk of the night.'
+        ar: 'فن شعبي يزيّن مجالس السمر، واسمه مأخوذ من «السَّمَر» وهو حديث الليل. بدأ في القصيم وازدهر في نجد، وللمنطقة الشرقية سامريها الحساوي.',
+        en: 'A folk art that livens up evening gatherings. Its name comes from "samar," the talk of the night. It began in Al-Qassim and grew in Najd, and the Eastern Region has its own Hasawi Samri.'
       },
       how: {
-        ar: 'يجلس المؤدّون ويغنّون على إيقاع الطبول والطارات.',
-        en: 'The performers sit and sing to the beat of drums and tars (frame drums).'
+        ar: 'يجثو صفّان من الرجال متقابلين، وفي وسط كل صف معلّم، والمبتدئ يبدأ من الطرف. يشيل الصف الأول بيت القصيدة ويرد عليه الثاني، وصف يغني ويصفق والثاني يتمايل ويرفع الطارات وينزّلها على الإيقاع، وبالنهاية يرمونها على الأرض بضربة وحدة.',
+        en: 'Two rows of men kneel facing each other, with an expert leader, the mu\'allim, at the center of each and beginners at the ends. The first row sings the line and the second answers it. One row sings and claps while the other sways and lifts and lowers its drums to the beat, and at the end they slap the drums down on the ground together.'
       },
-      materials: { ar: 'طبلان، وعدد من الطارات', en: 'Two drums and several tars' },
-      occasion: { ar: 'مجالس السمر والأفراح', en: 'Evening gatherings and celebrations' },
-      place: { ar: 'المنطقة الشرقية', en: 'Eastern Region' }
+      materials: { ar: 'طبلان، وعدد من الطارات. والطار إطار من الخشب مشدود عليه جلد ماعز أو غنم.', en: 'Two drums and several tars. A tar is a frame drum: a wooden frame with goat or sheep skin stretched over it.' },
+      occasion: { ar: 'مجالس السمر والأفراح، واليوم في اليوم الوطني وسوق عكاظ ومهرجان الجنادرية', en: 'Evening gatherings and celebrations, and today National Day, Souq Okaz and the Janadriyah festival' },
+      place: { ar: 'المنطقة الشرقية، وأصله من القصيم في نجد', en: 'Eastern Region; it began in Al-Qassim, in Najd' }
     },
     taqiyah: {
       cat: 'games', regions: ['eastern'],
@@ -149,20 +149,21 @@ window.CL_CONTENT = {
       occasion: { ar: 'لعبة يلعبها الصغار في الحواري', en: 'Played by children in the neighborhood alleys' },
       place: { ar: 'المنطقة الوسطى', en: 'Central Region (Najd)' }
     },
-    // Not in the spreadsheet: the existing Ghutrah experience page, kept as is
-    ghutrah: {
-      cat: 'clothing', regions: ['najd'], page: 'ghutrah.html', mins: 3,
-      name: { en: 'The Iqal and Ghutrah', ar: 'العقال والغترة' },
+    // Not in the spreadsheet: Al-Sadu, written from UNESCO, Saudipedia and the sources listed in sadu.js
+    sadu: {
+      cat: 'clothing', regions: ['northern'], page: 'sadu.html', mins: 10,
+      name: { en: 'Al-Sadu', ar: 'السدو' },
       story: {
-        ar: 'اللبس يختلف حسب المناسبة، وكل قطعة تقول شي عن صاحبها.',
-        en: 'What a man wears changes with the occasion, and every piece says something about the person wearing it.'
+        ar: 'نسيج نساء البادية، يُنسج على نول أرضي من صوف الغنم ووبر الإبل وشعر الماعز، ومنه بيت الشعر وما فيه.',
+        en: 'The weaving of Bedouin women, made on a ground loom from sheep\'s wool, camel hair and goat hair. The house of hair itself is woven from it, along with what is inside.'
       },
       how: {
-        ar: 'الثوب أول، ثم الغترة، ثم العقال، وكل وحدة لها طريقة.',
-        en: 'The thobe comes first, then the ghutrah, then the iqal, each worn its own way.'
+        ar: 'يُجز الصوف ويُنظّف ويُمشّط، ثم يُغزل بالمغزل ويُصبغ. بعدها يُمد السدى بين خشبتين مربوطة بأوتاد، وكل صف تُفتح خيوطه وتُمرّر اللحمة وتُدق، وخيوط النقش تُرفع باليد.',
+        en: 'The wool is sheared, cleaned and combed, spun on the spindle and dyed. Then the warp is laid between two beams pegged to the ground, and row by row the threads are opened, the weft passed and beaten in, with the pattern threads picked up by hand.'
       },
-      materials: { ar: 'الثوب، الغترة، العقال', en: 'The thobe, the ghutrah, the iqal' },
-      place: { ar: 'المنطقة الوسطى', en: 'Central Region (Najd)' }
+      materials: { ar: 'صوف الغنم، وبر الإبل، شعر الماعز. الأدوات: الكرداش، المغزل، النول وأوتاده، الميشع، المنشزة، القرن.', en: 'Sheep\'s wool, camel hair and goat hair. Tools: the kirdash (combing boards), the spindle, the ground loom and its stakes, the mishaʿ (the stick that carries the weft), the minshaza (beater) and the horn (for picking up the pattern threads).' },
+      occasion: { ar: 'بيت الشعر ومفارشه ومسانده، وزينة الإبل', en: 'The house of hair, its rugs and cushions, and the decoration of camels' },
+      place: { ar: 'المنطقة الشمالية، وتشتهر به الجوف', en: 'Northern Region, especially Al-Jouf' }
     },
 
     // ════ SOUTHERN REGION ════
