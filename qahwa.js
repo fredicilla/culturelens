@@ -100,7 +100,7 @@
       hint: { en: 'Tap a tool', ar: 'اضغط على أداة' },
       tools: [
         { key: 'mihmas', name: { en: 'Al-Mihmas', ar: 'المحماس' }, text: { en: 'A shallow iron pan with a long handle. The green beans are roasted in it over the fire.', ar: 'مقلاة حديد بيد طويلة، يتحمّس فيها البن الأخضر على النار.' } },
-        { key: 'mubarrid', name: { en: 'Al-Mubarrid', ar: 'المبرد' }, text: { en: 'A wooden tray where the roasted beans are spread out to cool.', ar: 'صحن خشب ينفرش فيه البن بعد التحميص عشان يبرد.' } },
+        { key: 'mubarrid', name: { en: 'Al-Mabrada', ar: 'المبردة' }, text: { en: 'A tray of local wood where the roasted beans are spread out to cool before they are pounded.', ar: 'صحن من الخشب ينفرش فيه البن بعد التحميص عشان يبرد قبل الدق.' } },
         { key: 'najr', name: { en: 'Al-Najr', ar: 'النجر' }, text: { en: 'A brass mortar and pestle for pounding the beans. Its ringing tells the neighbors there is a guest.', ar: 'هاون نحاس مع يده، يندق فيه البن، ورنّته تعلم الجيران إن فيه ضيف.' } },
         { key: 'dallah', name: { en: 'Al-Dallah', ar: 'الدلة' }, text: { en: 'The coffee pot. A plug of palm fiber in its spout, the leef, keeps the grounds out of the cup.', ar: 'إبريق القهوة. وفي خشمها «الليف» اللي يمنع البن ينزل بالفنجال.' } },
         { key: 'finjan', name: { en: 'Al-Finjal', ar: 'الفناجيل' }, text: { en: 'Small cups without handles, poured a little at a time.', ar: 'فناجيل صغيرة بلا يد، ينصب فيها شوي شوي.' } }
@@ -134,7 +134,7 @@
         { year: { en: '2022', ar: '٢٠٢٢' }, text: { en: 'UNESCO inscribed the knowledge and practices of growing Khawlani coffee beans in Jazan.', ar: 'سجّلت اليونسكو المعارف والممارسات المرتبطة بزراعة البن الخولاني في جازان.' } },
         { year: { en: 'Today', ar: 'اليوم' }, text: { en: 'Coffee is still the first step in receiving official guests.', ar: 'وما زالت القهوة أول خطوة في مراسم استقبال الضيوف الرسميين.' } }
       ],
-      sources: { en: 'Sources: UNESCO Intangible Cultural Heritage lists; Saudi Ministry of Culture; the CultureLens heritage sheet.', ar: 'المصادر: قوائم اليونسكو للتراث غير المادي؛ وزارة الثقافة؛ ملف تراث المناطق لفريق عدسة ثقافية.' }
+      sources: { en: 'Sources: UNESCO Intangible Cultural Heritage lists; Saudi Ministry of Culture; Ajel and Riyadh Daily, on the coffee tools (2026); the CultureLens heritage sheet.', ar: 'المصادر: قوائم اليونسكو للتراث غير المادي؛ وزارة الثقافة؛ عاجل وصحيفة الرياض ديلي عن أدوات القهوة (٢٠٢٦)؛ ملف تراث المناطق لفريق عدسة ثقافية.' }
     }
   ];
 
@@ -152,7 +152,7 @@
     {
       key: 'najr', stage: 'scene', scene: 'najrScene', action: 'taps', taps: 8,
       title: { en: 'Pound it in the najr', ar: 'دقّه بالنجر' },
-      text: { en: 'Let the beans cool on the mubarrid, then pound them in the najr until they are coarsely ground. Tap the najr, or the button, eight times.', ar: 'خلّ البن يبرد بالمبرد، وبعدين دقّه بالنجر لين ينطحن خشن. اطرق النجر، أو الزر، ثمان مرات.' },
+      text: { en: 'Let the beans cool in the mabrada, then pound them in the najr until they are coarsely ground. Tap the najr, or the button, eight times.', ar: 'خلّ البن يبرد في المبردة، وبعدين دقّه بالنجر لين ينطحن خشن. اطرق النجر، أو الزر، ثمان مرات.' },
       note: { en: 'The najr is struck in a rhythm, and its ringing tells the neighbors there is a guest.', ar: 'النجر ينطرق على إيقاع، ورنّته تعلم الجيران إن عندكم ضيف.' },
       cta: { en: 'Pound', ar: 'دق' }
     },

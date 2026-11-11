@@ -18,6 +18,7 @@
  *   occasion  { en, ar }
  *   place     { en, ar }
  *   mins      length of the full experience, when built
+ *   cover     a picture of the full experience, taken from its own scene
  */
 window.CL_CONTENT = {
   CATEGORIES: {
@@ -64,21 +65,6 @@ window.CL_CONTENT = {
       },
       place: { ar: 'المنطقة الشرقية', en: 'Eastern Region' }
     },
-    samri: {
-      cat: 'music', regions: ['eastern'], page: 'samri.html', mins: 8,
-      name: { en: 'Al-Samri', ar: 'السامري' },
-      story: {
-        ar: 'فن شعبي يزيّن مجالس السمر، واسمه مأخوذ من «السَّمَر» وهو حديث الليل. بدأ في القصيم وازدهر في نجد، وللمنطقة الشرقية سامريها الحساوي.',
-        en: 'A folk art that livens up evening gatherings. Its name comes from "samar," the talk of the night. It began in Al-Qassim and grew in Najd, and the Eastern Region has its own Hasawi Samri.'
-      },
-      how: {
-        ar: 'يجثو صفّان من الرجال متقابلين، وفي وسط كل صف معلّم، والمبتدئ يبدأ من الطرف. يشيل الصف الأول بيت القصيدة ويرد عليه الثاني، وصف يغني ويصفق والثاني يتمايل ويرفع الطارات وينزّلها على الإيقاع، وبالنهاية يرمونها على الأرض بضربة وحدة.',
-        en: 'Two rows of men kneel facing each other, with an expert leader, the mu\'allim, at the center of each and beginners at the ends. The first row sings the line and the second answers it. One row sings and claps while the other sways and lifts and lowers its drums to the beat, and at the end they slap the drums down on the ground together.'
-      },
-      materials: { ar: 'طبلان، وعدد من الطارات. والطار إطار من الخشب مشدود عليه جلد ماعز أو غنم.', en: 'Two drums and several tars. A tar is a frame drum: a wooden frame with goat or sheep skin stretched over it.' },
-      occasion: { ar: 'مجالس السمر والأفراح، واليوم في اليوم الوطني وسوق عكاظ ومهرجان الجنادرية', en: 'Evening gatherings and celebrations, and today National Day, Souq Okaz and the Janadriyah festival' },
-      place: { ar: 'المنطقة الشرقية، وأصله من القصيم في نجد', en: 'Eastern Region; it began in Al-Qassim, in Najd' }
-    },
     taqiyah: {
       cat: 'games', regions: ['eastern'],
       name: { en: 'Taq Taq Taqiyah', ar: 'طاق طاق طاقية' },
@@ -93,7 +79,7 @@ window.CL_CONTENT = {
 
     // ════ NAJD (CENTRAL REGION) ════
     qahwa: {
-      cat: 'food', regions: ['najd'], page: 'qahwa.html', mins: 10,
+      cat: 'food', regions: ['najd'], page: 'qahwa.html', mins: 10, cover: 'cover-qahwa.jpg',
       name: { en: 'Saudi Coffee', ar: 'القهوة السعودية' },
       story: {
         ar: 'القهوة عند أهل نجد عنوان الكرم وأول ما يُقدَّم للضيف. يفوح ريحها في المجلس قبل ما تنصب، وصوت النجر يعلن للجيران إن عند البيت ضيف. وما زالت إلى اليوم أول خطوة في مراسم استقبال الضيوف الرسميين.',
@@ -134,8 +120,23 @@ window.CL_CONTENT = {
       },
       place: { ar: 'المنطقة الوسطى، وتُؤدّى في أنحاء المملكة', en: 'Central Region, and performed across the Kingdom' }
     },
+    samri: {
+      cat: 'music', regions: ['najd'], page: 'samri.html', mins: 8, cover: 'cover-samri.jpg',
+      name: { en: 'Al-Samri', ar: 'السامري' },
+      story: {
+        ar: 'فن شعبي يزيّن مجالس السمر، واسمه مأخوذ من «السَّمَر» وهو حديث الليل. بدأ في القصيم وازدهر في نجد.',
+        en: 'A folk art that livens up evening gatherings. Its name comes from "samar," the talk of the night. It began in Al-Qassim and grew across Najd.'
+      },
+      how: {
+        ar: 'يجثو صفّان من الرجال متقابلين، وفي وسط كل صف معلّم، والمبتدئ يبدأ من الطرف. يشيل الصف الأول بيت القصيدة ويرده الثاني، وصف يغني ويصفق والثاني يتمايل ويرفع الطارات وينزّلها على الإيقاع. وإيقاع عنيزة ثقيل: ضربة لحالها وبعدها ثلاث ورا بعض. وبالنهاية يرمون الطارات على الأرض بضربة وحدة.',
+        en: 'Two rows of men kneel facing each other, with an expert leader, the mu\'allim, at the center of each and beginners at the ends. The first row sings a line of the poem and the second sings it back. One row sings and claps while the other sways and lifts and lowers its drums to the beat. In Unaizah the beat is heavy: one stroke on its own, then three in a row. At the end they slap the drums down on the ground together.'
+      },
+      materials: { ar: 'طبلان، وعدد من الطارات، وفي عنيزة طار كبير اسمه المرجاف. والطار إطار من الخشب مشدود عليه جلد ماعز أو غنم.', en: 'Two drums and several tars, and in Unaizah a big tar called the marjaf. A tar is a frame drum: a wooden frame with goat or sheep skin stretched over it.' },
+      occasion: { ar: 'مجالس السمر والأفراح، واليوم في اليوم الوطني وسوق عكاظ ومهرجان الجنادرية', en: 'Evening gatherings and celebrations, and today National Day, Souq Okaz and the Janadriyah festival' },
+      place: { ar: 'المنطقة الوسطى، وأصله من القصيم', en: 'Central Region (Najd); it began in Al-Qassim' }
+    },
     masaqil: {
-      cat: 'games', regions: ['najd'], page: 'masaqeel.html', mins: 8,
+      cat: 'games', regions: ['najd'], page: 'masaqeel.html', mins: 8, cover: 'cover-masaqil.jpg',
       name: { en: 'Al-Masaqil', ar: 'المصاقيل' },
       story: {
         ar: 'لعبة شعبية تشتهر في المنطقة الوسطى، تُلعب بحبيبات كروية صغيرة.',
@@ -151,7 +152,7 @@ window.CL_CONTENT = {
     },
     // Not in the spreadsheet: Al-Sadu, written from UNESCO, Saudipedia and the sources listed in sadu.js
     sadu: {
-      cat: 'clothing', regions: ['northern'], page: 'sadu.html', mins: 10,
+      cat: 'clothing', regions: ['northern'], page: 'sadu.html', mins: 10, cover: 'cover-sadu.jpg',
       name: { en: 'Al-Sadu', ar: 'السدو' },
       story: {
         ar: 'نسيج نساء البادية، يُنسج على نول أرضي من صوف الغنم ووبر الإبل وشعر الماعز، ومنه بيت الشعر وما فيه.',

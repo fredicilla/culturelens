@@ -5,10 +5,13 @@
  * rows of nine men kneeling with their frame drums, the mu'allim at the center of each row,
  * a coffee hearth at one end, a lantern at the other, palms and the moon.
  *
- * The performers are drawn as instanced parts (thobe, shemagh, igal, arms, drum...). Each one
- * has an invisible rig that is posed every frame from the beat, so eighteen of them cost about
- * a dozen draw calls. A row can rest, sing and clap, or sway and lift the drums; "you" can be
- * one of them, moved by your own taps and swipes.
+ * The performers are drawn as instanced parts (thobe, shemagh, igal, arms, hands, drum...). Each
+ * one has an invisible rig that is posed every frame from the beat, so eighteen of them cost about
+ * sixteen draw calls. The shapes are drawn in code as smooth skins through rings (a body, a head with
+ * a face, hands), and two parts bend between two joints: the shemagh, which sits on the head but lies
+ * on the shoulders and back, and the beard, whose chin drops with the jaw when a man sings. A row can
+ * rest, sing and clap, or sway and lift the drums; "you" can be one of them, moved by your own taps
+ * and swipes.
  *
  * AR, as in Al-Masaqil and Al-Sadu:
  *   - Android (Chrome + ARCore): WebXR. The gathering sits on your real floor or table.
@@ -61,6 +64,12 @@ function tex(c, rx, ry) {
 }
 function lathe(points, seg, start, len) { return new THREE.LatheGeometry(points.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), seg || 24, start || 0, len || Math.PI * 2); }
 function pulse(b, w) { var d = Math.abs(b - Math.round(b)); return Math.max(0, 1 - d / (w || 0.22)); }
+// like pulse, but on the drum strokes of the Samri cycle (two beats long), wherever they fall
+function strokePulse(b, list, w) {
+  var c = b - Math.floor(b / 2) * 2, m = 0;
+  for (var i = 0; i < list.length; i++) { var d = Math.abs(c - list[i]); d = Math.min(d, 2 - d); m = Math.max(m, 1 - d / (w || 0.16)); }
+  return m;
+}
 function damp(cur, to, k, dt) { return cur + (to - cur) * (1 - Math.exp(-k * dt)); }
 
 // ─────────────────────────────────────────────────────────────
@@ -97,7 +106,7 @@ function shemaghTexture() {
     g.fillRect(k + 9, 0, 1, S); g.fillRect(0, k + 9, S, 1);
   }
   for (var y = 0; y < S; y += 16) for (var x = 0; x < S; x += 16) { g.fillRect(x + 1, y + 1, 5, 5); }
-  return tex(c, 4, 3);
+  return tex(c, 1, 1);
 }
 function skinTexture() {
   var S = 64, c = canvas(S), g = c.getContext('2d'), rnd = mulberry32(9);
@@ -125,13 +134,21 @@ function woodTexture() {
   for (var x = 0; x < 64; x += 2) { g.fillStyle = 'rgba(' + (50 + rnd() * 50 | 0) + ',' + (30 + rnd() * 30 | 0) + ',16,' + (0.25 + rnd() * 0.35) + ')'; g.fillRect(x, 0, 1 + rnd() * 2, 256); }
   return tex(c);
 }
+// the two colors of a face's features: dark (brows, lashes, the eye, the open mouth) and the white of the eye
+function faceTexture() {
+  var c = canvas(16, 8), g = c.getContext('2d');
+  g.fillStyle = '#1C1411'; g.fillRect(0, 0, 8, 8); g.fillStyle = '#E9E3D8'; g.fillRect(8, 0, 8, 8);
+  var t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.magFilter = THREE.NearestFilter; t.minFilter = THREE.NearestFilter; t.generateMipmaps = false; return t;
+}
 // gold thread along the edge of a bisht
 function bishtTexture() {
-  var c = canvas(64, 256), g = c.getContext('2d'), rnd = mulberry32(17);
-  g.fillStyle = '#2A1E17'; g.fillRect(0, 0, 64, 256);
-  for (var y = 0; y < 256; y += 2) { g.fillStyle = 'rgba(255,255,255,' + (rnd() * 0.035) + ')'; g.fillRect(0, y, 64, 1); }
-  g.fillStyle = '#C9A04E'; g.fillRect(0, 0, 64, 10); g.fillStyle = 'rgba(255,230,160,0.6)'; g.fillRect(0, 3, 64, 2);
-  return tex(c, 6, 1);
+  var c = canvas(256, 256), g = c.getContext('2d'), rnd = mulberry32(17);
+  g.fillStyle = '#2A1E17'; g.fillRect(0, 0, 256, 256);
+  for (var y = 0; y < 256; y += 2) { g.fillStyle = 'rgba(255,255,255,' + (rnd() * 0.035) + ')'; g.fillRect(0, y, 256, 1); }
+  // gold down the two front edges and round the neck
+  g.fillStyle = '#C9A04E'; g.fillRect(0, 0, 9, 256); g.fillRect(247, 0, 9, 256); g.fillRect(0, 0, 256, 7);
+  g.fillStyle = 'rgba(255,230,160,0.6)'; g.fillRect(3, 0, 2, 256); g.fillRect(251, 0, 2, 256); g.fillRect(0, 2, 256, 2);
+  var t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
 }
 function rugTexture(specs, rows) {
   var parts = specs.map(function (s) { return bandCanvas(s, rows, { cw: 4, ch: 5, dir: 'h' }); });
@@ -192,60 +209,340 @@ function skyEquirect() {
 }
 
 // ─────────────────────────────────────────────────────────────
+// surfaces drawn through stacks of rings (bodies, heads, cloth)
+// ─────────────────────────────────────────────────────────────
+function lerp(a, b, t) { return a + (b - a) * t; }
+// a ring is [y, half-width (x), depth to the front (+z), depth to the back, squareness (2 is an ellipse), middle along z]
+function ringAt(T, y) {
+  var i = 0; while (i < T.length - 2 && y > T[i + 1][0]) i++;
+  var a = T[i], b = T[i + 1], t = Math.min(1, Math.max(0, (y - a[0]) / (b[0] - a[0])));
+  return { y: y, w: lerp(a[1], b[1], t), f: lerp(a[2], b[2], t), b: lerp(a[3], b[3], t), n: lerp(a[4] || 2, b[4] || 2, t), cz: lerp(a[5] || 0, b[5] || 0, t) };
+}
+// the point of a ring at angle phi (0 is the front, a quarter turn is +x)
+function ringXZ(r, phi) {
+  var s = Math.sin(phi), c = Math.cos(phi), e = 2 / (r.n || 2);
+  return [Math.sign(s) * Math.pow(Math.abs(s), e) * r.w, (r.cz || 0) + Math.sign(c) * Math.pow(Math.abs(c), e) * (c >= 0 ? r.f : r.b)];
+}
+// the front (or the back) of a ring at a given x
+function ringZ(r, x, back) {
+  var lo = back ? Math.PI : 0, hi = Math.PI / 2, ax = Math.min(Math.abs(x), r.w * 0.999);
+  for (var i = 0; i < 22; i++) { var mid = (lo + hi) / 2; if (Math.abs(ringXZ(r, mid)[0]) < ax) lo = mid; else hi = mid; }
+  return ringXZ(r, lo)[1];
+}
+function inRing(r, x, z, grow) {
+  var dz = z - (r.cz || 0), g = grow || 0, n = r.n || 2;
+  return Math.pow(Math.abs(x) / (r.w + g), n) + Math.pow(Math.abs(dz) / ((dz >= 0 ? r.f : r.b) + g), n) < 1;
+}
+// a sheet of rows and columns; fn(i, j) gives [x, y, z, u, v]. Rows go up, columns go round toward +x
+function grid(nr, nc, fn, o) {
+  o = o || {};
+  var pos = new Float32Array(nr * nc * 3), uv = new Float32Array(nr * nc * 2), idx = [], k = 0, q = 0, i, j;
+  for (i = 0; i < nr; i++) for (j = 0; j < nc; j++) { var p = fn(i, j); pos[k++] = p[0]; pos[k++] = p[1]; pos[k++] = p[2]; uv[q++] = p[3] || 0; uv[q++] = p[4] || 0; }
+  for (i = 0; i < nr - 1; i++) for (j = 0; j < nc - 1; j++) {
+    var a = i * nc + j, b = a + 1, c = a + nc, d = c + 1;
+    if (o.flip) idx.push(a, c, b, b, c, d); else idx.push(a, b, c, b, d, c);
+  }
+  var g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); g.setIndex(idx);
+  g.computeVertexNormals();
+  // where the first and last column are the same line, give them the same normals so no seam shows
+  var nm = g.attributes.normal;
+  for (i = 0; i < nr; i++) {
+    var s0 = i * nc, s1 = s0 + nc - 1;
+    if (Math.abs(pos[s0 * 3] - pos[s1 * 3]) + Math.abs(pos[s0 * 3 + 1] - pos[s1 * 3 + 1]) + Math.abs(pos[s0 * 3 + 2] - pos[s1 * 3 + 2]) > 1e-5) continue;
+    var x = nm.getX(s0) + nm.getX(s1), y = nm.getY(s0) + nm.getY(s1), z = nm.getZ(s0) + nm.getZ(s1), l = Math.hypot(x, y, z) || 1;
+    nm.setXYZ(s0, x / l, y / l, z / l); nm.setXYZ(s1, x / l, y / l, z / l);
+  }
+  return g;
+}
+// a closed skin through a table of rings, at the heights given
+function loft(T, ys, seg, o) {
+  o = o || {};
+  var rings = ys.map(function (y) { return ringAt(T, y); });
+  return grid(rings.length, seg + 1, function (i, j) {
+    var p = ringXZ(rings[i], Math.PI * 2 * j / seg);
+    return [p[0], rings[i].y, p[1], j / seg * (o.us || 1), rings[i].y * (o.vs || 1)];
+  });
+}
+function setAll(g, name, v) { var a = new Float32Array(g.attributes.position.count); a.fill(v); g.setAttribute(name, new THREE.BufferAttribute(a, 1)); return g; }
+// the same shape for the other side of the body
+function mirrorX(g) {
+  var m = g.clone(); m.scale(-1, 1, 1);
+  var ix = m.index.array; for (var i = 0; i < ix.length; i += 3) { var t = ix[i + 1]; ix[i + 1] = ix[i + 2]; ix[i + 2] = t; }
+  m.computeVertexNormals(); return m;
+}
+
+// ─────────────────────────────────────────────────────────────
 // the performer: the shapes of the parts (posed by a rig, drawn instanced)
 // ─────────────────────────────────────────────────────────────
+// the thobe over the body, from below the hips to the collar (heights above the hips)
+var TORSO = [
+  [-0.09, 0.190, 0.125, 0.118, 2.6], [0.0, 0.186, 0.122, 0.112, 2.6], [0.10, 0.180, 0.118, 0.104, 2.5], [0.20, 0.178, 0.114, 0.100, 2.5],
+  [0.28, 0.183, 0.116, 0.100, 2.5], [0.35, 0.192, 0.116, 0.100, 2.5], [0.405, 0.199, 0.110, 0.097, 2.5], [0.44, 0.197, 0.098, 0.090, 2.4],
+  [0.462, 0.172, 0.084, 0.082, 2.3], [0.482, 0.125, 0.068, 0.072, 2.2], [0.497, 0.078, 0.058, 0.062, 2.1], [0.507, 0.061, 0.054, 0.057, 2],
+  [0.531, 0.058, 0.052, 0.055, 2]
+];
+// the head and neck (heights above the base of the neck, where the head turns)
+var HEAD = [
+  [-0.045, 0.049, 0.046, 0.053, 2], [0.020, 0.050, 0.047, 0.056, 2], [0.033, 0.052, 0.058, 0.058, 2], [0.043, 0.056, 0.078, 0.062, 2.1],
+  [0.055, 0.061, 0.090, 0.068, 2.2], [0.072, 0.066, 0.0935, 0.078, 2.3], [0.092, 0.0705, 0.0935, 0.088, 2.35], [0.112, 0.0735, 0.092, 0.096, 2.35],
+  [0.135, 0.0752, 0.0905, 0.100, 2.35], [0.155, 0.0755, 0.093, 0.102, 2.3], [0.175, 0.0748, 0.094, 0.101, 2.25], [0.195, 0.072, 0.090, 0.097, 2.2],
+  [0.212, 0.066, 0.080, 0.088, 2.1], [0.226, 0.054, 0.064, 0.072, 2.05], [0.235, 0.034, 0.040, 0.046, 2], [0.2395, 0.0006, 0.0006, 0.0006, 2]
+];
+var HEAD_AT = { x: 0, y: 0.52, z: 0.012 };      // where the head sits on the chest
+// the face is pressed in at the eyes and out at the brow, the cheekbones and the mouth
+function faceBump(x, y) {
+  var ax = Math.abs(x), d = 0;
+  d -= 0.0078 * Math.exp(-(Math.pow((ax - 0.031) / 0.018, 2) + Math.pow((y - 0.137) / 0.0115, 2)));
+  d += 0.0034 * Math.exp(-Math.pow((y - 0.1535) / 0.0075, 2)) * Math.exp(-Math.pow(x / 0.058, 2));
+  d += 0.0030 * Math.exp(-(Math.pow((ax - 0.045) / 0.02, 2) + Math.pow((y - 0.112) / 0.016, 2)));
+  d += 0.0022 * Math.exp(-(Math.pow(x / 0.03, 2) + Math.pow((y - 0.071) / 0.012, 2)));
+  return d;
+}
+// a point on the head at angle phi and height y, lifted `off` off the skin
+function headAt(phi, y, off) {
+  var r = ringAt(HEAD, y), p = ringXZ(r, phi), x = p[0], z = p[1];
+  if (z > 0.02) z += faceBump(x, y) * smooth(0.02, 0.06, z);
+  if (off) { var l = Math.hypot(x, z) || 1; x += x / l * off; z += z / l * off; }
+  return [x, y, z];
+}
+function faceZ(x, y) { var z = ringZ(ringAt(HEAD, y), x); return z + faceBump(x, y) * smooth(0.02, 0.06, z); }
+// is a point (in the head's frame) inside the body or the neck? `grow` makes the body that much bigger
+function inBody(x, y, z, grow) {
+  var yc = y + HEAD_AT.y, zc = z + HEAD_AT.z;
+  if (yc > 0.531) return inRing(ringAt(HEAD, Math.max(-0.045, y)), x, z, grow);
+  if (yc < -0.09) return false;
+  if (inRing(ringAt(TORSO, yc), x, zc, grow)) return true;
+  // the round tops of the sleeves at the shoulders
+  var dx = Math.abs(x) - 0.2, dy = yc - 0.44; return dx * dx + dy * dy + zc * zc < Math.pow(0.058 + (grow || 0), 2);
+}
+var HOOD_TOP = 0.2478, FOREHEAD = 0.170, FACE_OPEN = 1.02;
+// the shemagh over the head: it follows the skull down to the temples, then hangs straight
+function hoodRing(y) {
+  var wide = ringAt(HEAD, 0.155);
+  if (y >= 0.155) {
+    var r = ringAt(HEAD, 0.155 + (y - 0.155) * (0.2395 - 0.155) / (HOOD_TOP - 0.155));
+    return { y: y, w: r.w * 1.112, f: r.f * 1.08, b: r.b * 1.085, n: r.n, cz: 0 };
+  }
+  // below the temples it hangs free, a little wider and further back the lower it goes
+  var t = smooth(0.155, 0.015, y);
+  return { y: y, w: wide.w * 1.112 + 0.032 * t, f: 0.0975 - 0.006 * t, b: wide.b * 1.085 + 0.008 * t, n: 2.3, cz: 0 };
+}
+// how far the face opening has spread at height y (nothing above the forehead line)
+function faceOpen(y) { return y >= FOREHEAD ? 0 : FACE_OPEN * Math.sqrt(Math.min(1, (FOREHEAD - y) / 0.022)); }
+
 function performerGeometry() {
-  var G = {};
-  // kneeling, sitting back on the heels: the thobe over the folded legs
-  G.legs = new RoundedBoxGeometry(0.42, 0.22, 0.56, 4, 0.1); G.legs.translate(0, 0.11, 0.1);
-  // the body of the thobe, from the hips to the neck
-  G.torso = lathe([[0, 0], [0.2, 0.0], [0.214, 0.05], [0.188, 0.2], [0.176, 0.3], [0.196, 0.41], [0.178, 0.47], [0.085, 0.515], [0.05, 0.53], [0, 0.535]], 22);
-  G.torso.scale(1, 1, 0.74);
-  // a bisht for the mu'allim: open at the front
-  G.bisht = lathe([[0.235, 0.0], [0.24, 0.06], [0.215, 0.22], [0.205, 0.33], [0.218, 0.42], [0.19, 0.465], [0.1, 0.5]], 22, 0.55, Math.PI * 2 - 1.1);
-  G.bisht.scale(1, 1, 0.8);
-  var skull = new THREE.SphereGeometry(0.086, 18, 14); skull.scale(0.94, 1.08, 1); skull.translate(0, 0.102, 0.02);
-  var nose = new THREE.SphereGeometry(0.016, 8, 6); nose.scale(0.8, 1.4, 1.1); nose.translate(0, 0.098, 0.103);
+  var G = {}, PI = Math.PI;
+
+  // ── kneeling, sitting back on the heels: the thobe over the folded legs, the knees showing through ──
+  // drawn as a row of arches from behind the heels to the front of the knees
+  var LEGS = [   // [along the body (z), half-width, height]: the feet under the cloth, the seat, the thighs, the knees
+    [-0.296, 0.04, 0.02], [-0.288, 0.105, 0.062], [-0.262, 0.165, 0.098], [-0.228, 0.192, 0.158], [-0.20, 0.202, 0.214], [-0.14, 0.212, 0.243], [-0.04, 0.216, 0.245],
+    [0.06, 0.212, 0.222], [0.16, 0.207, 0.192], [0.26, 0.202, 0.166], [0.34, 0.196, 0.146], [0.40, 0.184, 0.116], [0.436, 0.15, 0.07], [0.45, 0.07, 0.022]
+  ];
+  var LZ = [-0.296, -0.288, -0.275, -0.262, -0.245, -0.228, -0.20, -0.17, -0.14, -0.09, -0.04, 0.01, 0.06, 0.11, 0.16, 0.21, 0.26, 0.30, 0.34, 0.37, 0.40, 0.42, 0.436, 0.45];
+  var legRings = LZ.map(function (z) { var r = ringAt(LEGS.map(function (L) { return [L[0], L[1], L[2], 0.004, 2.4]; }), z); return r; });
+  G.legs = grid(legRings.length, 33, function (i, j) {
+    // an arch standing on the rug: built lying down (a ring per step along the body), then stood up
+    var r = legRings[i], p = ringXZ(r, PI * 2 * j / 32), x = p[0], h = Math.max(0, p[1]), z = r.y;
+    // the cloth dips between the two thighs, deeper toward the knees
+    h *= 1 - 0.36 * smooth(-0.02, 0.3, z) * Math.exp(-Math.pow(x / 0.055, 2));
+    // and the thighs are rounder on top than the lap between them
+    h *= 1 + 0.05 * smooth(0.0, 0.2, z) * Math.exp(-Math.pow((Math.abs(x) - 0.12) / 0.05, 2));
+    return [x, h, z, j / 32 * 2.6, z * 2.2];
+  }, { flip: true });
+
+  // ── the body of the thobe, from the hips up to the collar, with the placket down the chest ──
+  var TY = [-0.09, -0.04, 0.0, 0.05, 0.10, 0.15, 0.20, 0.24, 0.28, 0.315, 0.35, 0.38, 0.405, 0.425, 0.44, 0.452, 0.462, 0.472, 0.482, 0.49, 0.497, 0.507, 0.519, 0.531];
+  var body = loft(TORSO, TY, 32, { us: 2.6, vs: 2.2 });
+  // the top of the collar turns in and closes around the neck
+  var lip = grid(3, 33, function (i, j) {
+    var r = { y: 0, w: [0.058, 0.0505, 0.02][i], f: [0.052, 0.0455, 0.02][i], b: [0.055, 0.0485, 0.02][i], n: 2 };
+    var p = ringXZ(r, PI * 2 * j / 32); return [p[0], [0.531, 0.527, 0.5][i], p[1], j / 32, 0];
+  });
+  var plk = grid(9, 3, function (i, j) {
+    var y = 0.31 + (0.505 - 0.31) * i / 8, x = (j - 1) * 0.009;
+    return [x, y, ringZ(ringAt(TORSO, y), x) + (j === 1 ? 0.0024 : 0.0006), 0.5, y * 2.2];
+  });
+  var parts = [body, lip, plk];
+  [0.475, 0.435, 0.395, 0.355].forEach(function (y) { var bt = new THREE.SphereGeometry(0.0038, 8, 6); bt.scale(1, 1, 0.5); bt.translate(0, y, ringZ(ringAt(TORSO, y), 0) + 0.0028); parts.push(bt); });
+  G.torso = mergeGeometries(parts);
+
+  // ── a bisht for the mu'allim: over the shoulders, open down the front ──
+  var BY = [0.0, 0.06, 0.12, 0.18, 0.24, 0.30, 0.35, 0.39, 0.42, 0.44, 0.455, 0.468, 0.48, 0.49, 0.498];
+  G.bisht = grid(BY.length, 31, function (i, j) {
+    var r = ringAt(TORSO, BY[i]), g = 0.017 - 0.006 * smooth(0.46, 0.5, BY[i]);
+    var open = 0.5 - 0.22 * smooth(0.3, 0.498, BY[i]);                 // the opening narrows toward the neck
+    var p = ringXZ({ w: r.w + g, f: r.f + g, b: r.b + g, n: r.n }, open + (PI * 2 - open * 2) * j / 30);
+    return [p[0], BY[i], p[1], j / 30, i / (BY.length - 1)];
+  });
+
+  // ── the head: neck, jaw, cheeks, brow, with a nose ──
+  var HY = [-0.045, 0.0, 0.02, 0.033, 0.043, 0.055, 0.063, 0.072, 0.082, 0.092, 0.102, 0.112, 0.120, 0.128, 0.135, 0.142, 0.149, 0.155, 0.165, 0.175, 0.195, 0.212, 0.226, 0.235, 0.2395];
+  var skull = grid(HY.length, 37, function (i, j) { var p = headAt(PI * 2 * j / 36, HY[i]); return [p[0], p[1], p[2], j / 36, HY[i] * 4]; });
+  var NY = [0.0965, 0.100, 0.106, 0.115, 0.130, 0.146], NW = [0.009, 0.0135, 0.0145, 0.011, 0.008, 0.0055], NP = [0.004, 0.016, 0.0235, 0.019, 0.010, 0.002];
+  var nose = grid(6, 9, function (i, j) {
+    var a = -PI / 2 + PI * j / 8, base = faceZ(0, NY[i]) - 0.003;
+    return [NW[i] * Math.sin(a), NY[i], base + (NP[i] + 0.003) * Math.cos(a), 0.5, NY[i] * 4];
+  });
   G.head = mergeGeometries([skull, nose]);
-  // a beard and moustache: the lower front of the face
-  G.beard = new THREE.SphereGeometry(0.09, 16, 10, Math.PI * 0.08, Math.PI * 0.84, Math.PI * 0.52, Math.PI * 0.4);   // centered on the front (+z)
-  G.beard.scale(0.95, 1.05, 1.06); G.beard.translate(0, 0.104, 0.024);
-  // the shemagh: over the head and down onto the shoulders, open for the face
-  G.shemagh = lathe([[0.0, 0.214], [0.062, 0.206], [0.1, 0.178], [0.113, 0.13], [0.117, 0.07], [0.13, 0.0], [0.168, -0.05], [0.2, -0.085], [0.215, -0.12]], 28, 0.9, Math.PI * 2 - 1.8);
-  // it hangs down the back to the shoulder blades, and lies over the shoulders at the sides
-  (function () {
-    var sp = G.shemagh.attributes.position;
-    for (var i = 0; i < sp.count; i++) {
-      var x = sp.getX(i), y = sp.getY(i), z = sp.getZ(i);
-      if (y >= 0.02) continue;
-      var back = (1 - z / Math.max(0.001, Math.hypot(x, z))) / 2;      // 0 at the front, 1 at the back
-      var d = (0.02 - y);
-      sp.setY(i, 0.02 - d * (1 + 1.4 * back * back));
-      var k = 1 + d * 1.5 * back;
-      sp.setX(i, x * (1 + d * 0.6)); sp.setZ(i, z * k - back * d * 0.12);
+
+  // ── the features of the face: eyes, brows, and the inside of the mouth (seen when the jaw drops). The part is
+  //    painted from a two-color strip: everything is dark except the whites of the eyes ──
+  var dark = [];
+  function paint(g, white) { var uv = g.attributes.uv; for (var q = 0; q < uv.count; q++) uv.setXY(q, white ? 0.75 : 0.25, 0.5); return g; }
+  [-1, 1].forEach(function (sd) {
+    var ez = faceZ(0.031, 0.1372);
+    var white = new THREE.SphereGeometry(1, 12, 8); white.scale(0.0128, 0.0058, 0.0042);
+    white.rotateZ(sd * -0.08); white.translate(sd * 0.031, 0.1368, ez + 0.0002); dark.push(paint(white, true));
+    var iris = new THREE.SphereGeometry(1, 10, 8); iris.scale(0.0058, 0.0058, 0.003); iris.translate(sd * 0.0305, 0.1368, ez + 0.0024); dark.push(paint(iris));
+    // the upper lid and lashes, and the brow
+    var lid = [-0.0125, -0.0065, 0, 0.0065, 0.0125].map(function (dx, k) { return new THREE.Vector3(sd * (0.031 + dx), 0.1368 + [0.0006, 0.0052, 0.0066, 0.0052, 0.0004][k] - dx * sd * 0.0 , ez + [0.0006, 0.003, 0.0038, 0.003, 0.0006][k]); });
+    dark.push(paint(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(lid), 8, 0.0016, 5, false)));
+    var pts = [0.011, 0.023, 0.036, 0.049].map(function (x, k) { var y = [0.1502, 0.1538, 0.1538, 0.1492][k]; return new THREE.Vector3(sd * x, y, faceZ(x, y) + 0.0014); });
+    dark.push(paint(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 8, 0.0029, 5, false)));
+  });
+  // the inside of the mouth: a dark patch lying on the lips, wide enough for everything the jaw uncovers when it drops
+  var mouth = grid(6, 11, function (i, j) {
+    var x = -0.031 + 0.062 * j / 10, y = 0.0527 + 0.0285 * i / 5;
+    return [x, y, faceZ(x, y) + 0.0012, 0.25, 0.5];
+  });
+  dark.push(paint(mouth));
+  G.face = mergeGeometries(dark);
+
+  // ── a beard: along the jaw and under the chin, and a moustache. The chin moves with the jaw (bw = 1) ──
+  var HANG = [[0.02, 0.031], [0.03, 0.038], [0.045, 0.022], [0.06, 0.010], [0.0745, 0.0012], [0.2, 0.0012]];
+  function hang(y) { var i = 0; while (i < HANG.length - 2 && y > HANG[i + 1][0]) i++; var a = HANG[i], b = HANG[i + 1]; return lerp(a[1], b[1], Math.min(1, Math.max(0, (y - a[0]) / (b[0] - a[0])))); }
+  var bwL = [];
+  var low = grid(10, 31, function (i, j) {
+    var phi = -1.75 + 3.5 * j / 30, a = Math.abs(phi), t = i / 9;
+    var yb = 0.02 + 0.087 * Math.pow(a / 1.75, 1.6), yt = 0.0745 + 0.0605 * Math.pow(smooth(0.3, 1.75, a), 0.8), y = lerp(yb, yt, t);
+    var chin = Math.exp(-Math.pow(a / 0.75, 2));
+    var th = 0.0012 + 0.0036 * Math.pow(Math.sin(PI * Math.min(1, 0.08 + 0.92 * t)), 0.6) + chin * hang(y);
+    var p = headAt(phi, y, th);
+    bwL.push(smooth(0.95, 0.35, a) * smooth(0.118, 0.085, y));
+    return [p[0], p[1], p[2], j / 30, t];
+  });
+  low.setAttribute('bw', new THREE.BufferAttribute(new Float32Array(bwL), 1));
+  var stache = grid(5, 15, function (i, j) {
+    var phi = -0.44 + 0.88 * j / 14, a = Math.abs(phi) / 0.44, t = i / 4;
+    var y = lerp(0.0765 - 0.011 * Math.pow(a, 1.5), 0.0948 - 0.006 * a * a, t);
+    var p = headAt(phi, y, 0.001 + 0.0044 * Math.sin(PI * (0.14 + 0.8 * t)) * (1 - 0.45 * a * a));
+    return [p[0], p[1], p[2], j / 14, t];
+  });
+  G.beard = mergeGeometries([low, setAll(stache, 'bw', 0)]);
+
+  // ── the shemagh: one cloth over the head, open for the face, lying on the shoulders by the neck and
+  //    hanging in a point down the back. The part on the body follows the chest (bw = 1), so it never cuts
+  //    through the body when the head turns ──
+  var HOOD = [0.015, 0.035, 0.055, 0.075, 0.095, 0.115, 0.135, 0.148, 0.152, 0.158, 0.163, 0.167, FOREHEAD, 0.188, 0.205, 0.222, 0.235, 0.243, HOOD_TOP];
+  var KD = 9, NU = 44, rowsS = KD + HOOD.length, bwS = [];
+  function hoodPoint(y, j) {
+    var a0 = faceOpen(y), phi = a0 + (PI * 2 - a0 * 2) * j / NU;
+    var p = ringXZ(hoodRing(y), phi); return [p[0], y, p[1]];
+  }
+  // push a point of the cloth out of the body until it lies `gap` off it
+  function outOf(pt, gap) {
+    for (var it = 0; it < 40 && inBody(pt[0], pt[1], pt[2], gap); it++) {
+      var yc = pt[1] + HEAD_AT.y, l = Math.hypot(pt[0], pt[2]) || 1, up = yc > 0.43 ? 1.4 : 0, n = Math.hypot(1, up);
+      pt[0] += pt[0] / l * 0.003 / n; pt[2] += pt[2] / l * 0.003 / n; pt[1] += 0.003 * up / n;
     }
-    G.shemagh.computeVertexNormals();
-  })();
-  // two black cords of the igal
-  var i1 = new THREE.TorusGeometry(0.094, 0.012, 8, 30); i1.rotateX(Math.PI / 2); i1.translate(0, 0.17, 0);
-  var i2 = new THREE.TorusGeometry(0.09, 0.011, 8, 30); i2.rotateX(Math.PI / 2); i2.translate(0, 0.192, -0.004);
-  G.igal = mergeGeometries([i1, i2]); G.igal.rotateX(-0.12);
-  G.upper = new THREE.CapsuleGeometry(0.044, 0.2, 4, 10); G.upper.translate(0, -0.135, 0);
-  G.fore = new THREE.CapsuleGeometry(0.037, 0.17, 4, 10); G.fore.translate(0, -0.12, 0);
-  G.hand = new THREE.SphereGeometry(0.041, 12, 10); G.hand.scale(1, 1.15, 0.8);
-  // the frame drum (tar): a wooden frame with the skin on the side facing +z
+    return pt;
+  }
+  // where the edge of the cloth ends for each column: `a` is 0 at the middle of the back, 1 at the face
+  function hem(a, sd) {
+    var x, y, z;
+    if (a <= 0.6) { var q = a / 0.6; x = 0.16 * Math.pow(q, 0.9); y = -0.30 + 0.245 * q; z = -0.2; }
+    else { var q2 = (a - 0.6) / 0.4; x = 0.16 - 0.058 * q2; y = -0.055 + 0.02 * q2; z = -0.09 + 0.135 * q2; }
+    var pt = [sd * x, y, z];
+    if (a <= 0.6) {                 // on the back: come forward until the cloth meets it
+      for (var it = 0; it < 80 && !inBody(pt[0], pt[1], pt[2], 0.013); it++) pt[2] += 0.002;
+      pt[2] -= 0.002;
+    }
+    return outOf(pt, 0.012);
+  }
+  // the part below the head, column by column from the hem up; then evened out along the rows so the edge is clean
+  var drape = [], backness = [];
+  for (var dj = 0; dj <= NU; dj++) {
+    var top = hoodPoint(HOOD[0], dj), dphi = FACE_OPEN + (PI * 2 - FACE_OPEN * 2) * dj / NU;
+    var da = Math.abs(dphi - PI) / (PI - FACE_OPEN), h = hem(da, dphi < PI ? 1 : -1), col = [];
+    for (var di = 0; di < KD; di++) { var ds = 1 - di / KD; col.push(outOf([lerp(top[0], h[0], ds), lerp(top[1], h[1], ds), lerp(top[2], h[2], Math.pow(ds, 0.8))], 0.011)); }
+    drape.push(col); backness.push(1 - smooth(0.55, 1, da));
+  }
+  for (var pass = 0; pass < 2; pass++) {
+    var nxt = drape.map(function (col) { return col.map(function (pt) { return pt.slice(); }); });
+    for (dj = 1; dj < NU; dj++) for (di = 0; di < KD; di++) for (var ax = 0; ax < 3; ax++) nxt[dj][di][ax] = drape[dj][di][ax] * 0.5 + (drape[dj - 1][di][ax] + drape[dj + 1][di][ax]) * 0.25;
+    drape = nxt.map(function (col) { return col.map(function (pt) { return outOf(pt, 0.0095); }); });
+  }
+  G.shemagh = grid(rowsS, NU + 1, function (i, j) {
+    var p = i >= KD ? hoodPoint(HOOD[i - KD], j) : drape[j][i];
+    bwS.push(smooth(0.075, -0.01, p[1]));
+    // the check goes round the head; on the back it is laid flat, and on the crown it is laid flat from above
+    var u = j / NU * 6.2, v = p[1] * 10;
+    if (i < KD) u = lerp(u, 3.1 - p[0] * 9.6, backness[j] * Math.min(1, (KD - i) / 2));
+    if (p[1] >= 0.2215) { u = p[0] * 10; v = p[2] * 10; }
+    return [p[0], p[1], p[2], u, v];
+  });
+  G.shemagh.setAttribute('bw', new THREE.BufferAttribute(new Float32Array(bwS), 1));
+
+  // ── the two black cords of the igal, lying on the cloth ──
+  function cord(y0, rt) {
+    return grid(41, 8, function (i, j) {
+      var phi = PI * 2 * i / 40, c = ringXZ(hoodRing(y0), phi), l = Math.hypot(c[0], c[1]) || 1, m = PI * 2 * j / 7;
+      var out = rt * 0.7 + rt * Math.cos(m), y = y0 + c[1] * 0.1 + rt * Math.sin(m);
+      return [c[0] + c[0] / l * out, y, c[1] + c[1] / l * out, i / 40, j / 7];
+    }, { flip: true });
+  }
+  G.igal = mergeGeometries([cord(0.204, 0.0092), cord(0.2215, 0.0088)]);
+
+  // ── sleeves: round at the shoulder and the elbow, an open cuff at the wrist ──
+  G.upper = lathe([[0, -0.317], [0.03, -0.311], [0.044, -0.294], [0.048, -0.27], [0.052, -0.16], [0.057, -0.06], [0.0585, 0], [0.051, 0.03], [0.031, 0.05], [0, 0.0585]], 16);
+  G.fore = lathe([[0, -0.2], [0.03, -0.212], [0.035, -0.233], [0.0455, -0.233], [0.0445, -0.224], [0.043, -0.19], [0.046, -0.08], [0.048, 0], [0.046, 0.016], [0.03, 0.038], [0, 0.048]], 16);
+
+  // ── hands: a palm, the fingers together and slightly curled, a thumb (the palm faces -z) ──
+  var HAND = [
+    [-0.122, 0.006, 0.0025, 0.0025, 2, -0.021], [-0.115, 0.022, 0.0065, 0.0065, 2.2, -0.017], [-0.103, 0.033, 0.0095, 0.009, 2.5, -0.010],
+    [-0.085, 0.0385, 0.0115, 0.0105, 2.6, -0.004], [-0.065, 0.0405, 0.0135, 0.0125, 2.6, 0], [-0.045, 0.0395, 0.015, 0.014, 2.5, 0],
+    [-0.02, 0.0335, 0.016, 0.015, 2.3, 0], [0.0, 0.0245, 0.016, 0.0155, 2.1, 0], [0.036, 0.0215, 0.017, 0.017, 2, 0]
+  ];
+  var palm = loft(HAND, [-0.122, -0.115, -0.103, -0.085, -0.065, -0.045, -0.02, 0.0, 0.036], 16);
+  var thumb = new THREE.CapsuleGeometry(0.0105, 0.034, 3, 8);
+  var dir = new THREE.Vector3(-0.024, -0.044, -0.008).normalize();
+  thumb.applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, -1, 0), dir)));
+  thumb.translate(-0.04, -0.04, -0.007);
+  G.handL = mergeGeometries([palm, thumb]);
+  G.handR = mirrorX(G.handL);
+
+  // ── the frame drum (tar): a wooden frame with the skin on the side facing +z ──
   G.rim = new THREE.CylinderGeometry(0.21, 0.21, 0.055, 36, 1, true); G.rim.rotateX(Math.PI / 2);
   G.skin = new THREE.CircleGeometry(0.207, 36); G.skin.translate(0, 0, 0.026);
   return G;
 }
-// arm poses: [shoulder x, shoulder z (outward), elbow x], left arm; the right one is mirrored
+// a part that follows two joints at once, a little of each per vertex (cloth between the head and the
+// shoulders, a beard on a moving jaw). `bw` says how much of the second joint; `rel` is where that joint
+// is, seen from the first one
+function twoBone(mat) {
+  mat.onBeforeCompile = function (sh) {
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nattribute float bw;\nattribute mat4 rel;')
+      .replace('#include <beginnormal_vertex>', '#include <beginnormal_vertex>\n  objectNormal = normalize(mix(objectNormal, mat3(rel) * objectNormal, bw));')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\n  transformed = mix(transformed, (rel * vec4(transformed, 1.0)).xyz, bw);');
+  };
+  mat.customProgramCacheKey = function () { return 'twoBone'; };
+  return mat;
+}
+// arm poses, left arm (the right one is mirrored): [shoulder x, shoulder z (outward), elbow, turn of the forearm,
+// turn of the upper arm, bend of the wrist, tilt of the wrist]. They were worked out so that the palms land where
+// they should: on the thighs, flat on each other, under the frame of the drum, on its skin, and on its two sides
+// when it is lifted
 var POSE = {
-  knee: [-0.42, 0.06, -0.78],
-  clap: [-1.0, -0.44, -1.15],
-  holdL: [-1.0, 0.36, -1.05], holdR: [-0.92, -0.02, -1.38],
-  upL: [-2.75, 0.22, -0.35], upR: [-2.55, -0.12, -0.62]
+  knee: [-0.34, 0.16, -0.43, 0.85, -1.06, -0.46, 0.05],
+  clap: [-0.52, 0.09, -1.48, 1.60, -0.88, -0.85, 0.15], clapOpen: [-0.32, 0.15, -1.64, 1.44, -0.55, -0.88, 0.07],
+  holdL: [-0.17, 0.15, -1.51, -0.53, -0.52, 0.22, 0.16],
+  holdR: [-0.46, 0.06, -1.67, 1.60, -0.01, 0.69, -0.45], hitR: [-0.32, 0.07, -1.84, 1.60, -0.14, 0.67, -0.45],
+  upL: [-2.28, 0.04, -1.11, 1.60, 0.00, 0.28, -0.17], upR: [-2.19, 0.20, -1.40, 1.60, -0.06, 0.17, 0.01]
 };
-function mix3(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
+function mix3(a, b, t) { var o = []; for (var i = 0; i < a.length; i++) o.push(a[i] + (b[i] - a[i]) * t); return o; }
 
 // ─────────────────────────────────────────────────────────────
 // the world
@@ -260,7 +557,8 @@ export class World {
     this.xr = null; this.placed = false; this.arScale = 1;
     this.orbit = { yaw: 0, pitch: 0, on: false };
     // the beat everyone moves to (set by the controller each frame), and what each row is doing
-    this.beat = 0; this.bpm = 66;
+    this.beat = 0; this.bpm = 48;
+    this.strokes = [0, 2 / 3, 1, 4 / 3];   // where the drum strokes fall in the cycle (set by the controller)
     this.rows = [{ mode: 'hold' }, { mode: 'hold' }];
     this.you = -1;            // which performer is you (-1: nobody)
     this.youManual = false;   // when true, your performer moves only with your taps and swipes
@@ -363,9 +661,10 @@ export class World {
     var M = this.pm = {
       thobe: new THREE.MeshStandardMaterial({ map: cloth, color: 0xF1EEE6, roughness: 0.82 }),
       skin: new THREE.MeshStandardMaterial({ map: skinTexture(), color: 0xB07C59, roughness: 0.62 }),
-      shemagh: new THREE.MeshStandardMaterial({ map: shemaghTexture(), roughness: 0.85, side: THREE.DoubleSide }),
+      face: new THREE.MeshStandardMaterial({ map: faceTexture(), roughness: 0.45 }),
+      shemagh: twoBone(new THREE.MeshStandardMaterial({ map: shemaghTexture(), roughness: 0.85, side: THREE.DoubleSide })),
       igal: new THREE.MeshStandardMaterial({ color: 0x141212, roughness: 0.55 }),
-      beard: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95 }),
+      beard: twoBone(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95 })),
       bisht: new THREE.MeshStandardMaterial({ map: bishtTexture(), roughness: 0.75, side: THREE.DoubleSide }),
       rim: new THREE.MeshStandardMaterial({ map: this.wood.map, color: 0xB08A60, roughness: 0.7, side: THREE.DoubleSide }),
       drum: new THREE.MeshStandardMaterial({ map: drumSkinTexture(), roughness: 0.75, side: THREE.DoubleSide })
@@ -378,14 +677,24 @@ export class World {
       m.frustumCulled = false;
       F.add(m); return m;
     }
+    // the two parts that bend between two joints carry, for each man, where the second joint is
+    function bend(geo) {
+      var rel = new THREE.InstancedBufferAttribute(new Float32Array(N * 16), 16); rel.setUsage(THREE.DynamicDrawUsage);
+      var id = new THREE.Matrix4(); for (var k = 0; k < N; k++) id.toArray(rel.array, k * 16);
+      geo.setAttribute('rel', rel); return geo;
+    }
+    var depthBend = twoBone(new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }));
     this.im = {
       legs: inst(G.legs, M.thobe, N), torso: inst(G.torso, M.thobe, N), head: inst(G.head, M.skin, N),
-      shemagh: inst(G.shemagh, M.shemagh, N), igal: inst(G.igal, M.igal, N),
-      beard: inst(G.beard, M.beard, N),
-      upper: inst(G.upper, M.thobe, N * 2), fore: inst(G.fore, M.thobe, N * 2), hand: inst(G.hand, M.skin, N * 2),
+      face: inst(G.face, M.face, N),
+      shemagh: inst(bend(G.shemagh), M.shemagh, N), igal: inst(G.igal, M.igal, N),
+      beard: inst(bend(G.beard), M.beard, N),
+      upper: inst(G.upper, M.thobe, N * 2), fore: inst(G.fore, M.thobe, N * 2), handL: inst(G.handL, M.skin, N), handR: inst(G.handR, M.skin, N),
       rim: inst(G.rim, M.rim, N), skin: inst(G.skin, M.drum, N),
       bisht: inst(G.bisht, M.bisht, 2)
     };
+    this.im.shemagh.customDepthMaterial = depthBend; this.im.beard.customDepthMaterial = depthBend;
+    this.im.face.castShadow = false;
     // a little variety in the white of the thobes
     var rnd = mulberry32(42), tint = new THREE.Color();
     for (var i = 0; i < N; i++) {
@@ -395,11 +704,13 @@ export class World {
       this.im.upper.setColorAt(i * 2, tint); this.im.upper.setColorAt(i * 2 + 1, tint);
       this.im.fore.setColorAt(i * 2, tint); this.im.fore.setColorAt(i * 2 + 1, tint);
       var s = 0.85 + rnd() * 0.3; tint.setRGB(s, s, s);
-      this.im.head.setColorAt(i, tint); this.im.hand.setColorAt(i * 2, tint); this.im.hand.setColorAt(i * 2 + 1, tint);
+      this.im.head.setColorAt(i, tint); this.im.handL.setColorAt(i, tint); this.im.handR.setColorAt(i, tint);
       // beards: black, dark brown, or grey for the elders (the two mu'allims are elders)
       var lead = i % ROW.N === ROW.LEAD, k = rnd();
       tint.set(lead || k < 0.18 ? 0xB9B4AC : k < 0.6 ? 0x1A1512 : 0x3A2A1E);
       this.im.beard.setColorAt(i, tint);
+      // the mu'allim's arms are in the sleeves of his bisht
+      if (lead) { tint.set(0x30231B); ['upper', 'fore'].forEach(function (k2) { self.im[k2].setColorAt(i * 2, tint); self.im[k2].setColorAt(i * 2 + 1, tint); }); }
     }
     var white = new THREE.Color(1, 1, 1);
     for (var c2 = 0; c2 < N; c2++) this.im.skin.setColorAt(c2, white);
@@ -420,29 +731,32 @@ export class World {
     this.tmpM = new THREE.Matrix4(); this.tmpQ = new THREE.Quaternion(); this.tmpQ2 = new THREE.Quaternion();
     this.tmpP = new THREE.Vector3(); this.tmpP2 = new THREE.Vector3(); this.tmpS = new THREE.Vector3();
     this.zero = new THREE.Matrix4().makeScale(0, 0, 0);
-    this.leadScale = new THREE.Matrix4().makeScale(1.12, 1.02, 1.3);
+    this.tmpM2 = new THREE.Matrix4(); this.tmpE = new THREE.Euler();
+    // the mu'allim's shemagh lies over his bisht: the part on his body sits a little further out
+    var d = HEAD_AT;
+    this.leadDrape = new THREE.Matrix4().makeTranslation(-d.x, -d.y + 0.008, -d.z).multiply(new THREE.Matrix4().makeScale(1.09, 1, 1.16)).multiply(new THREE.Matrix4().makeTranslation(d.x, d.y, d.z));
     this.updateFigures(0.016);
   }
   makeFigure(row, seat, rnd) {
     var root = new THREE.Object3D();
     var hips = new THREE.Object3D(); hips.position.set(0, 0.2, -0.04); root.add(hips);
     var chest = new THREE.Object3D(); chest.position.set(0, 0.0, 0); hips.add(chest);
-    var head = new THREE.Object3D(); head.position.set(0, 0.52, 0.012); chest.add(head);
+    var head = new THREE.Object3D(); head.position.set(HEAD_AT.x, HEAD_AT.y, HEAD_AT.z); chest.add(head);
     var shL = new THREE.Object3D(); shL.position.set(0.2, 0.44, 0); chest.add(shL);
     var shR = new THREE.Object3D(); shR.position.set(-0.2, 0.44, 0); chest.add(shR);
     var elL = new THREE.Object3D(); elL.position.set(0, -0.27, 0); shL.add(elL);
     var elR = new THREE.Object3D(); elR.position.set(0, -0.27, 0); shR.add(elR);
-    var hdL = new THREE.Object3D(); hdL.position.set(0, -0.255, 0); elL.add(hdL);
-    var hdR = new THREE.Object3D(); hdR.position.set(0, -0.255, 0); elR.add(hdR);
+    var hdL = new THREE.Object3D(); hdL.position.set(0, -0.255, 0); hdL.rotation.order = 'YXZ'; elL.add(hdL);
+    var hdR = new THREE.Object3D(); hdR.position.set(0, -0.255, 0); hdR.rotation.order = 'YXZ'; elR.add(hdR);
     // where the drum sits: held at the chest, lifted over the head, or lying on the rug
     var dHold = new THREE.Object3D(); dHold.position.set(-0.03, 0.34, 0.31); dHold.rotation.set(-0.12, -0.28, 0); chest.add(dHold);
-    var dUp = new THREE.Object3D(); dUp.position.set(-0.02, 0.76, 0.17); dUp.rotation.set(-0.55, -0.12, 0); chest.add(dUp);
-    var dDown = new THREE.Object3D(); dDown.position.set(0.02, 0.035, 0.5); dDown.rotation.set(-Math.PI / 2, 0, 0.3); root.add(dDown);
+    var dUp = new THREE.Object3D(); dUp.position.set(-0.02, 0.86, 0.14); dUp.rotation.set(-0.75, -0.12, 0); chest.add(dUp);
+    var dDown = new THREE.Object3D(); dDown.position.set(0.02, 0.035, 0.66); dDown.rotation.set(-Math.PI / 2, 0, 0.3); root.add(dDown);
     var p = this.seatPos(row, seat);
     root.position.set(p.x, 0, p.z); root.rotation.y = row === 0 ? 0 : Math.PI;
     return {
       row: row, seat: seat, nodes: { root: root, hips: hips, chest: chest, head: head, shL: shL, shR: shR, elL: elL, elR: elR, hdL: hdL, hdR: hdR, dHold: dHold, dUp: dUp, dDown: dDown },
-      jit: (rnd() - 0.5) * 0.06, lean: 0, bob: 0, lift: 0, hold: 1, clapOn: 0, sing: 0, show: 1, showTo: 1,
+      jit: (rnd() - 0.5) * 0.06, lean: 0, bob: 0, lift: 0, hold: 1, clapOn: 0, sing: 0, mouth: 0, wide: 0.8 + rnd() * 0.35, show: 1, showTo: 1,
       strike: 0, clap: 0, slap: 0, x: p.x, z: p.z,
       // your own moves, when you are this performer
       man: { lean: 0, leanT: 0, lift: 0, hold: 1, strikeT: -9, clapT: -9, sing: 0, slapT: -9 }
@@ -499,6 +813,7 @@ export class World {
   updateFigures(dt) {
     var figs = this.figs, b0 = this.beat, im = this.im, self = this;
     var tm = this.tmpM, q = this.tmpQ, q2 = this.tmpQ2, p1 = this.tmpP, p2 = this.tmpP2, sc = this.tmpS;
+    var relS = im.shemagh.geometry.attributes.rel, relB = im.beard.geometry.attributes.rel, m2 = this.tmpM2;
     for (var i = 0; i < figs.length; i++) {
       var f = figs[i], n = f.nodes, b = b0 + f.jit, mode = this.rows[f.row].mode;
       var isYou = i === this.you && this.youManual;
@@ -512,17 +827,18 @@ export class World {
         tHold = 1; tSing = 1; tLean = 0.3 * Math.sin(Math.PI * b / 2); tBob = 0.08 * Math.sin(Math.PI * b);
       }
       else if (mode === 'sing') {
-        // one row sings and claps: drums down, hands meeting on the beat, a small rock forward
-        tHold = 0; tClapOn = 1; tSing = 1; clap = pulse(b, 0.24);
+        // one row sings and claps: drums down, hands meeting on the drum strokes, a small rock forward
+        tHold = 0; tClapOn = 1; tSing = 1; clap = strokePulse(b, this.strokes, 0.15);
         tBob = 0.35 * pulse(b, 0.45);
       } else if (mode === 'sway') {
-        // the other row sways side to side, lifting the drums every other bar, striking on the beat
+        // the other row sways, right for one cycle and left for the next, lifting the drums every
+        // other pair of cycles and striking on every stroke
         tHold = 1; tLean = Math.cos(Math.PI * b / 2);
         tLift = rowLift != null ? rowLift : (Math.floor(b / 4) % 2 === 1) ? 1 : 0;
-        strike = pulse(b, 0.2); tBob = 0.15 * pulse(b + 1, 0.5);
+        strike = strokePulse(b, this.strokes, 0.13); tBob = 0.15 * pulse(b + 1, 0.5);
       } else if (mode === 'beat') {
-        // drums held at the chest, struck on every beat
-        tHold = 1; strike = pulse(b, 0.2); tBob = 0.18 * pulse(b, 0.5);
+        // drums held at the chest, struck on every stroke
+        tHold = 1; strike = strokePulse(b, this.strokes, 0.13); tBob = 0.18 * pulse(b, 0.5);
       }
       if (isYou) {
         var m = f.man;
@@ -533,6 +849,8 @@ export class World {
         strike = Math.max(0, 1 - (this.clock - m.strikeT) / 0.16);
         clap = Math.max(0, 1 - (this.clock - m.clapT) / 0.16);
       }
+      // the mouth: on the syllables of the verse when the controller says which, otherwise a plain open-and-close
+      var rm = this.rows[f.row].mouth, tMouth = rm != null ? rm : (tSing > 0.5 ? 0.35 + 0.3 * Math.sin(this.clock * 7 + i) : 0);
       // the khallu: drums slapped down on the rug together
       var slap = 0, slapHold = 1;
       var ks = isYou ? (this.clock - f.man.slapT) : (this.khalluAt != null ? (b0 - this.khalluAt) * 60 / this.bpm : -9);
@@ -549,6 +867,7 @@ export class World {
       f.hold = damp(f.hold, tHold * slapHold, slapHold < 1 ? 30 : 5, dt);
       f.clapOn = damp(f.clapOn, tClapOn, 6, dt);
       f.sing = damp(f.sing, tSing, 4, dt);
+      f.mouth = damp(f.mouth, Math.min(1, tMouth * f.wide), 26, dt);
       f.show = damp(f.show, f.showTo, 5, dt);
       if (f.tx !== undefined) f.x = damp(f.x, f.tx, 4, dt);
       // the joints
@@ -557,35 +876,39 @@ export class World {
       n.root.scale.setScalar(sh);
       n.hips.rotation.set(f.bob * 0.32, 0, f.lean * 0.21);
       n.chest.rotation.set(f.bob * 0.18 - f.sing * 0.04, 0, f.lean * 0.1);
-      n.head.rotation.set(-f.sing * 0.24 + f.bob * 0.2, 0, f.lean * 0.12);
-      var gL = mix3(POSE.knee, POSE.clap, f.clapOn), gR = mix3(POSE.knee, POSE.clap, f.clapOn);
-      var hL = mix3(POSE.holdL, POSE.upL, f.lift), hR = mix3(POSE.holdR, POSE.upR, f.lift);
-      var L = mix3(gL, hL, f.hold), Rr = mix3(gR, hR, f.hold);
-      var apart = (1 - clap) * 0.3 * f.clapOn * (1 - f.hold);
-      L[1] += apart; Rr[1] += apart;
-      Rr[2] += strike * 0.5 * f.hold; Rr[0] += strike * 0.12 * f.hold;
+      n.head.rotation.set(-f.sing * 0.2 + f.bob * 0.2 - f.mouth * 0.05, 0, f.lean * 0.12);
+      // hands on the thighs, or clapping (apart, then together on the stroke)
+      var gL = mix3(POSE.knee, mix3(POSE.clapOpen, POSE.clap, clap), f.clapOn);
+      // the left hand under the frame of the drum; the right one off the skin, landing on it for a stroke; both on the frame when it is lifted
+      var hL = mix3(POSE.holdL, POSE.upL, f.lift), hR = mix3(mix3(POSE.holdR, POSE.hitR, strike), POSE.upR, f.lift);
+      var L = mix3(gL, hL, f.hold), Rr = mix3(gL, hR, f.hold);
+      Rr[2] += strike * 0.12 * f.lift * f.hold;
       L[0] -= slap * 0.5; Rr[0] -= slap * 0.5;
-      n.shL.rotation.set(L[0], 0, L[1]); n.elL.rotation.set(L[2], 0, 0);
-      n.shR.rotation.set(Rr[0], 0, -Rr[1]); n.elR.rotation.set(Rr[2], 0, 0);
+      n.shL.rotation.set(L[0], L[4], L[1]); n.elL.rotation.set(L[2], 0, 0); n.hdL.rotation.set(L[5], L[3], L[6]);
+      n.shR.rotation.set(Rr[0], -Rr[4], -Rr[1]); n.elR.rotation.set(Rr[2], 0, 0); n.hdR.rotation.set(Rr[5], -Rr[3], -Rr[6]);
       n.root.updateMatrixWorld(true);
       // instance matrices
       if (f.show < 0.02) {
-        ['legs', 'torso', 'head', 'beard', 'shemagh', 'igal', 'rim', 'skin'].forEach(function (k) { im[k].setMatrixAt(i, self.zero); });
-        ['upper', 'fore', 'hand'].forEach(function (k) { im[k].setMatrixAt(i * 2, self.zero); im[k].setMatrixAt(i * 2 + 1, self.zero); });
+        ['legs', 'torso', 'head', 'face', 'beard', 'shemagh', 'igal', 'handL', 'handR', 'rim', 'skin'].forEach(function (k) { im[k].setMatrixAt(i, self.zero); });
+        ['upper', 'fore'].forEach(function (k) { im[k].setMatrixAt(i * 2, self.zero); im[k].setMatrixAt(i * 2 + 1, self.zero); });
         if (f.leader) im.bisht.setMatrixAt(f.bishtIndex, self.zero);
         continue;
       }
       im.legs.setMatrixAt(i, n.root.matrixWorld);
       im.torso.setMatrixAt(i, n.chest.matrixWorld);
-      im.head.setMatrixAt(i, n.head.matrixWorld);
+      im.head.setMatrixAt(i, n.head.matrixWorld); im.face.setMatrixAt(i, n.head.matrixWorld);
+      // the beard sits on the head; its chin drops with the jaw as the mouth opens
       im.beard.setMatrixAt(i, n.head.matrixWorld);
-      // the mu'allim's shemagh lies over his bisht
-      if (f.leader) { tm.multiplyMatrices(n.head.matrixWorld, this.leadScale); im.shemagh.setMatrixAt(i, tm); }
-      else im.shemagh.setMatrixAt(i, n.head.matrixWorld);
+      m2.makeTranslation(0, -0.0135 * f.mouth, -0.0015 * f.mouth); m2.toArray(relB.array, i * 16);
+      // the shemagh sits on the head; the part lying on the shoulders and back stays with the chest. Seen
+      // from the head, the chest is the head's own turn undone (the mu'allim's lies a little further out, over his bisht)
+      im.shemagh.setMatrixAt(i, n.head.matrixWorld);
+      m2.makeRotationFromEuler(n.head.rotation).invert(); if (f.leader) m2.multiply(this.leadDrape);
+      m2.toArray(relS.array, i * 16);
       im.igal.setMatrixAt(i, n.head.matrixWorld);
       im.upper.setMatrixAt(i * 2, n.shL.matrixWorld); im.upper.setMatrixAt(i * 2 + 1, n.shR.matrixWorld);
       im.fore.setMatrixAt(i * 2, n.elL.matrixWorld); im.fore.setMatrixAt(i * 2 + 1, n.elR.matrixWorld);
-      im.hand.setMatrixAt(i * 2, n.hdL.matrixWorld); im.hand.setMatrixAt(i * 2 + 1, n.hdR.matrixWorld);
+      im.handL.setMatrixAt(i, n.hdL.matrixWorld); im.handR.setMatrixAt(i, n.hdR.matrixWorld);
       if (f.leader) im.bisht.setMatrixAt(f.bishtIndex, n.chest.matrixWorld);
       // the drum: between held and lifted, then between that and lying on the rug
       n.dHold.matrixWorld.decompose(p1, q, sc);
@@ -599,6 +922,7 @@ export class World {
       f.drumPos = f.drumPos || new THREE.Vector3(); f.drumPos.copy(p2);
     }
     for (var k in im) { im[k].instanceMatrix.needsUpdate = true; if (im[k].instanceColor) im[k].instanceColor.needsUpdate = true; }
+    relS.needsUpdate = true; relB.needsUpdate = true;
     // your ring follows you
     var me = this.youFig();
     if (me && this.youRing.visible) {
@@ -900,13 +1224,33 @@ export class World {
   async quickLook() {
     var mod = this._usdzMod || await import('three/addons/exporters/USDZExporter.js');
     // the exporter doesn't take instanced meshes: copy each performer's parts into plain meshes first
-    var tmp = new THREE.Group(), m4 = new THREE.Matrix4();
+    var tmp = new THREE.Group(), m4 = new THREE.Matrix4(), rel = new THREE.Matrix4(), v = new THREE.Vector3(), col = new THREE.Color(), mats = {};
     for (var k in this.im) {
-      var im = this.im[k];
+      var im = this.im[k], bw = im.geometry.attributes.bw, relA = im.geometry.attributes.rel;
       for (var i = 0; i < im.count; i++) {
         im.getMatrixAt(i, m4);
         if (Math.abs(m4.determinant()) < 1e-9) continue;
-        var mesh = new THREE.Mesh(im.geometry, im.material);
+        var geo = im.geometry, mat = im.material;
+        if (bw && relA) {
+          // a part bent between two joints: work out where each point really is for this man
+          geo = new THREE.BufferGeometry(); geo.setIndex(im.geometry.index);
+          geo.setAttribute('uv', im.geometry.attributes.uv);
+          var src = im.geometry.attributes.position, out = new Float32Array(src.count * 3);
+          rel.fromArray(relA.array, i * 16);
+          for (var q = 0; q < src.count; q++) {
+            var w = bw.getX(q), x = src.getX(q), y = src.getY(q), z = src.getZ(q);
+            v.set(x, y, z).applyMatrix4(rel);
+            out[q * 3] = x + (v.x - x) * w; out[q * 3 + 1] = y + (v.y - y) * w; out[q * 3 + 2] = z + (v.z - z) * w;
+          }
+          geo.setAttribute('position', new THREE.BufferAttribute(out, 3)); geo.computeVertexNormals();
+        }
+        if (im.instanceColor) {
+          // each man's own shade (his beard, his thobe, his skin)
+          im.getColorAt(i, col); var key = k + col.getHexString();
+          if (!mats[key]) { mats[key] = new THREE.MeshStandardMaterial({ map: im.material.map, color: im.material.color.clone().multiply(col), roughness: im.material.roughness, side: im.material.side }); }
+          mat = mats[key];
+        } else if (mat.onBeforeCompile && bw) mat = new THREE.MeshStandardMaterial({ map: mat.map, color: mat.color, roughness: mat.roughness, side: mat.side });
+        var mesh = new THREE.Mesh(geo, mat);
         mesh.applyMatrix4(m4); tmp.add(mesh);
       }
     }

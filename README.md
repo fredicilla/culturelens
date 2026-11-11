@@ -46,12 +46,18 @@ Then open `http://localhost:8080` in Chrome.
 
 ```
 culturelens/
-├── index.html      — Home menu (3 category cards)
+├── index.html      — The region map, then the region's home
+├── food.html, music.html, games.html, clothing.html — the four categories
+├── experience.html — One experience: its story, how it's made, and the way in
+├── community.html, account.html
+├── app.css         — The look of all the pages above (paper and ink, region colors)
+├── logo.svg, logo-mark.svg, logo-h-en.svg, logo-h-ar.svg — the logo, its mark, and the header versions
+├── cover-*.jpg     — Pictures of the four full experiences, taken from their own scenes
 ├── qahwa.html      — ☕ Najdi Qahwa experience + mini-game
 ├── masaqeel.html   — Al-Masaqil: 3D marble game with AR
 ├── sadu.html       — Al-Sadu: Bedouin weaving, 3D loom with AR + weaving race
 ├── samri.html      — Al-Samri: a Samri night in 3D with AR + rhythm game
-└── style.css       — Shared styles
+└── style.css, ui.css, studio.css — Shared styles of the four full experiences
 ```
 
 ---
@@ -72,21 +78,24 @@ culturelens/
 - Game: round 1 reads a Sadu (4 questions); round 2 races Grandma Haya to the end of a band with the real weaving rhythm, faster each time you win
 
 ### Al-Samri (samri.html)
-- One live 3D scene: a Samri night in the dunes, two rows of nine kneeling face to face on rugs, a mu'allim at the center of each, a fire at one end
-- All the sound is made in code (samri-music.js): frame drums, claps, the slap of the drums thrown down, and hummed lines for the two rows. The beat runs on the audio clock, so the dancers, the cues and the scoring stay with what you hear
-- History: where it began (Al-Qassim and Najd, and the Hasawi Samri of the Eastern Region), the two rows, the tar, the call and answer of the poetry (waneen, yisheel, marrad), and where it is sung today
-- How it's performed, done with your fingers on the scene: take your seat at the end of the row (drag), tune your drum by wetting the skin (tap, rub), answer the first row (hold through your line), keep the beat (tap), sway right and left (swipe), then lift and lower the drums and slap them down with everyone
-- Game: round 1 asks the mu'allim's 4 questions; round 2 is a whole Samri (heavy, then light and fast) where every passage you keep up with moves you one seat closer to the mu'allim
+- One live 3D scene: a Samri night in the dunes, two rows of nine kneeling face to face on rugs, a mu'allim at the center of each (in a bisht), a fire at one end. The men are drawn in code: faces with beards, a shemagh and igal that lie on the head and shoulders, hands that land on the drum, and mouths that move with the words they sing
+- The sound is played on the beat by samri-music.js from one file, samri-sounds.mp3, with the real Samri rhythms: the heavy Samri of Unaizah (one stroke on its own, then three in a row) and the light Samri of the rest of Najd (two strokes in a row, then one), the big marjaf drum, claps, and the slap of the drums thrown down. The beat runs on the audio clock, so the dancers, the cues and the scoring stay with what you hear
+  - Drums and claps: real recordings of frame drums, a bass drum and hand claps from the Versilian Community Sample Library (VCSL, Versilian Studios, CC0 / public domain), layered into a row of men striking together
+  - Singing: a machine voice, not a recording of a Samri group. An Arabic text-to-speech voice (Piper "ar_JO-kareem") says the verse in the Najdi way, and each syllable is put on the rhythm, held and tuned (WORLD vocoder), seven times over to make a row. The tune is ours, in the style, not a transcription. To be replaced by a real group when one can be recorded
+- The poem is a real Samri verse: يا جر قلبي جر لدن الغصوني / وغصون سدر جرها السيل جرا (one of the best-known Samri poems, attributed to the 19th-century poet Dakhilallah al-Dujaima). The rows sing it half by half, and each word lights up on screen as it is sung
+- History: where it began (Al-Qassim, in Najd), the two rows, the drums and both rhythms (tap Heavy or Light to hear them), the call and answer of the poetry (waneen, yisheel, marrad) with the verse, and where it is sung today
+- How it's performed, done with your fingers on the scene: take your seat at the end of the row (drag), tune your drum by wetting the skin (tap, rub), sing the line back (hold through your half of the verse), play the beat of Unaizah (tap on every stroke), sway right and left (swipe), then lift and lower the drums on the leader's call and slap them down with everyone
+- Game: round 1 asks the mu'allim's 4 questions; round 2 is a whole Samri, heavy then light, where you clap with the drum strokes when your row sings and every passage you keep up with moves you one seat closer to the mu'allim
 - AR on Android, Quick Look on iPhone
-- Sources: Saudipedia; the Samri booklet of the Royal Institute of Traditional Arts (Wrth); Aramco World, "Saudi Folk Music: Alive and Well" (2007)
+- Sources: Saudipedia; the Samri booklet of the Royal Institute of Traditional Arts (Wrth); Aramco World, "Saudi Folk Music: Alive and Well" (2007); Abdulaziz bin Hamad Al-Qadi, "Samri Unaizah", Al-Jazirah (2 Nov 2025); Al-Jazirah, "Samri" (17 Oct 2016); Al-Manwar, "The Samri tradition in Saudi Arabia" (2025); the Saudi Heritage Preservation Society, for the verse
 
 ---
 
 ## 🔊 AUDIO NOTES
-- All sounds generated via Web Audio API — no audio files needed
-- Drum beats, success sounds, failure sounds — all built in
-- **Must interact with page first** before audio works (browser requirement)
-- On iOS: mute switch must be OFF
+- Sounds are played with the Web Audio API. Qahwa, Al-Masaqil and Al-Sadu make theirs in code, with no audio files
+- Al-Samri plays recorded drums and claps and a sung verse from samri-sounds.mp3 (see its section), and falls back to sounds made in code if that file cannot be loaded
+- **Must interact with page first** before audio works (browser requirement): the first tap anywhere starts it
+- On iPhone, Al-Samri asks to play as media, so it should sound even with the silent switch on (iOS 16.4 and later; older ones use a silent track for the same effect)
 
 ---
 
@@ -115,7 +124,7 @@ culturelens/
 1. Show home screen — explain the 3 categories
 2. Open Qahwa — tap through 2 story panels, do the mini-game
 3. Open Al-Sadu (Northern Region) — weave a few rows and pick up the tree, then race Grandma Haya
-4. Open Al-Samri (Eastern Region): answer the first row, slap the drums down, then play a whole Samri and move up the row
+4. Open Al-Samri (Najd): hear the heavy and light beats, sing the verse back, slap the drums down, then play a whole Samri and move up the row
 
 **Talking point:** "PNU has students from all 13 regions of Saudi Arabia — CultureLens lets a student from Asir and a student from Najd learn each other's heritage through experience, not just text."
 

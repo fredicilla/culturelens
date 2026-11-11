@@ -1,14 +1,14 @@
 /**
  * samri.js — Al-Samri, the night art of Najd.
  *
- * One live 3D scene (samri-world.js) carries the whole experience, with its sound made in code
- * (samri-music.js):
+ * One live 3D scene (samri-world.js) carries the whole experience, with its sound played on the beat
+ * by samri-music.js (recorded frame drums and claps, and a machine voice singing the verse):
  *   1. History (#story)           a Samri night in the dunes outside Unaizah while the story is told
  *   2. How it's performed (#how)  done with your fingers: take your seat at the end of the row,
- *                                 tune your drum, answer the first row, keep the beat, sway,
- *                                 lift the drums and slap them down together
- *   3. The game (#play)           four questions for the mu'allim, then a whole Samri: keep up and
- *                                 he moves you up the row, seat by seat, toward him
+ *                                 tune your drum, sing a line of the poem back, play the heavy
+ *                                 Samri beat of Unaizah, sway, lift the drums and slap them down
+ *   3. The game (#play)           four questions for the mu'allim, then a whole Samri, heavy then
+ *                                 light: keep up and he moves you up the row, seat by seat
  *
  * AR: on Android (Chrome) the gathering sits on your real floor or table (WebXR). On iPhone,
  * "View in your room" opens it in AR Quick Look.
@@ -18,8 +18,7 @@
  *     Al-Dawasir, Bisha, Al-Aarid and southern Riyadh; two rows of men kneel, sway together and
  *     clap to the beat; Unaizah holds Samri evenings every week; in Al-Jawf the poet sings the poem
  *     out and the facing rows repeat it, taking turns on the drums; National Day, Souq Okaz,
- *     Janadriyah; the Ministry of Culture's 2019 competition. Saudipedia, "Al-Hasawi art": the
- *     Hasawi Samri of the Eastern Region.
+ *     Janadriyah; the Ministry of Culture's 2019 competition.
  *   The Royal Institute of Traditional Arts (Wrth), Samri booklet: the name from samar (staying up
  *     late talking), the leader's call and the two facing rows, the opening called the waneen, the
  *     first row "yisheel" and the answering row "marrad", the leader or mulaqqin feeding the verses,
@@ -33,9 +32,20 @@
  *     the khallu, when the drums are thrown on the ground with a loud slap; each line's mu'allim at
  *     its center, beginners at the ends moving toward the center as they learn; sequences that take
  *     years; the songs take the meter of the poetry.
+ *   Abdulaziz bin Hamad Al-Qadi, "Samri Unaizah", Al-Jazirah, 2 November 2025: the heavy, slow
+ *     Samri of Unaizah, one stroke on its own then three in a row; the light, fast Samri of the rest
+ *     of Najd (al-Hawti in Unaizah), two strokes in a row then one; the troupe led with calls of
+ *     "lift" and "lower"; Muhsin Al-Hazzani linked with the early Samri poetry of love.
+ *   Al-Jazirah, "Samri" (17 October 2016): the drum notation tak .. dum tak dum; two rhymes, one for
+ *     the first half of each verse and one for the second.
+ *   Al-Manwar, "The Samri tradition in Saudi Arabia" (January 2025): it emerged from the heart of
+ *     Najd; the marjaf; the waneen then the lead line; the rows alternate singing and playing.
+ *   The verse: the Saudi Heritage Preservation Society (on X, 2015) names it one of the best-known
+ *     Samri poems; it is attributed to Dakhilallah al-Dujaima (19th century) by arabic-stories.com
+ *     and the Unaizah poets' forum (3naizah.net).
  */
 import { World, ROW } from './samri-world.js';
-import { Music, LINES } from './samri-music.js';
+import { Music, STYLES, SUNG } from './samri-music.js';
 
 // ════════════════════════════════════════════════════════════
 // helpers
@@ -119,7 +129,7 @@ var T = {
 
 var STORY = [
   {
-    scene: 'cover', kicker: { en: 'Music & Performances · Eastern Region', ar: 'الفنون والعروض · المنطقة الشرقية' },
+    scene: 'cover', kicker: { en: 'Music & Performances · Najd', ar: 'الفنون والعروض · نجد' },
     title: { en: 'Al-Samri', ar: 'السامري' },
     body: { en: 'A night art from Najd: two rows that answer each other in song, the beat of the drums, and bodies swaying as one. Its name comes from samar, staying up late talking at night.', ar: 'فن ليلي من نجد: صفّان يرد واحدهم على الثاني بالغناء، مع قرع الطبول، وأجساد تتمايل كأنها وحدة. واسمه من «السَّمَر»، وهو السهر والحديث بالليل.' },
     hint: T.dragHint
@@ -129,10 +139,9 @@ var STORY = [
     body: { en: 'It began in Al-Qassim and grew in Najd, then spread to Hail, Wadi Al-Dawasir, Al-Jawf, Riyadh and beyond, each place with its own melody.', ar: 'بدأ من القصيم وازدهر في نجد، وانتشر لحائل ووادي الدواسر والجوف والرياض وغيرها، ولكل مكان لحنه.' },
     hint: { en: 'Tap a place', ar: 'اضغط على مكان' },
     places: [
-      { key: 'unaizah', name: { en: 'Unaizah', ar: 'عنيزة' }, text: { en: 'Its Samri is the best known. Its men gathered every Thursday night, and in summer they met out in the sand dunes beyond the town.', ar: 'سامريها الأشهر. رجالها يجتمعون كل ليلة جمعة، وبالصيف يلتقون في النفود برّا البلد.' } },
+      { key: 'unaizah', name: { en: 'Unaizah', ar: 'عنيزة' }, text: { en: 'Its Samri is the best known: slow, heavy, and unlike any other. Its men gathered every Thursday night, and in summer they met out in the sand dunes beyond the town.', ar: 'سامريها الأشهر: ثقيل وبطيء وما يشبه غيره. رجالها يجتمعون كل ليلة جمعة، وبالصيف يلتقون في النفود برّا البلد.' } },
       { key: 'dawasir', name: { en: 'Wadi Al-Dawasir', ar: 'وادي الدواسر' }, text: { en: 'Known for the light Samri: fast, and suited to the young.', ar: 'يُعرف بالسامري الخفيف: سريع ويناسب الشباب.' } },
-      { key: 'jawf', name: { en: 'Al-Jawf', ar: 'الجوف' }, text: { en: 'The poet sings the poem out loud, and the two facing rows repeat it, taking turns on the drums.', ar: 'الشاعر ينشد القصيدة بصوت عالي، والصفّان المتقابلان يرددونها ويتناوبون ضرب الدفوف.' } },
-      { key: 'ahsa', name: { en: 'Al-Ahsa', ar: 'الأحساء' }, text: { en: 'The Eastern Region has a Samri of its own: the Hasawi Samri.', ar: 'وللمنطقة الشرقية سامريها الخاص: السامري الحساوي.' } }
+      { key: 'jawf', name: { en: 'Al-Jawf', ar: 'الجوف' }, text: { en: 'The poet sings the poem out loud, and the two facing rows repeat it, taking turns on the drums.', ar: 'الشاعر ينشد القصيدة بصوت عالي، والصفّان المتقابلان يرددونها ويتناوبون ضرب الدفوف.' } }
     ]
   },
   {
@@ -147,13 +156,15 @@ var STORY = [
   {
     scene: 'drum', title: { en: 'The drum', ar: 'الطار' },
     body: { en: 'The tar is a wooden frame with goat or sheep skin stretched over it. The skin is tightened until it gives the sound they want, and if it gets too tight, it is moistened with water.', ar: 'الطار إطار من الخشب مشدود عليه جلد ماعز أو غنم. يُشد الجلد لين يعطي الصوت المطلوب، وإذا صار مشدود زيادة يُرطّب بالماء.' },
+    more: { en: 'In Unaizah the beat is slow and heavy: one stroke on its own, then three in a row. The light Samri of the rest of Najd is fast: two strokes in a row, then one. A big frame drum, the marjaf, makes the beat stronger.', ar: 'في عنيزة الإيقاع ثقيل وبطيء: ضربة لحالها، وبعدها ثلاث ضربات ورا بعض. أما السامري الخفيف في باقي نجد فسريع: ضربتين ورا بعض، وبعدها ضربة وحدة. وفيه طار كبير اسمه «المرجاف» يقوّي الإيقاع.' },
     drum: true
   },
   {
     scene: 'poetry', title: { en: 'Poetry that answers itself', ar: 'قصيدة ترد على نفسها' },
-    body: { en: 'The leader calls and the rows line up, and the waneen opens. Then the first row sings the line (they call it yisheel) and the second answers it, which is why it is called the marrad. The leader keeps feeding them the verses.', ar: 'ينادي قائد الفرقة فيتراص الصفّان، ويبدأ «الونين» وهو الافتتاحية. وبعدين الصف الأول «يشيل» البيت والثاني يرد عليه، وعشان كذا اسمه «المرد». والقائد أو «الملقّن» يلقّنهم أبيات القصيدة.' },
-    more: { en: 'The poems speak of love, longing, praise, lament and parting, and the songs take the meter of the poetry.', ar: 'وقصايده عن الحب والشوق والمدح والرثاء والفراق، والألحان تمشي على وزن القصيدة.' },
-    listen: true
+    body: { en: 'The leader calls and the rows line up, and the waneen opens the night with a tune. Then the first row sings a line of the poem (they call it yisheel) and the second sings it back, which is why it is called the marrad. The leader keeps feeding them the verses.', ar: 'ينادي قائد الفرقة فيتراص الصفّان، ويبدأ «الونين» وهو الافتتاحية. وبعدين الصف الأول «يشيل» البيت والثاني يرده، وعشان كذا اسمه «المرد». والقائد أو «الملقّن» يلقّنهم أبيات القصيدة.' },
+    verse: true,
+    listen: true,
+    more: { en: 'Every first half of a verse ends on one rhyme and every second half on another, like -ūnī and -rā here. The poems speak of love, longing, praise and parting, and Muhsin Al-Hazzani of Najd is named among the first Samri poets.', ar: 'كل صدر بيت ينتهي بقافية، وكل عجز بقافية ثانية، مثل «ـوني» و«ـرا» هنا. والقصايد عن الحب والشوق والمدح والفراق، ومن أوائل شعراء السامري محسن الهزاني من نجد.' }
   },
   {
     scene: 'today', title: { en: 'Still sung today', ar: 'ما زال يُغنّى' },
@@ -162,12 +173,35 @@ var STORY = [
       { year: { en: '2019', ar: '٢٠١٩' }, text: { en: 'The Ministry of Culture listed Samri among the folk arts of its national cultural competitions.', ar: 'أدرجت وزارة الثقافة السامري ضمن الفنون الشعبية في مسابقاتها الثقافية الوطنية.' } },
       { year: { en: 'Today', ar: 'اليوم' }, text: { en: 'It is a fixture of National Day, Souq Okaz and the Janadriyah festival.', ar: 'وصار حاضر في اليوم الوطني وسوق عكاظ ومهرجان الجنادرية.' } }
     ],
-    sources: { en: 'Sources: Saudipedia; the Samri booklet of the Royal Institute of Traditional Arts (Wrth); Aramco World (2007).', ar: 'المصادر: سعوديبيديا؛ كتيّب السامري من المعهد الملكي للفنون التقليدية (ورث)؛ مجلة أرامكو وورلد (٢٠٠٧).' }
+    sources: { en: 'Sources: Saudipedia; the Samri booklet of the Royal Institute of Traditional Arts (Wrth); Aramco World (2007); Al-Jazirah: Abdulaziz Al-Qadi, "Samri Unaizah" (2025), and "Samri" (2016); Al-Manwar (2025); the Saudi Heritage Preservation Society, for the verse.', ar: 'المصادر: سعوديبيديا؛ كتيّب السامري من المعهد الملكي للفنون التقليدية (ورث)؛ مجلة أرامكو وورلد (٢٠٠٧)؛ جريدة الجزيرة: «سامري عنيزة» لعبدالعزيز القاضي (٢٠٢٥)، و«سامري» (٢٠١٦)؛ المنور (٢٠٢٥)؛ الجمعية السعودية للمحافظة على التراث، للبيت.' }
   }
 ];
-var LISTEN = { en: 'Listen to a call and answer', ar: 'اسمع الشيلة والرد' };
+var LISTEN = { en: 'Listen to the call and answer', ar: 'اسمع الشيلة والرد' };
 var LISTENING = { en: 'Listening...', ar: 'نسمع...' };
-var PLAYDRUM = { en: 'Hear the drums', ar: 'اسمع الإيقاع' };
+var DRUMS = {
+  heavy: { en: 'Heavy · Unaizah', ar: 'الثقيل · عنيزة' },
+  light: { en: 'Light', ar: 'الخفيف' }
+};
+// one of the best-known Samri verses, sung by the rows; each row takes one half of it at a time
+var VERSE = {
+  lines: ['يا جر قلبي جر لدن الغصوني', 'وغصون سدر جرها السيل جرا'],
+  mean: { en: '"My heart is pulled away like supple branches, like sidr branches the flood has dragged along."', ar: 'لدن الغصون: الغصون اللينة. والسدر: شجر النبق.' },
+  by: { en: 'One of the best-known Samri poems, attributed to the 19th-century poet Dakhilallah al-Dujaima.', ar: 'من أشهر قصائد السامري، وتُنسب للشاعر دخيل الله الدجيما من شعراء القرن التاسع عشر.' },
+  who: {
+    waneen: { en: 'The waneen opens', ar: 'الونين يفتتح' },
+    a: { en: 'The first row sings the line', ar: 'الصف الأول يشيل البيت' },
+    b: { en: 'The second row sings it back', ar: 'الصف الثاني يرده' }
+  }
+};
+// a half of the verse with each word on its own, so the words can light up as they are sung
+function lineWords(h) { return SUNG[h ? 'h2' : 'h1'].words.map(function (w, i) { return '<i data-w="' + i + '">' + w + '</i>'; }).join(' '); }
+function verseHtml() {
+  return '<div class="sm-verse" id="sm-verse">' +
+    '<div class="sm-verse-ar" lang="ar" dir="rtl"><span data-h="0">' + lineWords(0) + '</span><span data-h="1">' + lineWords(1) + '</span></div>' +
+    '<p class="sm-verse-mean">' + L(VERSE.mean) + '</p>' +
+    '<p class="sm-verse-by">' + L(VERSE.by) + '</p>' +
+    '<div class="sm-verse-who" id="sm-verse-who"></div></div>';
+}
 
 var HOW = [
   { key: 'seat', view: 'seat',
@@ -182,29 +216,29 @@ var HOW = [
     done: { en: 'That is the sound.', ar: 'هذا هو الصوت.' } },
   { key: 'answer', view: 'answer',
     title: { en: 'Call and answer', ar: 'يشيل ويرد' },
-    text: { en: 'The first row sings the line: it yisheel. Your row is the marrad, the one that answers. Listen to the line, then hold to sing your answer until it ends.', ar: 'الصف الأول يشيل البيت، وصفّك هو المرد: يرد عليه. اسمع البيت، وبعدين اضغط مطوّل وغنّ ردّك لين يخلص.' },
+    text: { en: 'The first row sings a line of the poem: it yisheel. Your row is the marrad: it sings the same line back. Listen to the line, then hold to sing it back until it ends.', ar: 'الصف الأول يشيل بيت من القصيدة، وصفّك هو المرد: يرد نفس البيت. اسمع البيت، وبعدين اضغط مطوّل وردّه لين يخلص.' },
     hint: { en: 'Listen, then hold', ar: 'اسمع، وبعدين اضغط مطوّل' },
-    done: { en: 'Two good answers. The line goes back and forth like that all night.', ar: 'ردّين زينين. وكذا يروح البيت ويجي طول الليل.' } },
+    done: { en: 'Two good answers. The verse goes back and forth like that all night.', ar: 'ردّين زينين. وكذا يروح البيت ويجي طول الليل.' } },
   { key: 'beat', view: 'mydrum',
-    title: { en: 'Keep the beat', ar: 'اضبط الإيقاع' },
-    text: { en: 'The drums give the beat. Strike yours together with the others: tap on every beat.', ar: 'الطبول تعطي الإيقاع. اضرب طارك مع الباقين: اضغط مع كل ضربة.' },
-    hint: { en: 'Tap on the beat', ar: 'اضغط مع الإيقاع' },
-    done: { en: 'Right with the row.', ar: 'ماشي مع الصف.' } },
+    title: { en: 'The beat of Unaizah', ar: 'إيقاع عنيزة' },
+    text: { en: 'The heavy Samri of Unaizah goes like this: one stroke on its own, then three in a row. Strike your drum with the others on every stroke.', ar: 'السامري الثقيل في عنيزة كذا: ضربة لحالها، وبعدها ثلاث ورا بعض. اضرب طارك مع الباقين مع كل ضربة.' },
+    hint: { en: 'Tap on every stroke', ar: 'اضغط مع كل ضربة' },
+    done: { en: 'One, then three. Right with the row.', ar: 'وحدة، وبعدها ثلاث. ماشي مع الصف.' } },
   { key: 'sway', view: 'sway',
     title: { en: 'The sway', ar: 'التمايل' },
-    text: { en: 'One row sings and claps while the other sways from side to side, leaning toward the neighbor on the right, then the left. Then they swap.', ar: 'صف يغني ويصفق، والثاني يتمايل يمين ويسار، يميل على جاره اللي يمينه وبعدين اللي يساره. وبعدين يتبادلون.' },
-    hint: { en: 'Swipe right, then left, on the beat', ar: 'اسحب يمين ثم يسار مع الإيقاع' },
+    text: { en: 'One row sings and claps while the other sways from side to side, leaning toward the neighbor on the right for one round of the beat, then the left. Then they swap.', ar: 'صف يغني ويصفق، والثاني يتمايل يمين ويسار: يميل على جاره اللي يمينه دورة من الإيقاع، وبعدين اللي يساره. وبعدين يتبادلون.' },
+    hint: { en: 'Swipe right, then left, as each round starts', ar: 'اسحب يمين ثم يسار مع بداية كل دورة' },
     done: { en: 'Swaying as one with your row.', ar: 'تتمايل مع صفّك كأنكم واحد.' } },
   { key: 'khallu', view: 'game',
     title: { en: 'Lift, then slap them down', ar: 'ارفع، وبعدين اضرب الأرض' },
-    text: { en: 'The drums go up and come down with the song. At the end, everyone throws the drums down on the ground together with one loud slap, a movement called the khallu.', ar: 'الطبول ترتفع وتنزل مع الغنا. وبالنهاية يرمونها كلهم على الأرض مع بعض بضربة وحدة قوية.' },
+    text: { en: 'The leader calls "lift" and "lower", and the drums go up and come down with the song. At the end, everyone throws the drums down on the ground together with one loud slap, a movement called the khallu.', ar: 'القائد ينادي «ارفع» و«نزّل»، والطبول ترتفع وتنزل مع الغنا. وبالنهاية يرمونها كلهم على الأرض مع بعض بضربة وحدة قوية.' },
     hint: { en: 'Up, down, then slap down', ar: 'فوق، تحت، وبعدين اضرب الأرض' },
     done: { en: 'One slap, all together.', ar: 'ضربة وحدة، كلهم مع بعض.' } }
 ];
 var HOW_DONE = {
   title: { en: 'You are in the row', ar: 'صرت بالصف' },
   text: { en: 'Some Samri sequences are so complex they take years to learn. Now join a whole Samri, and see how far up the row you can get.', ar: 'بعض حركات السامري معقدة لدرجة إنها تاخذ سنين عشان تنتعلم. والحين ادخل سامري كامل، وشوف لوين توصل بالصف.' },
-  sources: { en: 'Sources: Aramco World (2007); the Samri booklet of Wrth; Saudipedia.', ar: 'المصادر: مجلة أرامكو وورلد (٢٠٠٧)؛ كتيّب السامري من «ورث»؛ سعوديبيديا.' }
+  sources: { en: 'Sources: Aramco World (2007); the Samri booklet of Wrth; Saudipedia; Abdulaziz Al-Qadi, "Samri Unaizah", Al-Jazirah (2025).', ar: 'المصادر: مجلة أرامكو وورلد (٢٠٠٧)؛ كتيّب السامري من «ورث»؛ سعوديبيديا؛ «سامري عنيزة» لعبدالعزيز القاضي، جريدة الجزيرة (٢٠٢٥).' }
 };
 var SEAT = {
   wrong: { en: 'That seat is close to the mu\'allim, for those who know the Samri well. Beginners start at the end.', ar: 'هالمكان قريب من المعلّم، لأهل الخبرة. المبتدئ يبدأ من الطرف.' },
@@ -254,17 +288,17 @@ var G = {
 var RW = {
   intro: { en: 'Sit at the end and follow the row. Keep up with a passage and I will call you one seat closer.', ar: 'اجلس بالطرف وامشِ مع الصف. وإذا ضبطت الطلعة، قرّبتك مكان.' },
   intro2: { en: 'Back again? Good. That is how the young ones learn.', ar: 'رجعت؟ زين. كذا يتعلمون الشباب.' },
-  tap: { en: 'Clap and strike on the beat', ar: 'صفّق واضرب مع الإيقاع' },
+  tap: { en: 'Clap with the drum strokes', ar: 'صفّق مع ضربات الطار' },
   lean: { en: 'Lean right and left', ar: 'ميل يمين ويسار' },
   lift: { en: 'Lift and lower the drum', ar: 'ارفع الطار ونزّله' },
   slap: { en: 'Slap it down at the end', ar: 'اضرب الأرض بالنهاية' },
-  tip: { en: 'Watch the circles coming toward the ring and move as each one reaches it. Taps when your row sings, swipes when your row sways.', ar: 'تابع الدوائر الجاية للحلقة وتحرك لما توصلها. ضغطات لما صفّك يغني، وسحبات لما صفّك يتمايل.' },
+  tip: { en: 'Watch the circles coming toward the ring and move as each one reaches it. When your row sings, tap with the drum strokes; when it sways, swipe. It starts heavy, the way Unaizah plays it, then turns light and fast.', ar: 'تابع الدوائر الجاية للحلقة وتحرك لما توصلها. لما صفّك يغني اضغط مع ضربات الطار، ولما يتمايل اسحب. يبدأ ثقيل مثل سامري عنيزة، وبعدين يصير خفيف وسريع.' },
   ready: { en: 'I am ready', ar: 'جاهز' },
   sec: [
     { en: 'Heavy Samri · your row sways', ar: 'السامري الثقيل · صفّك يتمايل' },
-    { en: 'Heavy Samri · your row sings', ar: 'السامري الثقيل · صفّك يغني' },
+    { en: 'Your row sings · one, then three', ar: 'صفّك يغني · وحدة، وبعدها ثلاث' },
     { en: 'Light Samri · faster now', ar: 'السامري الخفيف · أسرع' },
-    { en: 'Light Samri · your row sings', ar: 'السامري الخفيف · صفّك يغني' }
+    { en: 'Your row sings · two, then one', ar: 'صفّك يغني · ثنتين، وبعدها وحدة' }
   ],
   finale: { en: 'All on the drums, then slap them down', ar: 'كلنا على الطبول، وبعدين اضرب الأرض' },
   up: { en: 'One seat closer', ar: 'تقدّمت مكان' },
@@ -277,11 +311,11 @@ var RW = {
   againRow: { en: 'Play again', ar: 'العب مرة ثانية' }
 };
 var QUESTIONS = [
-  { key: 'sit', options: ['rows', 'circle', 'stand'], answer: 'rows',
-    labels: { rows: { en: 'Kneeling in two rows, face to face', ar: 'جاثين بصفّين متقابلين' }, circle: { en: 'In one circle around a fire', ar: 'بدائرة وحدة حول النار' }, stand: { en: 'Standing in one long line', ar: 'واقفين بصف واحد طويل' } },
-    prompt: { en: 'How do the performers sit?', ar: 'كيف يجلس المؤدون؟' },
-    good: { en: 'Right. Two rows kneel facing each other.', ar: 'صح. صفّين جاثين متقابلين.' },
-    bad: { en: 'Samri is two rows kneeling face to face.', ar: 'السامري صفّين جاثين متقابلين.' } },
+  { key: 'beat', options: ['onethree', 'even', 'twoone'], answer: 'onethree',
+    labels: { onethree: { en: 'One stroke on its own, then three in a row', ar: 'ضربة لحالها، وبعدها ثلاث ورا بعض' }, even: { en: 'Four even strokes', ar: 'أربع ضربات متساوية' }, twoone: { en: 'Two strokes in a row, then one', ar: 'ضربتين ورا بعض، وبعدها وحدة' } },
+    prompt: { en: 'How does the heavy Samri of Unaizah beat its drums?', ar: 'كيف إيقاع السامري الثقيل في عنيزة؟' },
+    good: { en: 'Right. Two in a row, then one, is the light, fast Samri of the rest of Najd.', ar: 'صح. أما ثنتين ورا بعض وبعدها وحدة، فهذا السامري الخفيف السريع في باقي نجد.' },
+    bad: { en: 'One stroke on its own, then three in a row. Two, then one, is the light Samri.', ar: 'ضربة لحالها وبعدها ثلاث ورا بعض. أما ثنتين وبعدها وحدة فهذا السامري الخفيف.' } },
   { key: 'answer', options: ['answers', 'solo', 'quiet'], answer: 'answers',
     labels: { answers: { en: 'It answers the line', ar: 'يرد على البيت' }, solo: { en: 'It plays a drum solo', ar: 'يضرب الطبل لحاله' }, quiet: { en: 'It stays silent', ar: 'يسكت' } },
     prompt: { en: 'The first row sings the line. What does the second row do?', ar: 'الصف الأول يشيل البيت. وش يسوي الصف الثاني؟' },
@@ -299,10 +333,10 @@ var QUESTIONS = [
     bad: { en: 'Samar is staying up late talking at night.', ar: 'السمر هو السهر والحديث بالليل.' } }
 ];
 var LEARN = [
-  { en: 'Samri began in Al-Qassim and grew in Najd, and the Eastern Region has its Hasawi Samri.', ar: 'السامري بدأ من القصيم وازدهر في نجد، وللمنطقة الشرقية سامريها الحساوي.' },
-  { en: 'Two rows kneel face to face, with the mu\'allim at the center of each.', ar: 'صفّين جاثين متقابلين، وبنص كل صف معلّم.' },
-  { en: 'The first row sings the line (yisheel) and the second answers (the marrad).', ar: 'الصف الأول يشيل البيت، والثاني يرد (المرد).' },
-  { en: 'One row sings and claps while the other sways, then they swap.', ar: 'صف يغني ويصفق والثاني يتمايل، وبعدين يتبادلون.' }
+  { en: 'Samri is Najdi: it began in Al-Qassim and grew across Najd.', ar: 'السامري فن نجدي: بدأ من القصيم وازدهر في نجد.' },
+  { en: 'Two rows kneel face to face. The first sings a line (yisheel) and the second sings it back (the marrad).', ar: 'صفّين جاثين متقابلين. الأول يشيل البيت، والثاني يرده (المرد).' },
+  { en: 'The heavy Samri of Unaizah: one stroke, then three. The light Samri: two, then one.', ar: 'السامري الثقيل في عنيزة: ضربة وبعدها ثلاث. والخفيف: ثنتين وبعدها وحدة.' },
+  { en: 'Every first half of a verse ends on one rhyme, and every second half on another.', ar: 'كل صدر بيت ينتهي بقافية، وكل عجز بقافية ثانية.' }
 ];
 var MAX_SCORE = QUESTIONS.length + 4;
 var RESULT_TITLES = [
@@ -313,7 +347,8 @@ var RESULT_TITLES = [
 
 // you are the end seat of row B; seat 5 of row B is the one close to the mu'allim
 var YOU = ROW.N + 8, NEAR = ROW.N + 5;
-var IDLE_BPM = 66;
+var LYRIC = { a: { en: 'The first row sings', ar: 'الصف الأول يشيل' }, b: { en: 'The second row answers', ar: 'الصف الثاني يرد' } };
+var IDLE_BPM = STYLES.heavy.bpm;
 
 // ════════════════════════════════════════════════════════════
 // state
@@ -321,7 +356,7 @@ var IDLE_BPM = 66;
 var S = { part: 'story', ch: 0, place: null, who: null, how: 0, hs: {}, howDone: false, game: null, sound: true, arMode: null, inAR: false, arPlaced: false, gest: null, touching: false, ambient: false, idle0: now() / 1000 };
 try { S.sound = localStorage.getItem('cl_sound') !== 'off'; } catch (e) {}
 var world, music, panel, bar, parts, toastEl, touch, callout, arBtn, root;
-var guideEl, markEl, cueEl, judgeEl, tokenEl, hudEl, trackEl;
+var guideEl, markEl, cueEl, judgeEl, tokenEl, hudEl, trackEl, lyricEl;
 var token = 0;
 
 // ════════════════════════════════════════════════════════════
@@ -509,11 +544,17 @@ function clearStepUI() {
 // soft drums and claps behind the story; the rows take turns singing and swaying
 function ambient(vol) {
   S.ambient = true;
-  if (!music.ready()) { S.wantAmbient = vol || 0.5; return; }
-  music.drumVol = vol || 0.5; music.claps = true;
+  // wait for the audio clock (the first tap), and a few seconds at most for the recorded sounds to arrive
+  if (!music.ready() || (!music.loaded() && now() < 7000)) { S.wantAmbient = vol || 0.5; return; }
+  music.drumVol = vol || 0.5; music.claps = true; music.voiceVol = 0.5 + (vol || 0.5) * 0.6; music.plan = ambientPlan;
   if (!music.playing) music.start('heavy', 0.3);
 }
-function quiet() { S.ambient = false; S.wantAmbient = 0; S.listen = null; S.solo = null; music.stop(); music.claps = false; music.drums = true; music.drumVol = 1; }
+// behind the story each row takes the whole verse in turn: the first half, then the second
+function ambientPlan(slot) {
+  if (S.listen || S.solo) return null;
+  return { row: Math.floor(slot / 2) % 2, what: slot % 2 ? 'h2' : 'h1' };
+}
+function quiet() { S.ambient = false; S.wantAmbient = 0; S.listen = null; S.solo = null; music.plan = null; music.stop(); music.claps = false; music.drums = true; music.drumVol = 1; music.voiceVol = 1; }
 function resetSeats() {
   world.figs.forEach(function (f, i) { world.setSeat(f, i % ROW.N, true); world.setShow(f, 1, true); world.setDrumTint(i, 1); });
   world.setYou(-1); world.youManual = false;
@@ -556,9 +597,15 @@ function goCh(i, fresh) {
   if (c.who) {
     html += '<div class="sm-chips">' + c.who.map(function (w) { return '<button class="sm-chip' + (S.who === w.key ? ' is-on' : '') + '" data-who="' + w.key + '">' + ICON.person + L(w.name) + '</button>'; }).join('') + '</div>';
   }
-  if (c.drum) html += '<div class="sm-chips"><button class="sm-chip' + (S.solo ? ' is-on' : '') + '" data-drum="1"' + (S.solo ? ' disabled' : '') + '>' + ICON.drum + L(PLAYDRUM) + '</button></div>';
-  if (c.more) html += '<p class="sm-note">' + L(c.more) + '</p>';
+  if (c.drum) {
+    if (c.more) html += '<p class="sm-note">' + L(c.more) + '</p>';
+    html += '<div class="sm-chips">' + ['heavy', 'light'].map(function (st) {
+      return '<button class="sm-chip' + (S.solo && S.solo.style === st ? ' is-on' : '') + '" data-drum="' + st + '"' + (S.solo ? ' disabled' : '') + '>' + ICON.drum + L(DRUMS[st]) + '</button>';
+    }).join('') + '</div>';
+  }
+  if (c.verse) html += verseHtml();
   if (c.listen) html += '<div class="sm-chips"><button class="sm-chip' + (S.listen ? ' is-on' : '') + '" data-listen="1"' + (S.listen ? ' disabled' : '') + '>' + ICON.play + L(S.listen ? LISTENING : LISTEN) + '</button></div>';
+  if (c.more && !c.drum) html += '<p class="sm-note">' + L(c.more) + '</p>';
   if (c.timeline) {
     html += '<div class="qx-timeline sm-timeline">' + c.timeline.map(function (t) {
       return '<div class="qx-tl"><div class="qx-tl-year">' + L(t.year) + '</div><div class="qx-tl-text">' + L(t.text) + '</div></div>';
@@ -582,38 +629,49 @@ function goCh(i, fresh) {
       });
     });
   }
-  if (c.drum) $('[data-drum]', panel).addEventListener('click', playDrumPattern);
+  if (c.drum) $$('[data-drum]', panel).forEach(function (b) { b.addEventListener('click', function () { playDrumPattern(b.getAttribute('data-drum')); }); });
   if (c.listen) { var lb = $('[data-listen]', panel); if (lb) lb.addEventListener('click', listenCallAnswer); }
+  S.lyKey = null;
   var last = S.ch === STORY.length - 1;
   setBar({
     back: S.ch > 0 ? function () { goCh(S.ch - 1); renderParts(); } : null,
     buttons: [{ label: S.ch === 0 ? T.begin : last ? T.toHow : T.next, icon: 'next', onClick: function () { sfx('tap'); if (last) setPart('how'); else { goCh(S.ch + 1); renderParts(); } } }]
   });
 }
-// the next beat that is at least `ahead` seconds away, and when it sounds
+// the start of the next cycle (an even beat) that is at least `ahead` seconds away, and when it sounds
 function nextBeat(ahead) {
-  if (music.playing) { var b = Math.ceil(music.beatAt(music.time() + ahead)); return { b: b, t: music.timeOf(b), spb: music.secPerBeat() }; }
+  if (music.playing) { var b = Math.ceil(music.beatAt(music.time() + ahead) / 2) * 2; return { b: b, t: music.timeOf(b), spb: music.secPerBeat() }; }
   var spb = 60 / IDLE_BPM;
   return { b: world.beat + ahead / spb, t: music.time() + ahead, spb: spb };
 }
-// the drum chapter: for two bars the drums come forward and both rows strike together
-function playDrumPattern() {
+// the drum chapter: for four cycles the drums come forward in the heavy or the light Samri, and
+// both rows strike together
+function playDrumPattern(style) {
   if (S.solo) return;
+  style = style === 'light' ? 'light' : 'heavy';
   music.ensure();
   if (!music.playing && music.ready()) ambient(0.5);
   var my = token, nb = nextBeat(0.18), dv = music.drumVol;
-  S.solo = { b0: nb.b, b1: nb.b + 8 };
-  if (music.playing) { music.drumVol = 1.15; music.claps = false; }
-  else if (S.sound) [[0, 'dum', 1], [1, 'tak', 0.8], [2, 'dum', 0.9], [2.5, 'dum', 0.5], [3, 'tak', 0.8], [4, 'dum', 1], [5, 'tak', 0.8], [6, 'dum', 0.9], [6.5, 'dum', 0.5], [7, 'tak', 0.8]].forEach(function (e) { music[e[1]](nb.t + e[0] * nb.spb, e[2]); });
+  S.solo = { b0: nb.b, b1: nb.b + 8, style: style };
+  music.hush(nb.t - 0.15);
+  var spb = 60 / STYLES[style].bpm, end;
+  if (music.playing) {
+    music.drumVol = 1.15; music.claps = false;
+    if (style === 'light') { music.change('light', nb.b); music.change('heavy', nb.b + 8); }
+    end = music.timeOf(nb.b + 8);
+  } else {
+    end = nb.t + 8 * spb;
+    if (S.sound) for (var cy = 0; cy < 4; cy++) STYLES[style].strokes.forEach(function (e) { var tt = nb.t + (cy * 2 + e[0] / 3) * spb; music[e[1]](tt, e[2]); if (e[0] === 0) music.marjaf(tt, 0.8); });
+  }
   goCh(S.ch);
   setTimeout(function () {
     S.solo = null;
     if (my !== token) return;
     if (music.playing) { music.drumVol = dv; music.claps = true; }
     if (S.part === 'story') goCh(S.ch);
-  }, (nb.t + 8 * nb.spb - music.time()) * 1000);
+  }, (end - music.time()) * 1000);
 }
-// the poetry chapter: the leader's opening, the first row's line, then the answer
+// the poetry chapter: the waneen, the first row sings the first half of the verse, the second sings it back
 function listenCallAnswer() {
   if (S.listen) return;
   music.ensure();
@@ -621,11 +679,12 @@ function listenCallAnswer() {
   var my = token, nb = nextBeat(0.2), dv = music.drumVol, spb = nb.spb, t = nb.t;
   S.listen = { b0: nb.b };
   music.drumVol = Math.min(dv, 0.22); music.claps = false;
-  if (S.sound) {
-    music.sing(t, LINES.waneen, spb, { voices: 1, vol: 0.1 });
-    music.sing(t + 4 * spb, LINES.call, spb, { voices: 3, vol: 0.09 });
-    music.sing(t + 8 * spb, LINES.answer, spb, { voices: 3, vol: 0.09, shift: -2 });
-  }
+  music.hush(t - 0.15);
+  var vv = music.voiceVol; music.voiceVol = 1;
+  music.voice(t, 'wan');
+  music.voice(t + 4 * spb, 'h1', { row: 0 });
+  music.voice(t + 8 * spb, 'h1', { row: 1 });
+  music.voiceVol = vv;
   goCh(S.ch);
   setTimeout(function () {
     S.listen = null;
@@ -634,19 +693,19 @@ function listenCallAnswer() {
     if (S.part === 'story') goCh(S.ch);
   }, (t + 12.5 * spb - music.time()) * 1000);
 }
-// behind the story, the rows take turns singing and swaying; the two chips above take over for a moment
+// behind the story, the rows take turns singing and swaying; the chips above take over for a moment
 function ambientRows(b) {
   var A = world.rows[0], B = world.rows[1], Ls = S.listen;
   A.lift = null; B.lift = null;
   if (Ls && b >= Ls.b0 - 0.4) {
-    if (b < Ls.b0 + 4) { A.mode = 'hold'; B.mode = 'hold'; }        // the leader's opening, the waneen
+    if (b < Ls.b0 + 4) { A.mode = 'hold'; B.mode = 'hold'; }        // the opening, the waneen
     else if (b < Ls.b0 + 8) { A.mode = 'voice'; B.mode = 'hold'; }  // the first row sings the line
-    else { A.mode = 'hold'; B.mode = 'voice'; }                     // and the second answers it
-    return;
+    else { A.mode = 'hold'; B.mode = 'voice'; }                     // and the second sings it back
+  } else if (S.solo && b >= S.solo.b0 - 0.4 && b < S.solo.b1) { A.mode = 'beat'; B.mode = 'beat'; }
+  else {
+    var phase = Math.floor(Math.max(0, b) / 8) % 2;
+    A.mode = phase ? 'sway' : 'sing'; B.mode = phase ? 'sing' : 'sway';
   }
-  if (S.solo && b >= S.solo.b0 - 0.4 && b < S.solo.b1) { A.mode = 'beat'; B.mode = 'beat'; return; }
-  var phase = Math.floor(Math.max(0, b) / 16) % 2;
-  A.mode = phase ? 'sway' : 'sing'; B.mode = phase ? 'sing' : 'sway';
 }
 
 // ════════════════════════════════════════════════════════════
@@ -826,22 +885,25 @@ CTRL.tune = {
   }
 };
 
-// 3. call and answer: the first row sings, you hold to sing your row's answer
+// 3. call and answer: the first row sings half of the verse, you hold to sing it back
+// (round k sings the first half when k is even, the second half when it is odd)
 function phraseHtml(hs) {
-  return '<div class="sm-phrase"><div class="a" id="sm-ph-a"><i></i><small>' + L(ANS.row1) + '</small><b>' + L(ANS.yisheel) + '</b></div>' +
+  return '<div class="sm-ph-line" lang="ar" dir="rtl" id="sm-ph-line" data-h="' + ((hs.lineK || 0) % 2) + '">' + lineWords((hs.lineK || 0) % 2) + '</div>' +
+    '<div class="sm-phrase"><div class="a" id="sm-ph-a"><i></i><small>' + L(ANS.row1) + '</small><b>' + L(ANS.yisheel) + '</b></div>' +
     '<div class="me" id="sm-ph-b"><i></i><small>' + L(ANS.row2) + '</small><b>' + L(ANS.marrad) + '</b></div></div>';
 }
+function halfLine(k) { return k % 2 ? 'h2' : 'h1'; }
 CTRL.answer = {
   start: function (hs) {
     music.ensure(); music.drumVol = 0.4; music.claps = false;
     music.start('heavy', 0.3);
-    hs.b0 = 4; hs.good = 0; hs.sched = {}; hs.holding = false; hs.cycDone = -1;
+    hs.b0 = 4; hs.good = 0; hs.sched = {}; hs.holding = false; hs.cycDone = -1; hs.lineK = 0;
     CTRL.answer.schedule(hs, 0);
   },
-  // the first row's line for cycle k
+  // the first row's half verse for round k
   schedule: function (hs, k) {
     if (hs.sched[k]) return; hs.sched[k] = true;
-    if (S.sound) music.sing(music.timeOf(hs.b0 + k * 8), LINES.call, music.secPerBeat(), { voices: 3, vol: 0.09 });
+    music.voice(music.timeOf(hs.b0 + k * 8), halfLine(k), { row: 0 });
   },
   extra: phraseHtml,
   frame: function (hs) {
@@ -849,6 +911,7 @@ CTRL.answer = {
     var a = $('#sm-ph-a i', panel), me = $('#sm-ph-b i', panel);
     if (pos < 0) { world.rows[0].mode = 'hold'; return; }
     var k = Math.floor(pos / 8), inC = pos - k * 8;
+    if (hs.lineK !== k) { hs.lineK = k; var ln = $('#sm-ph-line', panel); if (ln) { ln.setAttribute('data-h', k % 2); ln.innerHTML = lineWords(k % 2); S.lyKey = null; } }
     if (inC > 6.5) CTRL.answer.schedule(hs, k + 1);
     world.rows[0].mode = inC < 4 ? 'voice' : 'hold';
     if (a) a.style.width = (inC < 4 ? inC / 4 * 100 : 0).toFixed(1) + '%';
@@ -880,8 +943,8 @@ CTRL.answer = {
         if (inC < 3.6) { hs.msg = ANS.wait; hs.msgKind = 'bad'; stepStatus(); return; }
         if (inC > 5.2) { hs.msg = ANS.late; hs.msgKind = 'bad'; stepStatus(); return; }
         hs.holding = true; hs.holdK = k; hs.pressK = k;
-        var start = Math.max(music.time() + 0.02, music.timeOf(hs.b0 + k * 8 + 4));
-        if (S.sound) hs.voice = music.sing(start, LINES.answer, music.secPerBeat(), { voices: 3, vol: 0.1, shift: -2 });
+        // your row's voice comes in on its beat; if you pressed a little late it joins where the line already is
+        hs.voice = music.voice(music.timeOf(hs.b0 + k * 8 + 4), halfLine(k), { row: 1 });
         world.youSing(true); world.rows[1].mode = 'voice';
         hs.msg = null; stepStatus();
       },
@@ -910,9 +973,10 @@ CTRL.beat = {
   gesture: function (hs) {
     return swiper({ onTap: function (p, at) {
       if (hs.ok) return;
-      var t = at, b = music.beatAt(t), nb = Math.round(b), err = (b - nb) * music.secPerBeat();
-      world.youDo('strike'); if (S.sound) music.tak(music.time(), 0.45);
-      var j = judgeOffset(err, 0.13, 0.065);
+      // judged against the closest stroke of the pattern: one on its own, then three
+      var t = at, b = music.beatAt(t), sb = music.nearestStroke(b), err = (b - sb) * music.secPerBeat();
+      world.youDo('strike'); if (S.sound) music.tak(music.time(), 0.6, true);
+      var j = judgeOffset(err, 0.12, 0.06);
       var y = youDrumScreen()(); y = y ? y.y - 70 : null;
       if (j === 'perfect' || j === 'good') { hs.good++; judgeShow(JUDGE[j], j, y); buzz(6); hs.msg = null; }
       else { judgeShow(JUDGE[j], 'miss', y); hs.msg = JUDGE[j]; hs.msgKind = 'bad'; }
@@ -920,21 +984,23 @@ CTRL.beat = {
     } });
   },
   frame: function (hs) {
-    // a ring around your drum that pulses on every beat
-    if (!CU.on && !hs.ok) cue('tap', Math.ceil(world.beat), youDrumScreen());
-    if (CU.on && world.beat > CU.beat + 0.25) CU.beat = Math.ceil(world.beat);
+    // a ring around your drum that closes on every stroke of the pattern
+    if (hs.ok) return;
+    var nb = music.nextStroke(Math.max(0, world.beat - 0.1));
+    if (nb != null && (!CU.on || CU.beat !== nb)) cue('tap', nb, youDrumScreen());
   },
-  status: function (hs) { return { en: hs.good + ' of 8 on the beat', ar: num(hs.good) + ' من ' + num(8) + ' مع الإيقاع' }; },
+  status: function (hs) { return { en: hs.good + ' of 8 strokes', ar: num(hs.good) + ' من ' + num(8) + ' ضربات' }; },
   guide: function () { guide('tap', youDrumScreen(), null, null); },
   skip: function () { music.stop(); }
 };
 
-// 5. the sway: swipe right on the first beat of the bar and left on the third
+// 5. the sway: swipe right as one cycle of the beat starts, and left as the next one starts
 function swayWant(nb) { return ((nb % 4) + 4) % 4 === 0 ? 'right' : 'left'; }
 CTRL.sway = {
   start: function (hs) {
     hs.good = 0;
     world.rows[0].mode = 'sing'; world.rows[1].mode = 'sway';
+    music.plan = function (slot) { return slot < 1 ? null : { row: 0, what: slot % 2 ? 'h1' : 'h2' }; };
     music.ensure(); music.drumVol = 0.9; music.claps = true; music.start('heavy', 0.4);
   },
   gesture: function (hs) {
@@ -948,7 +1014,7 @@ CTRL.sway = {
       var j = judgeOffset(err, 0.16, 0.075);
       if (j === 'perfect' || j === 'good') { hs.good++; judgeShow(JUDGE[j], j, y); buzz(6); hs.msg = null; }
       else { judgeShow(JUDGE[j], 'miss', y); hs.msg = JUDGE[j]; hs.msgKind = 'bad'; }
-      if (hs.good >= 8) { setTimeout(function () { music.stop(); }, 600); stepDone(); } else stepStatus();
+      if (hs.good >= 6) { setTimeout(function () { music.stop(); }, 600); stepDone(); } else stepStatus();
     } });
   },
   frame: function (hs) {
@@ -956,15 +1022,15 @@ CTRL.sway = {
     var nb = Math.ceil((world.beat - 0.3) / 2) * 2;
     if (!CU.on || CU.beat !== nb) { var w = swayWant(nb); cue(w, nb, cueSpot, w === 'right' ? JUDGE.lRight : JUDGE.lLeft); }
   },
-  status: function (hs) { return { en: hs.good + ' of 8 in time', ar: num(hs.good) + ' من ' + num(8) + ' مع الإيقاع' }; },
+  status: function (hs) { return { en: hs.good + ' of 6 in time', ar: num(hs.good) + ' من ' + num(6) + ' مع الإيقاع' }; },
   skip: function () { music.stop(); }
 };
 
 // 6. lift and lower the drum with your row, then slap it down with everyone
-// the rows go round a 20-beat cycle from beat 4: up, down, up, down, the slap, and a bar to pick
-// the drums back up. If you miss a move, you join again on the row's next cycle
-var KH_CYC = 20;
-function khCycle(n) { var c = 4 + n * KH_CYC; return [{ b: c, k: 'up' }, { b: c + 4, k: 'down' }, { b: c + 8, k: 'up' }, { b: c + 12, k: 'down' }, { b: c + 16, k: 'khallu' }]; }
+// the rows go round a 12-beat round from beat 4: up, down, up, down (one cycle of the drums each),
+// the slap, and a moment to pick the drums back up. If you miss a move, you join the next round
+var KH_CYC = 12, KH_SLAP = 8;
+function khCycle(n) { var c = 4 + n * KH_CYC; return [{ b: c, k: 'up' }, { b: c + 2, k: 'down' }, { b: c + 4, k: 'up' }, { b: c + 6, k: 'down' }, { b: c + KH_SLAP, k: 'khallu' }]; }
 // the moment everyone slaps the drums down: the slap replaces the next stroke, then the drums stop
 function khalluAt(b) {
   world.khalluAt = b; music.drums = false;
@@ -981,12 +1047,12 @@ CTRL.khallu = {
   frame: function (hs) {
     var b = world.beat;
     var c0 = 4 + Math.max(0, Math.floor((b - 3.9) / KH_CYC)) * KH_CYC, inC = b - c0;
-    var up = (inC >= -0.1 && inC < 3.9) || (inC >= 7.9 && inC < 11.9) ? 1 : 0;
+    var up = (inC >= -0.1 && inC < 1.9) || (inC >= 3.9 && inC < 5.9) ? 1 : 0;
     world.rows[0].lift = up; world.rows[1].lift = up;
-    // everyone slaps the drums down together (scheduled a moment ahead), and the drums come back for the next cycle
-    var sb = music.beatAt(music.time()), sn = Math.max(0, Math.ceil((sb - 20) / KH_CYC)), sbeat = 20 + sn * KH_CYC;
+    // everyone slaps the drums down together (scheduled a moment ahead), and the drums come back for the next round
+    var s0 = 4 + KH_SLAP, sb = music.beatAt(music.time()), sn = Math.max(0, Math.ceil((sb - s0) / KH_CYC)), sbeat = s0 + sn * KH_CYC;
     if (hs.slapN < sn && sbeat - sb < 0.4) { hs.slapN = sn; khalluAt(sbeat); }
-    if (!music.drums && hs.slapN >= 0 && sb > 20 + hs.slapN * KH_CYC + 3.5) music.drums = true;
+    if (!music.drums && hs.slapN >= 0 && sb > s0 + hs.slapN * KH_CYC + 2.5) music.drums = true;
     if (hs.ok) return;
     var c = hs.script[hs.i];
     if (c && b > c.b + 0.6) {
@@ -1083,24 +1149,30 @@ function answer(k) {
 }
 
 // ── round 2: a whole Samri, and moving up the row ──
-// beats: a bar to count in, then four passages: heavy (sway, then sing), light (sway, then sing).
-// In the last bar both rows take up the drums and strike together, then slap them down
+// beats (one cycle of the drums is two beats): two cycles to count in, then four passages: the heavy
+// Samri of Unaizah (sway, then sing) and the light Samri (sway, then sing). When your row sings you
+// clap with the drum strokes of that Samri. At the end both rows take up the drums and strike
+// together, then slap them down
 var SECS = [
-  { from: 4, mine: 'sway', style: 'heavy', lift: [20, 24] },
-  { from: 32, mine: 'sing', style: 'heavy' },
-  { from: 52, mine: 'sway', style: 'light', lift: [68, 72] },
-  { from: 80, mine: 'sing', style: 'light' }
+  { from: 4, mine: 'sway', style: 'heavy', lift: [12, 14] },
+  { from: 16, mine: 'sing', style: 'heavy' },
+  { from: 28, mine: 'sway', style: 'light', lift: [36, 38] },
+  { from: 40, mine: 'sing', style: 'light' }
 ];
-var FINALE_B = 92, KHALLU_B = 96, ROW_END = 99;
+var LIGHT_B = 24, FINALE_B = 48, KHALLU_B = 52, ROW_END = 55;
 function buildChart() {
   var notes = [];
   SECS.forEach(function (s, i) {
     if (s.mine === 'sway') {
-      for (var k = 0; k < 4; k++) { notes.push({ b: s.from + 4 * k, k: 'right', s: i }); notes.push({ b: s.from + 4 * k + 2, k: 'left', s: i }); }
-      notes.push({ b: s.from + 16, k: 'up', s: i }); notes.push({ b: s.from + 20, k: 'down', s: i });
-    } else for (var j = 0; j < 16; j++) notes.push({ b: s.from + j, k: 'tap', s: i });
+      for (var k = 0; k < 2; k++) { notes.push({ b: s.from + 4 * k, k: 'right', s: i }); notes.push({ b: s.from + 4 * k + 2, k: 'left', s: i }); }
+      notes.push({ b: s.lift[0], k: 'up', s: i }); notes.push({ b: s.lift[1], k: 'down', s: i });
+    } else {
+      // four cycles, a clap on every stroke of this Samri's beat
+      for (var cy = 0; cy < 4; cy++) STYLES[s.style].strokes.forEach(function (e) { notes.push({ b: s.from + cy * 2 + e[0] / 3, k: 'tap', s: i }); });
+    }
   });
   notes.push({ b: KHALLU_B, k: 'khallu', s: 3 });
+  notes.sort(function (a, b) { return a.b - b.b; });
   return notes;
 }
 function moveChip(kind, label) { return '<div class="sm-move"><span class="sm-move-i">' + iconFor(kind) + '</span><b>' + L(label) + '</b></div>'; }
@@ -1115,6 +1187,14 @@ function renderRowIntro() {
     '<p class="sm-tip">' + L(RW.tip) + '</p>';
   setBar({ buttons: [{ label: RW.ready, icon: 'next', onClick: function () { sfx('tap'); startRow(); } }] });
 }
+// who sings in the game: in each passage the singing row takes the first half of the verse, then the second
+function rowPlan(slot, b) {
+  for (var i = 0; i < SECS.length; i++) {
+    var sec = SECS[i];
+    if (b === sec.from || b === sec.from + 4) return { row: sec.mine === 'sway' ? 0 : 1, what: b === sec.from ? 'h1' : 'h2' };
+  }
+  return null;
+}
 function startRow() {
   var g = S.game, my = ++token;
   quiet();
@@ -1124,9 +1204,9 @@ function startRow() {
   resetSeats(); world.setYou(YOU); world.youManual = true;
   renderGame();
   document.body.classList.add('sm-playing');
-  music.ensure(); music.drumVol = 1; music.claps = false; music.drums = true;
+  music.ensure(); music.drumVol = 1; music.claps = false; music.drums = true; music.plan = rowPlan;
   music.start('heavy', 0.6);
-  music.change('light', SECS[2].from - 4);
+  music.change('light', LIGHT_B);
   setGesture(swiper({ min: 26, onSwipe: function (dir) { rowInput(dir); }, onTap: function (p, at) { rowInput('tap', at); } }));
   buildTrack(); showRowHUD();
   if (!S.inAR) world.view('game', { k: 1.2 });
@@ -1186,7 +1266,7 @@ function buildTrack() {
   var r = S.game.row;
   trackEl.hidden = false;
   var html = '<div class="sm-hit"></div>';
-  for (var b = 4; b <= KHALLU_B; b += 4) html += '<i class="sm-bar-line" data-b="' + b + '"></i>';
+  for (var b = 4; b <= KHALLU_B; b += 2) html += '<i class="sm-bar-line" data-b="' + b + '"></i>';
   trackEl.innerHTML = html;
   r.notes.forEach(function (n) {
     var el = document.createElement('div'); el.className = 'sm-n k-' + n.k; el.innerHTML = iconFor(n.k); el.style.display = 'none';
@@ -1194,7 +1274,7 @@ function buildTrack() {
   });
   r.lines = $$('.sm-bar-line', trackEl).map(function (el) { return { el: el, b: +el.getAttribute('data-b') }; });
 }
-var PX_PER_S = 150, HIT_X = 37;
+var PX_PER_S = 190, HIT_X = 37;
 function frameTrack() {
   var r = S.game.row, tNow = music.time() - music.latency(), w = trackEl.clientWidth || 380;
   var horizon = (w - HIT_X + 30) / PX_PER_S;
@@ -1395,9 +1475,10 @@ function makeOverlays() {
     '<div class="sm-judge" id="sm-judge" aria-live="polite"></div>' +
     '<div class="sm-token" id="sm-token" hidden></div>' +
     '<div class="sm-hud" id="sm-hud" hidden></div>' +
+    '<div class="sm-lyric" id="sm-lyric" hidden aria-hidden="true"><small></small><div lang="ar" dir="rtl"></div></div>' +
     '<div class="sm-track" id="sm-track" hidden aria-hidden="true"></div>');
   markEl = $('#sm-markl'); guideEl = $('#sm-guide'); cueEl = $('#sm-cue'); judgeEl = $('#sm-judge');
-  tokenEl = $('#sm-token'); hudEl = $('#sm-hud'); trackEl = $('#sm-track');
+  tokenEl = $('#sm-token'); hudEl = $('#sm-hud'); trackEl = $('#sm-track'); lyricEl = $('#sm-lyric');
   tokenEl.addEventListener('beforexrselect', function (e) { e.preventDefault(); });
 }
 function onFrame(dt) {
@@ -1409,6 +1490,8 @@ function onFrame(dt) {
     if (S.wasPlaying) { S.wasPlaying = false; S.idle0 = t / 1000 - Math.max(0, world.beat) * 60 / IDLE_BPM; }
     world.beat = (t / 1000 - S.idle0) * IDLE_BPM / 60; world.bpm = IDLE_BPM;
   }
+  // the dancers' hands follow the strokes of the Samri playing now
+  world.strokes = music.offsets(world.beat);
   // behind the story and between the parts, the rows take turns singing and swaying
   if (S.ambient && (S.part !== 'how' || S.howDone)) ambientRows(world.beat);
   if (S.part === 'how' && !S.howDone && S.hs && !S.hs.ok) {
@@ -1417,7 +1500,63 @@ function onFrame(dt) {
     if (!S.hs.ok && !S.hs.canSkip && t - S.hs.t0 > 35000) { S.hs.canSkip = true; howBar(); }
   }
   if (S.part === 'play') rowFrame();
+  frameVoices();
   frameGuide(t); frameMarks(); frameCue();
+}
+// what a row is singing right now: which half of the verse, the word it has reached, and how open
+// the mouth is on this syllable
+function sungNow(row) {
+  var v = music.singing(row); if (!v) return null;
+  var syl = SUNG[v.what].syl, i = -1;
+  for (var k = 0; k < syl.length; k++) if (v.p >= syl[k][0] - 0.04) i = k;
+  if (i < 0) return { what: v.what, word: -1, open: 0, all: v.all };
+  var y = syl[i], x = Math.max(0, (v.p - y[0]) / y[1]);
+  // the mouth opens fast on the vowel, stays, and half closes on the consonant that ends the syllable
+  var open = x > 1.2 ? 0 : y[3] * (x < 0.15 ? 0.3 + 0.7 * x / 0.15 : x > 0.75 ? Math.max(0.15, 1 - (x - 0.75) / 0.35) : 1);
+  var word = -1; for (var q = 0; q <= i; q++) if (syl[q][2] >= 0) word = syl[q][2];
+  return { what: v.what, word: word, open: open, all: v.all };
+}
+function paintWords(el, word) {
+  if (!el) return;
+  $$('i', el).forEach(function (w) { var k = +w.getAttribute('data-w'); w.className = word < 0 ? '' : k < word ? 'sung' : k === word ? 'on' : ''; });
+}
+// every frame: each row is heard from where it stands on screen, the singers' mouths follow the
+// syllables, and the words light up as they are sung
+function frameVoices() {
+  var W = window.innerWidth || 1, A = world.rows[0], B = world.rows[1];
+  for (var r = 0; r < 2; r++) {
+    var sp = world.toScreen({ x: 0, y: 0.6, z: r ? ROW.Z : -ROW.Z });
+    if (sp.ok) music.rowPan[r] = clamp((sp.x / W - 0.5) * 1.1, -0.45, 0.45);
+  }
+  music.singer = A.mode === 'sing' || A.mode === 'voice' ? 0 : B.mode === 'sing' || B.mode === 'voice' ? 1 : null;
+  var sa = sungNow(0), sb = sungNow(1);
+  A.mouth = sa ? sa.open : 0; B.mouth = sb ? sb.open : 0;
+  var cur = sa || sb, row = sa && sa.all ? -1 : sa ? 0 : sb ? 1 : null;
+  var key = cur ? cur.what + '|' + cur.word + '|' + row : '';
+  if (key === S.lyKey) return;
+  S.lyKey = key;
+  var h = cur && cur.what !== 'wan' ? (cur.what === 'h2' ? 1 : 0) : -1, word = cur ? cur.word : -1;
+  var ph = !cur ? '' : cur.what === 'wan' ? 'waneen' : row ? 'b' : 'a';
+  // the verse card on the poetry page
+  var card = document.getElementById('sm-verse');
+  if (card) {
+    card.setAttribute('data-phase', ph);
+    paintWords($('[data-h="0"]', card), h === 0 ? word : -1); paintWords($('[data-h="1"]', card), h === 1 ? word : -1);
+    var who = document.getElementById('sm-verse-who'); if (who) who.textContent = ph ? L(VERSE.who[ph]) : '';
+  }
+  // the line in the call and answer step
+  var ln = document.getElementById('sm-ph-line');
+  if (ln) paintWords(ln, h === +ln.getAttribute('data-h') ? word : -1);
+  // everywhere else, the line being sung floats over the gathering
+  var show = h >= 0 && !card && !ln && !(S.inAR && !S.arPlaced);
+  if (lyricEl.hidden === show) lyricEl.hidden = !show;
+  if (show) {
+    var box = lyricEl.lastChild;
+    if (lyricEl.getAttribute('data-h') !== String(h)) { lyricEl.setAttribute('data-h', h); box.innerHTML = lineWords(h); }
+    paintWords(box, word);
+    lyricEl.firstChild.textContent = L(row ? LYRIC.b : LYRIC.a);
+    lyricEl.setAttribute('data-row', row ? 'b' : 'a');
+  }
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1437,7 +1576,7 @@ async function boot() {
   panel = $('#mq-panel'); bar = $('#qx-bar'); parts = $('#qx-parts'); toastEl = $('#qx-toast');
   touch = $('#mq-touch'); callout = $('#mq-callout'); arBtn = $('#mq-ar'); root = $('#mq-root');
   $('#qx-close').innerHTML = ICON.close;
-  music = new Music(); music.setMuted(!S.sound);
+  music = new Music(); music.setMuted(!S.sound); music.preload();
   makeOverlays();
   renderSound();
   $('#qx-sound').addEventListener('click', function () {
@@ -1447,13 +1586,18 @@ async function boot() {
     if (S.sound) sfx('tap');
     renderSound();
   });
-  // the audio clock can only start after a tap; the first one anywhere wakes it up
-  document.addEventListener('pointerdown', function () {
-    music.ensure();
-    if (S.wantAmbient && music.ready()) { var v = S.wantAmbient; S.wantAmbient = 0; if (S.ambient) ambient(v); }
-    else if (S.wantAmbient) setTimeout(function () { if (S.wantAmbient && music.ready() && S.ambient) { var v2 = S.wantAmbient; S.wantAmbient = 0; ambient(v2); } }, 120);
-  }, true);
-  if (window.ThemeManager && !window.ThemeManager.current()) window.ThemeManager.applyRegionTheme('eastern');
+  // the audio clock can only start inside a tap, a click or a key press, and the first one anywhere wakes
+  // it up. On a phone a finger going down does not count, a finger lifting does, so every kind is heard
+  music.onRunning = function () { if (S.wantAmbient && S.ambient) { var v = S.wantAmbient; S.wantAmbient = 0; ambient(v); } };
+  // the same once the recorded sounds have arrived (or after a few seconds without them)
+  music.loading.then(function () { if (music.ready()) music.onRunning(); });
+  setTimeout(function () { if (music.ready()) music.onRunning(); }, 7200);
+  ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'].forEach(function (ev) {
+    document.addEventListener(ev, function () { music.unlock(); if (S.wantAmbient && music.ready()) music.onRunning(); }, true);
+  });
+  // coming back to the page (after a call, or another app) the clock may have been put to sleep
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && music.ctx) music.wake(); });
+  if (window.ThemeManager && !window.ThemeManager.current()) window.ThemeManager.applyRegionTheme('najd');
   document.title = L(T.title) + ' — CultureLens';
   $('#mq-loading span').textContent = L(T.loading);
 
@@ -1484,7 +1628,7 @@ async function boot() {
   world.view(world.rig.mode || 'cover', { snap: true });
   setTimeout(function () { $('#mq-loading').classList.add('gone'); }, 250);
 
-  window.__sm = { world: world, music: music, S: S, setPart: setPart, goCh: goCh, HOW: HOW, CTRL: CTRL, stepDone: stepDone, startStep: startStep, howNext: howNext, rowInput: rowInput, SECS: SECS };
+  window.__sm = { world: world, music: music, S: S, setPart: setPart, goCh: goCh, HOW: HOW, CTRL: CTRL, stepDone: stepDone, startStep: startStep, howNext: howNext, rowInput: rowInput, SECS: SECS, startRow: startRow, listen: listenCallAnswer };
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

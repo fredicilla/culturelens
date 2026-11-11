@@ -32,12 +32,12 @@
       motifEn: 'Najdi mud-brick facade', motifAr: 'واجهة الطين النجدية',
       en: {
         welcome: 'Welcome to Najd',
-        known: 'Saudi Coffee, Al-Ardha, and the mud-brick lanes of Diriyah'
+        known: 'Saudi Coffee, Al-Ardah, Samri nights, and the mud-brick lanes of Diriyah'
       },
       ar: {
         welcome: 'هلا والله، حيّاك الله في نجد',
         tagline: 'عِش الثقافة، لا تقرا عنها وبس',
-        known: 'القهوة السعودية، العرضة النجدية، وطين الدرعية',
+        known: 'القهوة السعودية، العرضة، ليالي السامري، وطين الدرعية',
         change: 'غيّر المنطقة',
         soon: 'قريّب إن شاء الله'
       }
@@ -191,9 +191,10 @@
     };
     for (var k in vars) b.style.setProperty(k, vars[k]);
 
+    // the app's own pages keep the logo's ink strip on top; the experiences take the region's dark
     var meta = document.querySelector('meta[name="theme-color"]');
     if (!meta) { meta = document.createElement('meta'); meta.name = 'theme-color'; document.head.appendChild(meta); }
-    meta.content = c.bg;
+    meta.content = b.classList.contains('cl-app') ? '#0E0B1A' : c.bg;
 
     updateRegionUI(key);
   }
@@ -253,7 +254,10 @@
       else setT(n, r.nameEn, r.nameAr);
     });
     document.querySelectorAll('[data-motif]').forEach(function (n) {
-      paint(n, key, n.getAttribute('data-motif') || 'full', parseFloat(n.getAttribute('data-motif-scale')) || 1);
+      var sc = parseFloat(n.getAttribute('data-motif-scale')) || 1;
+      // a band shows whole tiles of the pattern, as tall as the band
+      if (n.hasAttribute('data-motif-fit') && P) { var hh = n.clientHeight || parseFloat(getComputedStyle(n).height) || 0; if (hh) sc = hh / P.tile(key)[1]; }
+      paint(n, key, n.getAttribute('data-motif') || 'full', sc);
     });
     var el = document.getElementById('region-indicator');
     if (!el) return;
@@ -335,23 +339,28 @@
     if (window.location.hash === '#map') history.replaceState(null, '', window.location.pathname);
   }
 
-  // Fill each region on the map with its own motif
+  // Each region on the map: its own color, with its pattern drawn faintly over it in cream
+  var MAP_INK = { najd: '#8F5427', hejaz: '#1E6E61', eastern: '#2B6688', southern: '#8A5C0C', northern: '#9B392E' };
   function paintMap() {
     var svg = screen && screen.querySelector('svg');
     if (!svg || !P) return;
     var NS = 'http://www.w3.org/2000/svg';
     var defs = svg.querySelector('defs') || svg.insertBefore(document.createElementNS(NS, 'defs'), svg.firstChild);
     Object.keys(REGIONS).forEach(function (key) {
-      var tile = P.tile(key), k = 1.5;
+      var tile = P.tile(key), k = 1.5, w = tile[0] * k, h = tile[1] * k;
       var pat = document.createElementNS(NS, 'pattern');
       pat.setAttribute('id', 'motif-' + key);
       pat.setAttribute('patternUnits', 'userSpaceOnUse');
-      pat.setAttribute('width', tile[0] * k);
-      pat.setAttribute('height', tile[1] * k);
+      pat.setAttribute('width', w);
+      pat.setAttribute('height', h);
+      var bg = document.createElementNS(NS, 'rect');
+      bg.setAttribute('width', w); bg.setAttribute('height', h); bg.setAttribute('fill', MAP_INK[key]);
       var img = document.createElementNS(NS, 'image');
-      img.setAttribute('href', 'data:image/svg+xml,' + encodeURIComponent(P.svg(key, 'full')));
-      img.setAttribute('width', tile[0] * k);
-      img.setAttribute('height', tile[1] * k);
+      img.setAttribute('href', 'data:image/svg+xml,' + encodeURIComponent(P.svg(key, 'tone', '#F3EADB')));
+      img.setAttribute('width', w);
+      img.setAttribute('height', h);
+      img.setAttribute('opacity', '0.42');
+      pat.appendChild(bg);
       pat.appendChild(img);
       defs.appendChild(pat);
       var path = svg.querySelector('.rm-region[data-region-key="' + key + '"]');
@@ -412,6 +421,8 @@
   function countEn(n) { return n + (n === 1 ? ' experience' : ' experiences'); }
   // "لـ" + name, joined properly: لـنجد، للحجاز، للمنطقة الشرقية
   function li(nameAr) { return nameAr.indexOf('ال') === 0 ? 'ل' + nameAr.slice(1) : 'لـ' + nameAr; }
+  // "the Southern Region", but plain "Najd" and "Hejaz"
+  function the(nameEn) { return /Region$/.test(nameEn) ? 'the ' + nameEn : nameEn; }
   function guideURL(id) { return 'experience.html?x=' + encodeURIComponent(id); }
   function metaFor(it) {
     if (it.page) return { en: 'History, AR, game · ' + it.mins + ' min', ar: 'قصة، واقع معزز، لعبة · ' + arNum(it.mins) + ' دقايق' };
@@ -425,6 +436,20 @@
 
   var CHEVRON = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
   var LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+  var ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  // the viewfinder corners of the logo, around a picture of an experience
+  var VF = ['tl', 'tr', 'bl', 'br'].map(function (k) { return '<svg class="vf-c ' + k + '" viewBox="0 0 26 26" aria-hidden="true"><path d="M2 24V2h22"/></svg>'; }).join('');
+  // a picture of the experience (its own scene) or, without one, its region's pattern
+  function artFor(el, it, hk, alt) {
+    if (it.cover) {
+      el.innerHTML = '<img src="' + it.cover + '" alt="" loading="lazy" decoding="async">';
+      el.classList.remove('is-pattern');
+      return true;
+    }
+    paint(el, hk, 'full', 1);
+    el.classList.add('is-pattern');
+    return false;
+  }
 
   var toastTimer = null;
   function toast(en, ar) {
@@ -442,7 +467,7 @@
     toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2600);
   }
   function elsewhereToast(home) {
-    toast('This one is from ' + home.nameEn + '. Switch to ' + home.nameEn + ' on the map to open it.',
+    toast('This one is from ' + the(home.nameEn) + '. Switch to ' + the(home.nameEn) + ' on the map to open it.',
           'هذي التجربة من ' + home.nameAr + '. غيّر منطقتك ' + li(home.nameAr) + ' من الخريطة عشان تفتحها.');
   }
 
@@ -464,7 +489,7 @@
     a.href = mine ? guideURL(id) : '#';
     a.setAttribute('data-exp', id);
     a.innerHTML =
-      '<div class="xp-art">' + (KA ? '<span class="xp-glyph">' + KA.glyph(it.cat) + '</span>' : '') + '</div>' +
+      '<div class="xp-art"></div>' +
       '<div class="xp-body">' +
         '<div class="xp-status"></div>' +
         '<div class="xp-title"></div>' +
@@ -472,10 +497,12 @@
         '<div class="xp-meta"></div>' +
       '</div>' + (mine ? CHEVRON : '<span class="xp-lock">' + LOCK + '</span>');
     var art = a.querySelector('.xp-art');
-    paint(art, hk, 'full', 1);
-    offsetArt(art, id, hk);
+    if (!artFor(art, it, hk)) {
+      offsetArt(art, id, hk);
+      if (KA) art.innerHTML = '<span class="xp-glyph">' + KA.glyph(it.cat) + '</span>';
+    }
     var st = a.querySelector('.xp-status');
-    if (!mine) setT(st, 'From ' + home.nameEn, 'من ' + home.nameAr);
+    if (!mine) setT(st, 'From ' + the(home.nameEn), 'من ' + home.nameAr);
     else if (it.page) setT(st, 'Full experience', 'تجربة كاملة');
     else setT(st, 'Story and guide', 'القصة والطريقة');
     setT(a.querySelector('.xp-title'), it.name.en, it.name.ar);
@@ -494,12 +521,6 @@
     if (!container) return;
     var cat = container.getAttribute('data-category');
     var region = REGIONS[key];
-    var head = document.querySelector('.hub-head');
-    if (head && KA) {
-      var hm = head.querySelector('.hub-medal');
-      if (!hm) { hm = document.createElement('div'); hm.className = 'hub-medal'; head.insertBefore(hm, head.firstChild); }
-      hm.innerHTML = KA.medal(cat, key, true);
-    }
     var ids = Object.keys(CATALOG).filter(function (id) { return CATALOG[id].cat === cat; });
     var mine = ids.filter(function (id) { return inRegion(CATALOG[id], key); });
     var elsewhere = ids.filter(function (id) { return !inRegion(CATALOG[id], key); });
@@ -509,7 +530,7 @@
     if (!mine.length) {
       var empty = document.createElement('p');
       empty.className = 'xp-empty';
-      setT(empty, 'Nothing from ' + region.nameEn + ' in this category yet.', 'ما فيه شي من ' + region.nameAr + ' في هذا القسم للحين.');
+      setT(empty, 'Nothing from ' + the(region.nameEn) + ' in this category yet.', 'ما فيه شي من ' + region.nameAr + ' في هذا القسم للحين.');
       container.appendChild(empty);
     }
     if (elsewhere.length) {
@@ -528,28 +549,12 @@
     }
   }
 
-  // Home: category rows + the featured experience for this region
+  // Home: the region's featured experience, the rest of its experiences, and the four categories
   function applyHome(key) {
     var region = REGIONS[key];
-    var hx = document.querySelector('.hx');
-    if (hx && KA) {
-      var art = hx.querySelector('.hx-art');
-      if (!art) { art = document.createElement('div'); art.className = 'hx-art'; art.setAttribute('aria-hidden', 'true'); hx.insertBefore(art, hx.firstChild); }
-      if (art.getAttribute('data-k') !== key) { art.innerHTML = KA.skyline(key); art.setAttribute('data-k', key); }
-      // how far you've come in this region
-      var full = Object.keys(CATALOG).filter(function (id) { return CATALOG[id].page && inRegion(CATALOG[id], key); });
-      var done = full.filter(function (id) { return !!progress()[id]; }).length;
-      var lp = hx.querySelector('.lobby-progress');
-      if (!lp) { lp = document.createElement('div'); lp.className = 'lobby-progress'; hx.querySelector('.hx-body').appendChild(lp); }
-      lp.style.display = full.length ? '' : 'none';
-      lp.innerHTML = '<div class="lp-row"><span class="lp-label"></span><b></b></div><div class="lp-bar"><i style="width:' + (full.length ? Math.round(done / full.length * 100) : 0) + '%"></i></div>';
-      setT(lp.querySelector('.lp-label'), 'Your journey in ' + region.nameEn, 'رحلتك في ' + region.nameAr);
-      setT(lp.querySelector('b'), done + ' of ' + full.length + ' played', arNum(done) + ' من ' + arNum(full.length));
-    }
     document.querySelectorAll('.cat-row[data-category]').forEach(function (row) {
       var catKey = row.getAttribute('data-category'), cat = CATEGORIES[catKey];
       if (!cat) return;
-      if (KA && !row.querySelector('.cat-glyph')) row.insertAdjacentHTML('afterbegin', '<span class="cat-glyph">' + KA.glyph(catKey) + '</span>');
       var n = Object.keys(CATALOG).filter(function (id) {
         return CATALOG[id].cat === catKey && inRegion(CATALOG[id], key);
       }).length;
@@ -558,7 +563,7 @@
       row.href = n ? cat.page : '#';
       row.onclick = n ? null : function (e) {
         e.preventDefault();
-        toast('Nothing from ' + region.nameEn + ' in this category yet.', 'ما فيه شي من ' + region.nameAr + ' في هذا القسم للحين.');
+        toast('Nothing from ' + the(region.nameEn) + ' in this category yet.', 'ما فيه شي من ' + region.nameAr + ' في هذا القسم للحين.');
       };
       if (meta) {
         if (n) setT(meta, countEn(n), countAr(n));
@@ -569,28 +574,51 @@
     var feat = document.getElementById('home-featured');
     if (!feat) return;
     var ids = Object.keys(CATALOG).filter(function (id) { return inRegion(CATALOG[id], key); });
-    var pick = ids.filter(function (id) { return CATALOG[id].page; })[0] || ids[0];
+    ids.sort(function (a, b) { return (CATALOG[b].page ? 1 : 0) - (CATALOG[a].page ? 1 : 0); });
+    var pick = ids[0];
     if (!pick) { feat.innerHTML = ''; return; }
-    var it = CATALOG[pick], cat = CATEGORIES[it.cat];
+    var it = CATALOG[pick], cat = CATEGORIES[it.cat], hk = homeKeyOf(it, key);
     feat.innerHTML =
       '<a class="feat" href="' + guideURL(pick) + '">' +
-        '<div class="feat-art"></div>' +
+        '<div class="feat-media"></div>' +
         '<div class="feat-body">' +
           '<div class="feat-kicker"></div>' +
           '<div class="feat-title"></div>' +
           '<div class="feat-desc"></div>' +
-          '<div class="feat-foot"><span class="feat-meta"></span><span class="feat-cta"></span></div>' +
+          '<div class="feat-foot"><span class="feat-meta"></span><span class="feat-cta"><span></span>' + ARROW + '</span></div>' +
         '</div>' +
       '</a>';
-    if (KA) feat.querySelector('.feat-art').innerHTML = KA.medal(it.cat, homeKeyOf(it, key), true);
-    else paint(feat.querySelector('.feat-art'), homeKeyOf(it, key), 'full', 1.5);
-    setT(feat.querySelector('.feat-kicker'), progress()[pick] ? 'Play again' : 'Start here', progress()[pick] ? 'العبها مرة ثانية' : 'ابدأ من هنا');
+    var media = feat.querySelector('.feat-media');
+    if (artFor(media, it, hk)) media.insertAdjacentHTML('beforeend', VF);
+    setT(feat.querySelector('.feat-kicker'),
+      cat.en + (it.page ? ' · Full experience' : ''),
+      cat.ar + (it.page ? ' · تجربة كاملة' : ''));
     setT(feat.querySelector('.feat-title'), it.name.en, it.name.ar);
     setT(feat.querySelector('.feat-desc'), it.story.en, it.story.ar);
     var m = metaFor(it);
     setT(feat.querySelector('.feat-meta'), m.en, m.ar);
     if (starsFor(pick)) feat.querySelector('.feat-meta').insertAdjacentHTML('beforeend', starsHTML(starsFor(pick)));
-    setT(feat.querySelector('.feat-cta'), it.page ? 'Begin' : 'Read', it.page ? 'ابدأ' : 'اقرأ');
+    setT(feat.querySelector('.feat-cta span'),
+      it.page ? (progress()[pick] ? 'Play again' : 'Begin') : 'Read',
+      it.page ? (progress()[pick] ? 'العبها مرة ثانية' : 'ابدأ') : 'اقرأ');
+
+    // everything else from this region
+    var more = document.getElementById('home-more');
+    if (more) {
+      var rest = ids.slice(1, 5);
+      more.innerHTML = '';
+      more.style.display = rest.length ? '' : 'none';
+      if (rest.length) {
+        var h = document.createElement('h2');
+        h.className = 'sec-label';
+        setT(h, 'Also in ' + the(region.nameEn), 'كمان في ' + region.nameAr);
+        more.appendChild(h);
+        var list = document.createElement('div');
+        list.className = 'xp-list is-inline';
+        rest.forEach(function (id) { list.appendChild(rowFor(id, key)); });
+        more.appendChild(list);
+      }
+    }
   }
 
   // Guide page (experience.html?x=<id>): everything from the spreadsheet for one experience
@@ -609,15 +637,23 @@
     document.title = it.name.en + ' — CultureLens';
     var back = document.querySelector('.cl-header .back-btn');
     if (back) back.href = cat.page;
+    // a picture of the experience in the viewfinder, or a wide band of its region's pattern
     paint(root.querySelector('.g-band'), hk, 'full', 1.5);
+    var cov = root.querySelector('.g-cover');
+    if (it.cover) {
+      if (!cov) { cov = document.createElement('div'); cov.className = 'g-cover'; root.insertBefore(cov, root.firstChild); }
+      if (cov.getAttribute('data-x') !== id) { cov.innerHTML = '<img src="' + it.cover + '" alt="">' + VF; cov.setAttribute('data-x', id); }
+    } else if (cov) cov.remove();
     var gh = root.querySelector('.g-head');
-    if (gh && KA) {
-      var gm = gh.querySelector('.g-medal');
-      if (!gm) { gm = document.createElement('div'); gm.className = 'g-medal'; gh.insertBefore(gm, gh.firstChild); }
-      gm.innerHTML = KA.medal(it.cat, hk, true);
-    }
     var old = root.querySelector('.g-path'); if (old) old.remove();
+    var oldGo = root.querySelector('.g-go'); if (oldGo) oldGo.remove();
     if (it.page && gh) {
+      // a way in right away, under the three parts; the full note stays at the end
+      var go = document.createElement('div');
+      go.className = 'g-go';
+      go.innerHTML = '<a class="btn btn-solid" href="' + it.page + '"><span></span>' + ARROW + '</a>';
+      setT(go.querySelector('span'), progress()[id] ? 'Play again' : 'Start the experience', progress()[id] ? 'العبها مرة ثانية' : 'ابدأ التجربة');
+      gh.parentNode.insertBefore(go, gh.nextSibling);
       var played = !!progress()[id];
       var path = document.createElement('div');
       path.className = 'g-path';
@@ -700,17 +736,17 @@
       '<div class="gate-card">' +
         '<div class="gate-art"></div>' +
         '<div class="gate-body">' +
-          '<h2>' + (ar ? 'هذي التجربة من ' + home.nameAr : 'This experience is from ' + home.nameEn) + '</h2>' +
+          '<h2>' + (ar ? 'هذي التجربة من ' + home.nameAr : 'This experience is from ' + the(home.nameEn)) + '</h2>' +
           '<p>' + (ar ? 'أنت الحين تستكشف ' + here.nameAr + '. انتقل ' + li(home.nameAr) + ' عشان تفتحها.'
-                      : "You're exploring " + here.nameEn + ' right now. Switch to ' + home.nameEn + ' to open it.') + '</p>' +
-          '<button type="button" class="btn btn-solid gate-go">' + (ar ? 'انتقل ' + li(home.nameAr) : 'Switch to ' + home.nameEn) + '</button>' +
+                      : "You're exploring " + the(here.nameEn) + ' right now. Switch to ' + the(home.nameEn) + ' to open it.') + '</p>' +
+          '<button type="button" class="btn btn-solid gate-go">' + (ar ? 'انتقل ' + li(home.nameAr) : 'Switch to ' + the(home.nameEn)) + '</button>' +
           '<button type="button" class="btn btn-ghost gate-back">' + (ar ? 'ارجع' : 'Go back') + '</button>' +
         '</div>' +
       '</div>';
     paint(g.querySelector('.gate-art'), homeKey, 'full', 1.5);
     var go = g.querySelector('.gate-go');
-    go.style.background = home.colors.accent;
-    go.style.color = home.colors.onAccent;
+    go.style.background = MAP_INK[homeKey] || home.colors.accent;
+    go.style.color = '#F4EEE4';
     go.addEventListener('click', function () {
       remember(homeKey);
       activeKey = homeKey;
@@ -747,11 +783,11 @@
     var el = document.createElement('div');
     el.className = 'cl-intro';
     el.setAttribute('aria-hidden', 'true');
-    el.innerHTML = '<div class="ci-in"><img src="logo-mark.png" alt=""><div class="ci-name">CultureLens<span>عدسة ثقافية</span></div><div class="ci-by">Threya Studio</div></div>';
+    el.innerHTML = '<img class="ci-logo" src="logo.svg" alt=""><div class="ci-by">Threya Studio</div>';
     document.body.appendChild(el);
     var gone = function () { el.classList.add('is-gone'); setTimeout(function () { el.remove(); }, 800); };
     el.addEventListener('click', gone);
-    setTimeout(gone, 2100);
+    setTimeout(gone, 1900);
   }
 
   function init() {

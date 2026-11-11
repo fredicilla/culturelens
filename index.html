@@ -3,41 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#14100D">
+  <meta name="theme-color" content="#0E0B1A">
   <title>CultureLens</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="ui.css">
-<link rel="stylesheet" href="studio.css">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="app.css">
 </head>
 
-<body>
+<body class="cl-app">
 
   <header class="cl-header">
-    <div class="logo"><img src="logo.png" class="logo-img" alt="CultureLens"></div>
-    <div style="display:flex;align-items:center;gap:8px;">
+    <div class="hdr-start">
+      <a class="brand" href="index.html" aria-label="CultureLens"><img class="brand-en" src="logo-h-en.svg" alt="CultureLens"><img class="brand-ar" src="logo-h-ar.svg" alt="عدسة ثقافية"></a>
+    </div>
+    <div class="hdr-actions">
       <button id="region-indicator" type="button" onclick="resetRegion()" style="display:none"></button>
       <button id="lang-toggle" type="button" onclick="toggleLanguage()"><span id="lang-label">العربية</span></button>
     </div>
   </header>
 
-  <!-- HOME -->
+  <!-- A REGION'S HOME -->
   <main class="home">
     <section class="hx">
-      <div class="hx-band" data-motif="full" data-motif-scale="1.5" aria-hidden="true"></div>
+      <div class="hx-band" data-motif="full" data-motif-fit aria-hidden="true"></div>
       <div class="hx-body">
         <div class="kicker" data-region-text="area"></div>
         <h1 class="hx-title" data-region-text="name">CultureLens</h1>
         <p class="hx-welcome translatable" data-dialect="welcome" data-en="Welcome" data-ar="حيّاك الله">Welcome</p>
+        <p class="hx-known translatable" data-dialect="known" data-en="" data-ar=""></p>
         <div class="hx-actions">
-          <button type="button" class="btn btn-outline" onclick="resetRegion()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg><span class="translatable" data-dialect="change" data-en="Change region" data-ar="غيّر المنطقة">Change region</span></button>
+          <button type="button" class="link-btn" onclick="resetRegion()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4.5 3.5 6.5v13l5.5-2 6 2 5.5-2v-13l-5.5 2-6-2z"/><path d="M9 4.5v13M15 6.5v13"/></svg><span class="translatable" data-dialect="change" data-en="Change region" data-ar="غيّر المنطقة">Change region</span></button>
+          <p class="hx-motif"><span class="sq" aria-hidden="true"></span><span data-region-text="motif"></span></p>
         </div>
-        <p class="hx-motif"><span class="translatable" data-en="Pattern:" data-ar="النقش:">Pattern:</span> <span data-region-text="motif"></span></p>
       </div>
     </section>
 
     <section class="home-section">
-      <h2 class="sec-label translatable" data-en="Featured" data-ar="مختارة لك">Featured</h2>
+      <h2 class="sec-label translatable" data-en="Start here" data-ar="ابدأ من هنا">Start here</h2>
       <div id="home-featured"></div>
+      <div id="home-more"></div>
 
       <h2 class="sec-label translatable" data-en="Explore" data-ar="استكشف">Explore</h2>
       <nav class="cat-list" aria-label="Categories">
@@ -71,7 +76,6 @@
 
   <!-- REGION MAP: opening screen. Tap a region to enter it. -->
   <section id="region-map-screen" aria-hidden="true" aria-labelledby="rm-title">
-    <div class="rm-lockup"><img src="logo-mark.png" alt=""><div class="rm-name">CultureLens<small>عدسة ثقافية</small></div></div>
     <div class="kicker translatable" data-en="CultureLens" data-ar="عدسة ثقافية">CultureLens</div>
     <h1 class="rm-title translatable" id="rm-title" data-en="Where do you want to start?" data-ar="من وين تبي تبدأ؟">Where do you want to start?</h1>
     <p class="rm-sub translatable" data-en="Pick a region. The app takes on its patterns, its colors, and the way people there speak." data-ar="اختر منطقة، والتطبيق ياخذ نقوشها وألوانها وطريقة كلام أهلها.">Pick a region. The app takes on its patterns, its colors, and the way people there speak.</p>
