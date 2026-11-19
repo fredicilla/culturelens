@@ -305,6 +305,7 @@ export class Music {
   // first beat falls at time t. o.row: 0 or 1, o.style: 'heavy' or 'light', o.vol
   voice(t, what, o) {
     o = o || {};
+    if (!SINGING) return { end: t, stop: function () {} };   // no singing at all: only the drums and claps play
     if (!this.ctx) return { end: t, stop: function () {} };
     var self = this, style = what === 'wan' ? 'heavy' : (o.style || 'heavy'), row = o.row ? 1 : 0, bpm = STYLES[style].bpm;
     var name = what === 'wan' ? 'v_wan' : 'v_' + (row ? 'b' : 'a') + '_' + what + '_' + bpm;
