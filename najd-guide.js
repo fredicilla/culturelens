@@ -93,7 +93,7 @@
       rel: ['ardah', 'samri', 'dialect'] },
 
     { id: 'food', title: { ar: 'أكلات نجد', en: 'Najdi food' },
-      k: ['اكلات', 'أكلات', 'اكل', 'أكل', 'طبخ', 'وجبه', 'وجبة', 'الاكلات الشعبيه', 'الكبسه', 'الكبسة', 'كبسه', 'الجريش', 'جريش', 'القرصان', 'قرصان', 'المرقوق', 'مرقوق', 'المطازيز', 'مطازيز', 'food', 'dish', 'eat', 'kabsa', 'jareesh'],
+      k: ['اكلات', 'أكلات', 'اكل', 'أكل', 'طبخ', 'وجبه', 'وجبة', 'الاكلات الشعبيه', 'الاكل الشعبي', 'وش ناكل', 'وش اكل', 'food', 'dish', 'eat', 'dishes'],
       a: { ar: 'من أشهر أكلات نجد: الكبسة، والجريش (قمح مجروش يُطبخ باللبن أو المرق)، والقرصان والمرقوق والمطازيز (عجين يُطبخ بمرق اللحم والخضار)، والحنيني في الشتاء (خبز وتمر وسمن)، والكليجا من القصيم.',
            en: 'Some of Najd\'s best-known dishes: kabsa, jareesh (cracked wheat cooked with buttermilk or broth), qursan, marqooq and matazeez (dough cooked in a meat and vegetable stew), haneeni in winter (bread, dates and ghee), and kleija from Al-Qassim.' },
       rel: ['kleija', 'dates', 'coffee'] },
@@ -135,16 +135,70 @@
       rel: ['coffeeEtiquette', 'coffee', 'dialect'] },
 
     { id: 'places', title: { ar: 'وين أروح في نجد؟', en: 'Where to go in Najd' },
-      k: ['اماكن', 'أماكن', 'مكان', 'وين اروح', 'وين أروح', 'سياحه', 'سياحة', 'ازور', 'أزور', 'زياره', 'معالم', 'طرف العالم', 'اشيقر', 'أشيقر', 'شقراء', 'places', 'visit', 'tourism', 'see', 'edge of the world', 'ushaiger'],
+      k: ['اماكن', 'أماكن', 'مكان', 'وين اروح', 'وين أروح', 'سياحه', 'سياحة', 'ازور', 'أزور', 'زياره', 'معالم', 'وين نروح', 'places', 'visit', 'tourism', 'where to go', 'where should i go', 'go'],
       a: { ar: 'قل لي وين تبي تروح وأنا بالخدمة! وإذا جيت نجد لا يفوتك: حي الطريف والبجيري في الدرعية، وقصر المصمك والمتحف الوطني في الرياض، و«طرف العالم» على جبال طويق، وقرية أشيقر التراثية، وشقراء القديمة، ووادي حنيفة، وسوق التمور في بريدة.',
            en: 'If you come to Najd, don\'t miss: At-Turaif and Al-Bujairi in Diriyah, Al-Masmak Fort and the National Museum in Riyadh, the "Edge of the World" on the Tuwaiq escarpment, the heritage village of Ushaiger, old Shaqra, Wadi Hanifa, and the date market in Buraydah.' },
       rel: ['diriyah', 'masmak', 'nature'] },
 
     { id: 'nature', title: { ar: 'طبيعة نجد وجوها', en: 'Land and weather' },
-      k: ['الطبيعه', 'الطبيعة', 'طبيعه', 'الجو', 'جو', 'الطقس', 'طقس', 'حر', 'برد', 'مطر', 'الشتاء', 'شتاء', 'الصيف', 'صيف', 'طويق', 'جبال طويق', 'وادي حنيفه', 'وادي حنيفة', 'صحراء', 'weather', 'climate', 'nature', 'tuwaiq', 'desert', 'winter', 'summer'],
+      k: ['الطبيعه', 'الطبيعة', 'طبيعه', 'الجو', 'جو', 'الطقس', 'طقس', 'حر', 'برد', 'مطر', 'الشتاء', 'شتاء', 'الصيف', 'صيف', 'طويق', 'جبال طويق', 'صحراء', 'الجو في', 'جو الرياض', 'طقس الرياض', 'جو نجد', 'weather', 'climate', 'nature', 'tuwaiq', 'desert', 'winter', 'summer'],
       a: { ar: 'نجد هضبة صحراوية تقطعها جبال طويق ووديان مثل وادي حنيفة. الصيف حار وجاف، والشتاء ليله بارد، والربيع بعد المطر تخضر فيه الروضات، وهو أحلى وقت للكشتة.',
            en: 'Najd is a desert plateau crossed by the Tuwaiq escarpment and valleys like Wadi Hanifa. Summers are hot and dry and winter nights are cold; in spring, after the rain, the meadows turn green, the best time for a desert outing.' },
       rel: ['places', 'najd'] },
+
+    { id: 'kabsa', title: { ar: 'الكبسة', en: 'Kabsa' },
+      k: ['الكبسه', 'الكبسة', 'كبسه', 'كبسة', 'كبسات', 'kabsa', 'kabsah'],
+      a: { ar: 'الكبسة رز مطبوخ مع اللحم أو الدجاج والبهارات، وهي أشهر طبق في نجد والمملكة. تُطبخ في قدر واحد، وتُقدَّم على صينية كبيرة يتجمّع عليها الأهل والضيوف.',
+           en: 'Kabsa is rice cooked with meat or chicken and spices, the best-known dish in Najd and the whole Kingdom. It is cooked in one pot and served on a large tray that the family and guests gather around.' },
+      rel: ['food', 'jareesh', 'hospitality'] },
+
+    { id: 'jareesh', title: { ar: 'الجريش', en: 'Jareesh' },
+      k: ['الجريش', 'جريش', 'jareesh', 'jarish'],
+      a: { ar: 'الجريش قمح مجروش يُطبخ على نار هادية مع اللبن أو المرق حتى يصير ناعم، ويُزيَّن بالبصل المحمّر والسمن. أكلة نجدية أصيلة، وتنحب في رمضان والشتاء.',
+           en: 'Jareesh is cracked wheat slow-cooked with buttermilk or broth until soft, topped with fried onions and ghee. It is a true Najdi dish, loved in Ramadan and in winter.' },
+      rel: ['food', 'qursan', 'kabsa'] },
+
+    { id: 'qursan', title: { ar: 'القرصان والمرقوق والمطازيز', en: 'Qursan, marqooq and matazeez' },
+      k: ['القرصان', 'قرصان', 'المرقوق', 'مرقوق', 'المطازيز', 'مطازيز', 'qursan', 'marqooq', 'matazeez'],
+      a: { ar: 'ثلاث أكلات نجدية من العجين والمرق: القرصان خبز رقيق يُقطّع ويُطبخ بمرق اللحم والخضار، والمرقوق عجين يُرقّق ويُطبخ في المرق مع اللحم والكوسة والقرع، والمطازيز قطع عجين مربعة تُطبخ بنفس الطريقة.',
+           en: 'Three Najdi dishes of dough and stew: qursan is thin bread torn and cooked in meat and vegetable broth; marqooq is rolled-out dough cooked in the stew with meat, zucchini and squash; and matazeez are small squares of dough cooked the same way.' },
+      rel: ['food', 'jareesh', 'haneeni'] },
+
+    { id: 'haneeni', title: { ar: 'الحنيني', en: 'Haneeni' },
+      k: ['الحنيني', 'حنيني', 'haneeni'],
+      a: { ar: 'الحنيني حلا نجدي شتوي: خبز البر يُفتّ ويُخلط مع التمر والسمن ويُرشّ عليه الهيل والزعفران. يدفّي في البرد ويُقدَّم مع القهوة.',
+           en: 'Haneeni is a Najdi winter sweet: wheat bread crumbled and mixed with dates and ghee, finished with cardamom and saffron. It warms you in the cold and is served with coffee.' },
+      rel: ['dates', 'food', 'coffee'] },
+
+    { id: 'coffeeHow', title: { ar: 'كيف تسوي القهوة', en: 'How to make the coffee' },
+      k: ['كيف اسوي القهوه', 'كيف تسوي القهوه', 'طريقه القهوه', 'طريقة القهوة', 'تحضير القهوه', 'اسوي قهوه', 'اطبخ القهوه', 'make coffee', 'brew coffee', 'coffee recipe'],
+      a: { ar: 'الطريقة: تحمّس البن على النار لين يصير ذهبي، وتدقّه بالنجر، وتغلي الماي بالدلة، وتحط البن وتخليه يفور على نار هادية، بعدها تحط الهيل المدقوق (ومن يحب يزيد زعفران أو قرنفل)، وتخليها تركد شوي، وتصبها وتقدّمها مع التمر.',
+           en: 'Roast the beans over the fire until golden, pound them in the najr, boil water in the dallah, add the coffee and let it simmer gently, then add crushed cardamom (and saffron or cloves if you like). Let it settle a moment, pour, and serve it with dates.' },
+      rel: ['coffeeEtiquette', 'coffee', 'dates'], page: 'qahwa.html' },
+
+    { id: 'wadiHanifa', title: { ar: 'وادي حنيفة', en: 'Wadi Hanifa' },
+      k: ['وادي حنيفه', 'وادي حنيفة', 'حنيفه', 'حنيفة', 'wadi hanifa', 'hanifa'],
+      a: { ar: 'وادي حنيفة من أشهر أودية نجد، يمتد أكثر من ١٢٠ كيلو ويمر بالدرعية والرياض، وعلى ضفافه قامت الدرعية. واليوم صار متنزه طبيعي فيه ممشى ومزارع نخل.',
+           en: 'Wadi Hanifa is one of the best-known valleys of Najd. It runs for more than 120 km past Diriyah and Riyadh, and Diriyah was built on its banks. Today it is a natural park with walking trails and palm groves.' },
+      rel: ['diriyah', 'riyadh', 'nature'] },
+
+    { id: 'edge', title: { ar: 'طرف العالم', en: 'The Edge of the World' },
+      k: ['طرف العالم', 'حافه العالم', 'حافة العالم', 'جبل الفهرين', 'الفهرين', 'edge of the world'],
+      a: { ar: 'طرف العالم جزء من جبال طويق، شمال غرب الرياض بحوالي ١٠٠ كيلو. فيه منحدرات صخرية عالية تطل على سهل واسع، والمنظر وقت الغروب ما ينوصف. أحلى وقت تروحه الشتاء والربيع، وخذ معك ماي وسيارة تتحمل الطريق.',
+           en: 'The Edge of the World is part of the Tuwaiq escarpment, about 100 km north-west of Riyadh. Tall cliffs drop to a wide plain, and the sunset there is unforgettable. Go in winter or spring, take water, and a car that can handle the track.' },
+      rel: ['nature', 'places', 'ushaiger'] },
+
+    { id: 'ushaiger', title: { ar: 'أشيقر وشقراء', en: 'Ushaiger and Shaqra' },
+      k: ['اشيقر', 'أشيقر', 'شقراء', 'شقرا', 'الوشم', 'ushaiger', 'shaqra'],
+      a: { ar: 'أشيقر بلدة تراثية قريبة من شقراء في منطقة الوشم، بيوتها الطينية ومساجدها وأزقتها القديمة محفوظة، وتقدر تتمشى فيها وتعيش جو نجد القديم. وشقراء نفسها فيها بلدة قديمة مرمّمة تستاهل الزيارة.',
+           en: 'Ushaiger is a heritage village near Shaqra in the Al-Washm area. Its mud houses, mosques and old lanes are preserved, and you can walk through them and feel old Najd. Shaqra itself has a restored old town that is well worth a visit.' },
+      rel: ['architecture', 'places', 'edge'] },
+
+    { id: 'museum', title: { ar: 'المتحف الوطني', en: 'The National Museum' },
+      k: ['المتحف الوطني', 'المتحف', 'متحف', 'مركز الملك عبدالعزيز التاريخي', 'museum', 'national museum'],
+      a: { ar: 'المتحف الوطني في الرياض، داخل مركز الملك عبدالعزيز التاريخي، يحكي تاريخ الجزيرة العربية من القدم إلى توحيد المملكة. وقريب منه قصر المربع.',
+           en: 'The National Museum in Riyadh, inside the King Abdulaziz Historical Center, tells the story of the Arabian Peninsula from ancient times to the unification of the Kingdom. Al-Murabba Palace is right next to it.' },
+      rel: ['riyadh', 'masmak', 'unification'] },
 
     { id: 'masaqil', title: { ar: 'المصاقيل', en: 'Al-Masaqil' },
       k: ['المصاقيل', 'مصاقيل', 'الالعاب', 'الألعاب', 'العاب', 'لعبه', 'لعبة', 'games', 'game', 'marbles', 'masaqil'],
@@ -157,6 +211,8 @@
   var TALK = {
     hello: { k: ['السلام عليكم', 'السلام', 'سلام', 'هلا', 'مرحبا', 'اهلين', 'أهلين', 'هاي', 'hello', 'hi', 'hey', 'salam'],
       a: { ar: 'وعليكم السلام ورحمة الله، هلا والله وغلا! أنا دليلك في نجد وبالخدمة. سم، وش تبي تعرف؟ عن تاريخها، أكلها، قهوتها، فنونها، أو قل لي وين تبي تروح.', en: 'Peace be upon you too, welcome! I am your guide to Najd. Ask me about its history, food, coffee, folk arts, or where to go.' } },
+    howAreYou: { k: ['وش علومك', 'علومك', 'كيف حالك', 'كيفك', 'شلونك', 'كيف الحال', 'how are you'],
+      a: { ar: 'علوم الخير، الله يسلمك! أنا بخير وبالخدمة. سم، وش تبي تعرف عن نجد؟', en: 'All good, thank you! I\'m here to help. What would you like to know about Najd?' } },
     thanks: { k: ['شكرا', 'شكراً', 'يعطيك العافيه', 'يعطيك العافية', 'مشكور', 'تسلم', 'thanks', 'thank you'],
       a: { ar: 'العفو، الله يحييك! أنا بالخدمة، تامر على شي ثاني؟', en: 'You\'re welcome! Ask me anything else about Najd.' } },
     who: { k: ['من انت', 'من أنت', 'وش انت', 'مين انت', 'وش اسمك', 'اسمك', 'who are you', 'your name'],
@@ -166,29 +222,48 @@
   };
   var UNKNOWN = { ar: 'السموحة، هذي ما عندي فيها علم أكيد، وما أحب أقولك شي مو متأكد منه. بس سم، اسألني عن نجد: تاريخها، أكلها، قهوتها، فنونها، أو قل لي وين تبي تروح وأنا بالخدمة.',
                   en: 'I don\'t have reliable information on that, and I\'d rather not guess. Ask me about Najd: its history, food, coffee, folk arts, or where to go.' };
-  var STARTERS = ['diriyah', 'food', 'coffeeEtiquette', 'dialect', 'places'];
+  var STARTERS = ['diriyah', 'food', 'coffeeHow', 'dialect', 'places', 'edge'];
 
   // ── matching: Arabic is normalized (hamza forms, taa marbuta, alif maqsura, diacritics) ──
+  // the same word can be written many ways: unify letters, drop diacritics, and turn other dialects' words into Najdi ones
+  var SAME = { 'ايش': 'وش', 'شنو': 'وش', 'شو': 'وش', 'ماذا': 'وش', 'ما هي': 'وش', 'ما هو': 'وش', 'اكله': 'اكلات', 'اكلة': 'اكلات', 'مشهور': 'اشهر', 'مشهوره': 'اشهر' };
+  var STOP = ['ابي', 'ابغى', 'ابغا', 'اعرف', 'عطني', 'عطنا', 'قول', 'قل', 'لي', 'خبرني', 'كلمني', 'تكلم', 'عن', 'في', 'من', 'على', 'الى', 'هل', 'لو', 'سمحت', 'يا', 'شي', 'شيء', 'معلومه', 'معلومات', 'tell', 'me', 'about', 'the', 'a', 'is', 'what', 'please', 'of', 'in'];
   function norm(s) {
-    return (' ' + String(s || '').toLowerCase() + ' ')
-      .replace(/[ً-ْـ]/g, '')
+    var t = (' ' + String(s || '').toLowerCase() + ' ')
+      .replace(/[\u064B-\u0652\u0640]/g, '')
       .replace(/[إأآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي')
       .replace(/[٠-٩]/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'.indexOf(d); })
-      .replace(/[^؀-ۿa-z0-9 ]+/g, ' ').replace(/\s+/g, ' ');
+      .replace(/[^\u0600-\u06FFa-z0-9 ]+/g, ' ').replace(/\s+/g, ' ');
+    Object.keys(SAME).forEach(function (k) { t = t.split(' ' + k + ' ').join(' ' + SAME[k] + ' '); });
+    return t;
   }
-  // a keyword counts if it is a whole word or phrase in the question, a longer piece of it, or the start of a word
-  // (لبس → لبسكم). Overlapping hits count once (القهوه and قهوه are the same hit), longer hits weigh more.
+  function stripAl(t) { return t.indexOf('ال') === 0 && t.length > 4 ? t.slice(2) : t.replace(/^(و|ب|ل)ال/, ''); }
+  // how many letters apart two words are (for typing mistakes)
+  function dist(a, b) {
+    if (Math.abs(a.length - b.length) > 2) return 9;
+    var d = []; for (var i = 0; i <= a.length; i++) { d[i] = [i]; } for (var j = 1; j <= b.length; j++) d[0][j] = j;
+    for (i = 1; i <= a.length; i++) for (j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    return d[a.length][b.length];
+  }
+  // a keyword counts if it is in the question as a word or phrase, as the start of a word (لبس → لبسكم),
+  // or as a word with a small typing mistake (الدرعيه → الدرعيا). Overlapping hits count once; longer hits weigh more.
   function score(q, words) {
-    var toks = q.trim().split(' '), seen = {}, hits = [];
+    var toks = q.trim().split(' ').filter(function (t) { return t && STOP.indexOf(t) < 0; }).map(stripAl), seen = {}, hits = [];
     words.forEach(function (w) {
       var n = norm(w).trim(); if (!n || seen[n]) return; seen[n] = 1;
-      var bare = n.indexOf('ال') === 0 && n.length > 4 ? n.slice(2) : n;
-      var hit = q.indexOf(' ' + n + ' ') >= 0 || (n.length >= 4 && q.indexOf(n) >= 0) || q.indexOf(' ' + bare + ' ') >= 0 ||
-        (n.indexOf(' ') < 0 && bare.length >= 3 && toks.some(function (t) { var tb = t.indexOf('ال') === 0 && t.length > 4 ? t.slice(2) : t; return tb.indexOf(bare) === 0 && tb.length - bare.length <= 3; }));
-      if (hit) hits.push(bare);
+      var bare = stripAl(n), hit = 0;
+      if (q.indexOf(' ' + n + ' ') >= 0 || (n.length >= 4 && q.indexOf(n) >= 0) || q.indexOf(' ' + bare + ' ') >= 0) hit = 1;
+      else if (n.indexOf(' ') < 0 && bare.length >= 3) {
+        toks.some(function (t) {
+          if (t.indexOf(bare) === 0 && t.length - bare.length <= 3) { hit = 1; return true; }
+          if (bare.length >= 5 && t.length >= 5 && dist(t, bare) <= (bare.length >= 8 ? 2 : 1)) { hit = 0.8; return true; }
+          return false;
+        });
+      }
+      if (hit) hits.push({ w: bare, v: bare.length * hit });
     });
-    hits = hits.filter(function (h, i) { return !hits.some(function (o, j) { return j !== i && o.length > h.length && o.indexOf(h) >= 0; }); });
-    var total = 0, best = 0; hits.forEach(function (h) { total += h.length; best = Math.max(best, h.length); });
+    hits = hits.filter(function (h) { return !hits.some(function (o) { return o !== h && o.w.length > h.w.length && o.w.indexOf(h.w) >= 0; }); });
+    var total = 0, best = 0; hits.forEach(function (h) { total += h.v; best = Math.max(best, h.v); });
     return total + best;
   }
   // he talks like a Najdi host: «أبشر»، «سم»، «أنا بالخدمة»
@@ -201,17 +276,19 @@
   }
   function answer(text) {
     var q = norm(text);
-    var bestKB = null, bestS = 0;
-    KB.forEach(function (e) { var s = score(q, e.k.concat([L(e.title)])); if (s > bestS) { bestS = s; bestKB = e; } });
+    var ranked = KB.map(function (e) { return { e: e, s: score(q, e.k.concat([L(e.title)])) }; }).sort(function (a, b) { return b.s - a.s; });
+    var bestKB = ranked[0].s > 0 ? ranked[0].e : null, bestS = ranked[0].s;
     var bestT = null, bestTS = 0;
     Object.keys(TALK).forEach(function (k) { var s = score(q, TALK[k].k); if (s > bestTS) { bestTS = s; bestT = TALK[k]; } });
-    // a greeting with a real question in it: return the greeting, then answer the question
     if (bestKB && bestS >= 4) {
       var a = najdi(bestKB.a);
       if (bestT === TALK.hello) a = { ar: 'وعليكم السلام وهلا والله! ' + a.ar, en: 'Peace be upon you too! ' + a.en };
       return { a: a, e: bestKB };
     }
     if (bestT && bestTS >= 2) return { a: bestT.a, e: null, starters: true };
+    // a weak match: ask what they meant instead of guessing
+    var near = ranked.filter(function (r) { return r.s >= 2; }).slice(0, 3).map(function (r) { return r.e.id; });
+    if (near.length) return { a: { ar: 'سم، ما فهمت عليك زين. تقصد وحدة من هذي؟', en: 'Sorry, I did not quite get that. Did you mean one of these?' }, e: null, near: near };
     return { a: UNKNOWN, e: null, starters: true };
   }
 
@@ -280,64 +357,74 @@
   // LOOK
   // ════════════════════════════════════════════════════════════
   var CSS = '' +
-    '#ng-btn{position:fixed;z-index:150;inset-inline-end:14px;bottom:calc(78px + env(safe-area-inset-bottom,0px));display:none;align-items:center;gap:8px;' +
-    'background:#1D1813;color:#F3EEE6;border:1px solid rgba(226,174,127,.55);border-radius:999px;padding:6px 16px 6px 6px;font:inherit;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.4)}' +
-    'html[dir="rtl"] #ng-btn{padding:6px 6px 6px 16px}' +
-    '#ng-btn.show{display:inline-flex}#ng-btn .ng-face{width:40px;height:40px;border-radius:50%;background:#2B221A;overflow:hidden;flex:none}' +
-    '#ng-btn .ng-face svg{width:100%;height:100%;transform:scale(1.5) translateY(9%)}' +
-    '#ng-panel{position:fixed;z-index:2147482000;top:0;bottom:0;inset-inline-end:0;width:min(420px,100vw);background:#14100D;color:#F3EEE6;display:flex;flex-direction:column;' +
-    'transform:translateX(105%);transition:transform .28s ease;box-shadow:-12px 0 40px rgba(0,0,0,.45);font-family:var(--font-ui,"IBM Plex Sans Arabic",system-ui,sans-serif)}' +
-    'html[dir="rtl"] #ng-panel{transform:translateX(-105%)}#ng-panel.open{transform:none!important}' +
-    '#ng-panel *{box-sizing:border-box}' +
-    '.ng-head{display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top,0px)) 14px 10px;border-bottom:1px solid rgba(243,238,230,.1)}' +
-    '.ng-head .ng-face{width:44px;height:44px;border-radius:50%;background:#2B221A;overflow:hidden;flex:none}.ng-head .ng-face svg{width:100%;height:100%;transform:scale(1.5) translateY(9%)}' +
-    '.ng-head b{display:block;font-size:16px}.ng-head small{color:rgba(243,238,230,.6);font-size:12.5px}.ng-head .ng-x{margin-inline-start:auto;background:rgba(243,238,230,.08);border:1px solid rgba(243,238,230,.18);color:#F3EEE6;border-radius:999px;width:36px;height:36px;font-size:16px;cursor:pointer}' +
-    '.ng-tabs{display:flex;gap:6px;padding:10px 14px}.ng-tabs button{flex:1;background:transparent;color:#F3EEE6;border:1px solid rgba(243,238,230,.22);border-radius:999px;padding:9px;font:inherit;font-weight:700;font-size:14px;cursor:pointer}' +
-    '.ng-tabs button.on{background:#C98A55;color:#1A120B;border-color:#C98A55}' +
-    '.ng-chat{flex:1;overflow-y:auto;padding:6px 14px 10px;display:flex;flex-direction:column;gap:10px}' +
-    '.ng-msg{max-width:88%;padding:10px 13px;border-radius:16px;line-height:1.75;font-size:15px;white-space:pre-wrap}' +
-    '.ng-msg.bot{background:#1D1813;border:1px solid rgba(226,174,127,.25);align-self:flex-start}.ng-msg.me{background:#C98A55;color:#1A120B;align-self:flex-end;font-weight:600}' +
-    '.ng-msg a.ng-try{display:inline-block;margin-top:8px;background:rgba(201,138,85,.18);color:#E2AE7F;border:1px solid rgba(226,174,127,.5);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700;text-decoration:none}' +
-    '.ng-chips{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start}.ng-chips button{background:transparent;color:#E2AE7F;border:1px solid rgba(226,174,127,.45);border-radius:999px;padding:6px 11px;font:inherit;font-size:13px;cursor:pointer}' +
-    '.ng-form{display:flex;gap:8px;padding:10px 14px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(243,238,230,.1)}' +
-    '.ng-form input{flex:1;min-width:0;background:#1D1813;color:#F3EEE6;border:1px solid rgba(243,238,230,.2);border-radius:999px;padding:11px 15px;font:inherit;font-size:15px}' +
-    '.ng-form button{background:#C98A55;color:#1A120B;border:0;border-radius:999px;padding:0 16px;font:inherit;font-weight:800;cursor:pointer}' +
-    '.ng-talk{flex:1;display:none;flex-direction:column;align-items:center;justify-content:flex-start;padding:4px 18px 10px;overflow-y:auto;text-align:center}' +
+    // the site's tokens (app.css), with fallbacks; --acc is the region's colour (Najd: clay brown)
+    '#ng-btn,#ng-panel{--g-paper:var(--paper,#F4EEE4);--g-ink:var(--ink,#16121D);--g-night:var(--night,#0E0B1A);--g-gold:var(--logo-gold,#E3C47A);--g-cream:var(--logo-cream,#F3EADB);' +
+    '--g-acc:var(--acc,#8F5427);--g-rule:var(--rule,rgba(22,18,29,.14));--g-r:var(--r,3px);font-family:var(--f,"IBM Plex Sans Arabic",system-ui,sans-serif)}' +
+    '#ng-btn{position:fixed;z-index:150;inset-inline-start:14px;bottom:calc(var(--nav,62px) + 14px + env(safe-area-inset-bottom,0px));display:none;align-items:center;gap:10px;' +
+    'background:var(--g-night);color:var(--g-cream);border:1px solid rgba(227,196,122,.45);border-radius:var(--g-r);padding:6px 16px 6px 6px;font-weight:700;font-size:14.5px;cursor:pointer;box-shadow:0 10px 26px rgba(14,11,26,.28)}' +
+    'html[dir="rtl"] #ng-btn{padding:6px 6px 6px 16px}#ng-btn:active{transform:translateY(1px)}' +
+    '#ng-btn.show{display:inline-flex}#ng-btn .ng-face{width:40px;height:40px;border-radius:var(--g-r);background:#2A2235;overflow:hidden;flex:none}' +
+    '#ng-btn .ng-face svg,.ng-head .ng-face svg{width:100%;height:100%;transform:scale(1.5) translateY(9%)}' +
+    '#ng-panel{position:fixed;z-index:2147482000;top:0;bottom:0;inset-inline-end:0;width:min(420px,100vw);background:var(--g-paper);color:var(--g-ink);display:flex;flex-direction:column;' +
+    'transform:translateX(105%);transition:transform .32s var(--ease,cubic-bezier(.22,1,.36,1));box-shadow:-14px 0 40px rgba(14,11,26,.25)}' +
+    'html[dir="rtl"] #ng-panel{transform:translateX(-105%)}#ng-panel.open{transform:none!important}#ng-panel *{box-sizing:border-box}' +
+    '.ng-head{display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;background:var(--g-night);color:var(--g-cream);min-height:var(--hdr,56px)}' +
+    '.ng-head .ng-face{width:42px;height:42px;border-radius:var(--g-r);background:#2A2235;overflow:hidden;flex:none;border:1px solid rgba(227,196,122,.35)}' +
+    '.ng-head b{display:block;font-size:16px;font-weight:700}.ng-head small{color:var(--g-gold);font-size:12.5px}' +
+    '.ng-head .ng-x{margin-inline-start:auto;background:transparent;border:1px solid rgba(243,234,219,.24);color:var(--g-cream);border-radius:var(--g-r);width:38px;height:38px;font-size:15px;cursor:pointer}' +
+    '.ng-band{height:10px;background:var(--region-motif-tone,none) var(--g-acc);background-size:auto 10px;opacity:.9}' +
+    '.ng-tabs{display:flex;padding:0 16px;border-bottom:1px solid var(--g-rule)}' +
+    '.ng-tabs button{flex:1;background:transparent;color:var(--g-ink);opacity:.6;border:0;border-bottom:2px solid transparent;padding:13px 4px 11px;font:inherit;font-weight:700;font-size:14.5px;cursor:pointer;margin-bottom:-1px}' +
+    '.ng-tabs button.on{opacity:1;border-bottom-color:var(--g-acc);color:var(--g-acc)}' +
+    '.ng-chat{flex:1;overflow-y:auto;padding:14px 16px 10px;display:flex;flex-direction:column;gap:10px}' +
+    '.ng-msg{max-width:90%;padding:11px 14px;border-radius:var(--g-r);line-height:1.8;font-size:15.5px;white-space:pre-wrap}' +
+    '.ng-msg.bot{background:#FFFDF9;border:1px solid var(--g-rule);border-inline-start:3px solid var(--g-acc);align-self:flex-start}' +
+    '.ng-msg.me{background:var(--g-ink);color:var(--g-paper);align-self:flex-end;font-weight:500}' +
+    '.ng-msg a.ng-try{display:inline-flex;margin-top:10px;background:var(--g-acc);color:var(--g-paper);border-radius:var(--g-r);padding:7px 14px;font-size:13.5px;font-weight:700;text-decoration:none}' +
+    '.ng-chips{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start}.ng-chips button{background:transparent;color:var(--g-acc);border:1px solid var(--g-acc);border-radius:var(--g-r);padding:6px 11px;font:inherit;font-size:13.5px;font-weight:500;cursor:pointer}' +
+    '.ng-chips button:hover{background:var(--g-acc);color:var(--g-paper)}' +
+    '.ng-form{display:flex;gap:8px;padding:10px 16px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--g-rule);background:var(--g-paper)}' +
+    '.ng-form input{flex:1;min-width:0;background:#FFFDF9;color:var(--g-ink);border:1px solid var(--g-rule);border-radius:var(--g-r);padding:12px 14px;font:inherit;font-size:15.5px}' +
+    '.ng-form input:focus{outline:2px solid var(--g-acc);outline-offset:-1px}' +
+    '.ng-form button{background:var(--g-acc);color:var(--g-paper);border:0;border-radius:var(--g-r);padding:0 18px;font:inherit;font-weight:700;cursor:pointer}' +
+    '.ng-talk{flex:1;display:none;flex-direction:column;align-items:center;justify-content:flex-start;padding:16px 18px 10px;overflow-y:auto;text-align:center}' +
     '#ng-panel.talk .ng-talk{display:flex}#ng-panel.talk .ng-chat{display:none}' +
-    '.ng-stage{width:min(250px,62vw);aspect-ratio:240/280;border-radius:22px;background:radial-gradient(circle at 50% 38%,#3A2C1F,#1D1813 70%);border:1px solid rgba(226,174,127,.3);overflow:hidden;flex:none;position:relative}' +
+    '.ng-stage{width:min(240px,60vw);aspect-ratio:240/280;border-radius:var(--g-r);background:radial-gradient(circle at 50% 36%,#3A2E46,var(--g-night) 72%);overflow:hidden;flex:none;position:relative;transition:box-shadow .2s}' +
     '.ng-stage svg{width:100%;height:100%;display:block}' +
     '.ng-man .ng-mouth-o{opacity:0}.ng-man.open .ng-mouth-o{opacity:1}.ng-man.open .ng-mouth-c{opacity:0}' +
     '.ng-man.half .ng-mouth-o{opacity:1;transform:scaleY(.5);transform-box:fill-box;transform-origin:center}.ng-man.half .ng-mouth-c{opacity:0}' +
     '.ng-man .ng-eyes{transform-box:fill-box;transform-origin:center;animation:ngBlink 4.6s infinite}' +
     '@keyframes ngBlink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.08)}}' +
-    '.ng-stage.speaking{box-shadow:0 0 0 4px rgba(201,138,85,.25)}.ng-stage.listening{box-shadow:0 0 0 4px rgba(126,224,138,.35)}' +
-    '.ng-said{min-height:1.6em;margin:12px 0 4px;color:rgba(243,238,230,.65);font-size:14px}.ng-reply{font-size:16.5px;line-height:1.8;margin:2px 0 10px;font-weight:600}' +
-    '.ng-mic{width:76px;height:76px;border-radius:50%;border:0;background:#C98A55;color:#1A120B;font-size:30px;cursor:pointer;flex:none;box-shadow:0 8px 24px rgba(0,0,0,.4)}' +
-    '.ng-mic.on{background:#7EE08A;animation:ngPulse 1.2s infinite}@keyframes ngPulse{50%{box-shadow:0 0 0 12px rgba(126,224,138,0)}}' +
-    '.ng-hint{color:rgba(243,238,230,.55);font-size:13px;margin-top:8px}' +
-    '#ng-panel.talk .ng-form{display:flex}';
+    '.ng-stage.speaking{box-shadow:0 0 0 3px var(--g-gold)}.ng-stage.listening{box-shadow:0 0 0 3px #3E8E5A}' +
+    '.ng-said{min-height:1.6em;margin:14px 0 4px;color:rgba(22,18,29,.6);font-size:14px}' +
+    '.ng-reply{font-size:16.5px;line-height:1.85;margin:2px 0 14px;font-weight:500;background:#FFFDF9;border:1px solid var(--g-rule);border-inline-start:3px solid var(--g-acc);border-radius:var(--g-r);padding:12px 14px;text-align:start;width:100%}' +
+    '.ng-reply:empty{display:none}' +
+    '.ng-mic{width:72px;height:72px;border-radius:50%;border:0;background:var(--g-acc);color:var(--g-paper);cursor:pointer;flex:none;display:grid;place-items:center;box-shadow:0 8px 22px rgba(143,84,39,.35)}' +
+    '.ng-mic svg{width:30px;height:30px}.ng-mic.on{background:#3E8E5A;animation:ngPulse 1.2s infinite}@keyframes ngPulse{50%{box-shadow:0 0 0 12px rgba(62,142,90,0)}}' +
+    '.ng-hint{color:rgba(22,18,29,.55);font-size:13px;margin-top:10px;line-height:1.6}';
 
   var PANEL = '<div class="ng-head"><span class="ng-face">' + MANsvg() + '</span><div><b id="ng-title"></b><small id="ng-sub"></small></div>' +
     '<button class="ng-x" id="ng-x" type="button" aria-label="Close">✕</button></div>' +
-    '<div class="ng-tabs"><button type="button" id="ng-t-chat" class="on"></button><button type="button" id="ng-t-talk"></button></div>' +
+    '<div class="ng-band" aria-hidden="true"></div><div class="ng-tabs"><button type="button" id="ng-t-chat" class="on"></button><button type="button" id="ng-t-talk"></button></div>' +
     '<div class="ng-chat" id="ng-chat" aria-live="polite"></div>' +
     '<div class="ng-talk"><div class="ng-stage" id="ng-stage">' + MANsvg() + '</div>' +
     '<div class="ng-said" id="ng-said"></div><div class="ng-reply" id="ng-reply"></div>' +
-    '<button class="ng-mic" id="ng-mic" type="button" aria-label="Talk">🎙</button><div class="ng-hint" id="ng-hint"></div></div>' +
+    '<button class="ng-mic" id="ng-mic" type="button" aria-label="Talk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><div class="ng-hint" id="ng-hint"></div></div>' +
     '<form class="ng-form" id="ng-form"><input id="ng-in" autocomplete="off"><button type="submit" id="ng-send"></button></form>';
 
   var TXT = {
     btn: { ar: 'اسأل دليل نجد', en: 'Ask about Najd' },
     title: { ar: 'دليلك في نجد', en: 'Your Najd guide' },
     sub: { ar: 'سم، أنا بالخدمة', en: 'Ask me about its history, people and food' },
-    chat: { ar: '💬 اكتب له', en: '💬 Chat' },
-    talk: { ar: '🗣 كلّمه', en: '🗣 Talk to him' },
+    chat: { ar: 'اكتب له', en: 'Chat' },
+    talk: { ar: 'كلّمه بصوتك', en: 'Talk to him' },
     ph: { ar: 'سم، وش تبي تعرف عن نجد؟', en: 'Ask anything about Najd…' },
     send: { ar: 'إرسال', en: 'Send' },
     hello: { ar: 'هلا والله وغلا، وحيّاك الله في نجد! أنا دليلك فيها وبالخدمة. سم، وش تبي تعرف؟ اسألني عن تاريخها، أكلها، قهوتها، فنونها، أو قل لي وين تبي تروح.', en: 'Welcome to Najd! I am your guide here. Ask me about its history, food, coffee, folk arts, or where to go.' },
     tapMic: { ar: 'اضغط الميكروفون وتكلّم، أو اكتب تحت', en: 'Tap the microphone and speak, or type below' },
     listening: { ar: 'أسمعك… تكلّم', en: 'Listening… go ahead' },
     noMic: { ar: 'متصفحك ما يدعم الكلام. اكتب سؤالك تحت ويرد عليك بصوته.', en: 'Your browser does not support speech input. Type your question below and he will answer out loud.' },
+    noVoice: { ar: 'جهازك ما فيه صوت عربي للقراءة، فالرد مكتوب فوق. (على الآيفون والماك وكروم أندرويد الصوت العربي موجود عادة)', en: 'Your device has no voice for this language, so the answer is written above.' },
     micDenied: { ar: 'ما قدرت أسمعك. اسمح للمتصفح يستخدم الميكروفون، أو اكتب سؤالك تحت.', en: 'I could not hear you. Allow microphone access, or type your question below.' },
     you: { ar: 'سألت: ', en: 'You asked: ' },
     tryIt: { ar: 'جرّبها بنفسك ←', en: 'Try it yourself →' }
@@ -379,7 +466,7 @@
     var html = esc(reply);
     if (r.e && r.e.page) html += '<br><a class="ng-try" href="' + r.e.page + '">' + L(TXT.tryIt) + '</a>';
     bubble('bot', html);
-    if (r.starters) chips(STARTERS); else if (r.e && r.e.rel) chips(r.e.rel);
+    if (r.near) chips(r.near); else if (r.starters) chips(STARTERS); else if (r.e && r.e.rel) chips(r.e.rel);
     if (mode === 'talk') {
       $('#ng-said', panel).textContent = L(TXT.you) + text;
       $('#ng-reply', panel).textContent = reply;
@@ -391,12 +478,38 @@
   // VOICE — he speaks (speech synthesis, mouth moves) and listens (speech recognition)
   // ════════════════════════════════════════════════════════════
   var flap = 0;
+  // voices ranked best first: natural (neural) voices, then Google's, then Apple's, then any Saudi or Arabic voice.
+  // A non-Arabic voice is never used for Arabic: it only garbles the words.
   function pickVoice() {
     if (!('speechSynthesis' in window)) return null;
-    var vs = speechSynthesis.getVoices(), want = isAr() ? 'ar' : 'en';
-    var mine = vs.filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf(want) === 0; });
-    var male = /maged|naayf|tarik|hamed|fahed|majed|male|daniel|alex|fred|guy|david/i;
-    return mine.filter(function (v) { return male.test(v.name); })[0] || mine.filter(function (v) { return /sa/i.test(v.lang); })[0] || mine[0] || null;
+    var vs = speechSynthesis.getVoices(), ar = isAr();
+    var mine = vs.filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf(ar ? 'ar' : 'en') === 0; });
+    if (!mine.length) return null;
+    var rank = ar
+      ? [/hamed.*natural|natural.*hamed/i, /(online|natural).*(sa|saudi)/i, /natural|online|neural/i, /google/i, /maged|majed/i, /naayf|tarik|shakir/i, /ar[-_]sa/i]
+      : [/natural|online|neural/i, /google us english|google uk english male/i, /daniel|alex|fred|guy|david/i];
+    for (var i = 0; i < rank.length; i++) {
+      var hit = mine.filter(function (v) { return rank[i].test(v.name + ' ' + v.lang); })[0];
+      if (hit) return hit;
+    }
+    return mine[0];
+  }
+  // text as it should be heard: no quotes or brackets, digits the voice can read, years said in full
+  function forSpeech(t) {
+    return String(t)
+      .replace(/[٠-٩]/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'.indexOf(d); })
+      .replace(/(\d+)م\b/g, '$1 ميلادي').replace(/(\d+)هـ/g, '$1 هجري').replace(/(\d+)\s*كم/g, '$1 كيلو')
+      .replace(/[«»"()\[\]←→…]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  // short sentences sound more natural and do not get cut off by the browser
+  function sentences(t) {
+    var out = [];
+    t.split(/(?<=[.!؟?:])\s+/).forEach(function (s) {
+      if (s.length <= 140) { if (s.trim()) out.push(s.trim()); return; }
+      var cur = ''; s.split(/(?<=،|,)\s*/).forEach(function (p) { if ((cur + ' ' + p).length > 140 && cur) { out.push(cur.trim()); cur = p; } else cur += (cur ? ' ' : '') + p; });
+      if (cur.trim()) out.push(cur.trim());
+    });
+    return out;
   }
   function mouth(on) {
     clearInterval(flap); man.classList.remove('open', 'half');
@@ -407,20 +520,33 @@
       if (r > 0.55) man.classList.add('open'); else if (r > 0.2) man.classList.add('half');
     }, 120);
   }
+  var talkId = 0;
   function speak(text) {
     stopListen();
-    if (!('speechSynthesis' in window)) { mouth(true); setTimeout(function () { mouth(false); }, Math.min(9000, 600 + text.length * 55)); return; }
+    var my = ++talkId;
+    var v = pickVoice();
+    if (!('speechSynthesis' in window) || !v) {
+      // no voice for this language on the device: show it, move the mouth, and say so once
+      if (!S_noVoiceSaid) { S_noVoiceSaid = true; $('#ng-hint', panel).textContent = L(TXT.noVoice); }
+      mouth(true); setTimeout(function () { if (my === talkId) mouth(false); }, Math.min(9000, 600 + text.length * 50)); return;
+    }
     try {
       speechSynthesis.cancel();
-      var u = new SpeechSynthesisUtterance(text), v = pickVoice();
-      if (v) u.voice = v; u.lang = v ? v.lang : (isAr() ? 'ar-SA' : 'en-US'); u.rate = 0.95; u.pitch = 0.9;
-      var guard = setTimeout(function () { mouth(false); }, Math.min(30000, 1500 + text.length * 90));
-      u.onstart = function () { mouth(true); };
-      u.onend = u.onerror = function () { clearTimeout(guard); mouth(false); };
-      mouth(true); speechSynthesis.speak(u);
+      var parts = sentences(forSpeech(text)), i = 0;
+      var next = function () {
+        if (my !== talkId) return;
+        if (i >= parts.length) { mouth(false); return; }
+        var u = new SpeechSynthesisUtterance(parts[i++]);
+        u.voice = v; u.lang = v.lang; u.rate = isAr() ? 0.9 : 0.95; u.pitch = 1;
+        var guard = setTimeout(next, Math.min(20000, 1200 + u.text.length * 95));
+        u.onend = u.onerror = function () { clearTimeout(guard); next(); };
+        speechSynthesis.speak(u);
+      };
+      mouth(true); next();
     } catch (e) { mouth(false); }
   }
-  function hush() { try { speechSynthesis.cancel(); } catch (e) {} mouth(false); }
+  var S_noVoiceSaid = false;
+  function hush() { talkId++; try { speechSynthesis.cancel(); } catch (e) {} mouth(false); }
 
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition, rec = null, listening = false;
   function stopListen() { if (rec && listening) { try { rec.stop(); } catch (e) {} } listening = false; $('#ng-mic', panel).classList.remove('on'); stage.classList.remove('listening'); }
