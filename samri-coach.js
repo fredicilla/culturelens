@@ -1,5 +1,5 @@
 /**
- * samri-coach.js — «الراوي», an AI coach for the Samri.
+ * samri-coach.js — «مدرّبك في السامري», an AI coach for the Samri.
  *
  * The phone's camera watches the player's upper body with a pose-estimation model (MediaPipe Pose
  * Landmarker, running in the browser; no video leaves the phone). While the real Samri drums play
@@ -110,9 +110,9 @@ const L = (o) => (o == null ? '' : typeof o === 'string' ? o : isAr() ? o.ar : o
 const num = (n) => (isAr() ? String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]) : String(n));
 
 const T = {
-  who: { en: 'Al-Rawi · your Samri coach', ar: 'الراوي · مدرّبك في السامري' },
+  who: { en: 'I am your Samri coach', ar: 'أنا مدرّبك في السامري' },
   introH: { en: 'Try the Samri yourself', ar: 'جرّب السامري بنفسك' },
-  introP: { en: 'The Samri is performed seated, in two facing rows. Al-Rawi watches you through the front camera and coaches you live: he gives you each move and tells you whether your technique is right.', ar: 'السامري يُؤدّى جلوسًا في صفّين متقابلين. الراوي يتابعك من الكاميرا الأمامية ويدرّبك مباشرة: يعطيك الحركة، ويقولك إذا طريقتك صحيحة أو تحتاج تعديل.' },
+  introP: { en: 'The Samri is performed seated, in two facing rows. I am your Samri coach: I watch you through the front camera and coach you live, giving you each move and telling you whether your technique is right.', ar: 'السامري يُؤدّى جلوسًا في صفّين متقابلين. أنا مدرّبك في السامري: أتابعك من الكاميرا الأمامية وأدرّبك مباشرة، أعطيك الحركة وأقولك إذا طريقتك صحيحة أو تحتاج تعديل.' },
   introL: [
     { en: '1 · Clap with the drum', ar: '١ · صفّق مع الطار' },
     { en: '2 · Sway right and left', ar: '٢ · تمايل يمين ويسار' },
@@ -167,7 +167,7 @@ const T = {
     early: { en: 'You are clapping before the stroke. Listen for it, and clap with it, not ahead of it.', ar: 'تصفّق قبل الضربة. اسمعها أول، وصفّق معها مو قبلها.' },
     late: { en: 'You are a little behind. Get your hands ready just before the stroke.', ar: 'متأخر شوي. جهّز يدينك قبل الضربة بلحظة.' },
     miss: { en: 'I did not see a clap. Bring your hands together in front of your chest, then open them between strokes.', ar: 'ما شفت تصفيق. قرّب يدينك قدّام صدرك، وافتحها بين الضربات.' },
-    small: { en: 'Lean your whole upper body, so your head goes over your neighbour\'s shoulder.', ar: 'مِل بجسمك كله، كأن راسك يروح فوق كتف جارك.' },
+    small: { en: 'Lean your whole upper body, so your head goes over your neighbour\'s shoulder.', ar: 'مِل بكتوفك وراسك كلها، كأن راسك يروح فوق كتف جارك.' },
     wrong: { en: 'Your right is the arrow\'s side. The screen works like a mirror.', ar: 'يمينك هي جهة السهم. الشاشة مثل المراية.' },
     easier: { en: 'I am making it a little easier for you: I will accept a bit more off the beat.', ar: 'بسهّلها عليك شوي: بقبل لو كنت بعيد عن الضربة شوي.' }
   },
