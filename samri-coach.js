@@ -48,7 +48,7 @@ const CSS = `
   .sc-who { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #E3C47A; font-weight: 700; margin-bottom: 6px; }
   .sc-who .dot { width: 8px; height: 8px; border-radius: 50%; background: #7EE08A; box-shadow: 0 0 0 0 rgba(126,224,138,.6); animation: scPulse 1.6s infinite; }
   @keyframes scPulse { 70% { box-shadow: 0 0 0 8px rgba(126,224,138,0); } 100% { box-shadow: 0 0 0 0 rgba(126,224,138,0); } }
-  .sc-msg { font-size: 17px; line-height: 1.6; min-height: 1.6em; }
+  .sc-msg { font-size: 19px; line-height: 1.7; min-height: 1.7em; font-weight: 600; }
   .sc-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
   .sc-steps { display: flex; gap: 6px; } .sc-steps i { width: 26px; height: 6px; border-radius: 3px; background: rgba(243,238,230,.18); }
   .sc-steps i.on { background: #E3C47A; } .sc-steps i.done { background: #7EE08A; }
@@ -234,7 +234,7 @@ let judgeTimer = 0;
 function judge(o, kind, quiet) {
   const el = $('#sc-judge'); el.textContent = L(o); el.className = 'sc-judge show ' + kind;
   if (!quiet) say(o);
-  clearTimeout(judgeTimer); judgeTimer = setTimeout(() => el.classList.remove('show'), 2000);
+  clearTimeout(judgeTimer); judgeTimer = setTimeout(() => el.classList.remove('show'), 3500);
 }
 function ringHit() { const r = $('#sc-ring'); r.classList.remove('hit'); void r.offsetWidth; r.classList.add('hit'); }
 function side(s) { $('#sc-side-r').classList.toggle('on', s === 'R'); $('#sc-side-l').classList.toggle('on', s === 'L'); }
@@ -393,7 +393,7 @@ function startLesson() {
   $('#sc-ring').hidden = false; $('#sc-count').textContent = '';
   progressRow();
   say(T.play.say);
-  const wait = Math.min(9, 1.2 + L(T.play.say).length * 0.06);
+  const wait = Math.min(14, 2.5 + L(T.play.say).length * 0.085);   // time to hear it and read it
   setTimeout(() => { if (S.phase === 'intro-say') nextStep(); }, wait * 1000);
 }
 function nextStep() {
@@ -422,7 +422,7 @@ function finish() {
 }
 function miss(o) {
   const now = performance.now();
-  if (now - S.lastJudge < 1400) return;       // one correction at a time
+  if (now - S.lastJudge < 3000) return;       // one correction at a time
   S.lastJudge = now; if (!S.stepMiss) { S.stepMiss = true; S.mistakes++; }
   judge(o, 'bad');
 }
@@ -444,7 +444,7 @@ function follow(clapped) {
       S.phase = 'pause'; S.lastJudge = now; $('#sc-ring').classList.remove('lean'); ringHit();
       judge(T.good[S.step % T.good.length], 'ok');
       S.step++; progressRow();
-      setTimeout(() => { if (S.phase === 'pause') nextStep(); }, 1500);
+      setTimeout(() => { if (S.phase === 'pause') nextStep(); }, 3000);
     } else if (v <= -LEAN_OK * 0.8) miss({ en: T.wrongSide.en[t], ar: T.wrongSide.ar[t] });
     else if (v >= LEAN_SMALL) miss(T.smallLean);
     else miss(T.noLean);
@@ -452,8 +452,8 @@ function follow(clapped) {
   }
   if (S.clapAt) return;                         // waiting a moment to judge the clap
   if (S.oppN === 15) miss({ en: T.wrongSide.en[t], ar: T.wrongSide.ar[t] });   // half a second on the wrong side
-  if (leaning && !S.hinted && S.holdN > 75) { S.hinted = true; say(T.nowClap); }   // leaning well for 2.5 s, no clap yet
-  if (!S.repeated && now - S.stepAt > 8000 && now - S.lastJudge > 3000) { S.repeated = true; say(T.step[t]); }
+  if (leaning && !S.hinted && S.holdN > 90) { S.hinted = true; say(T.nowClap); }   // leaning well for 2.5 s, no clap yet
+  if (!S.repeated && now - S.stepAt > 12000 && now - S.lastJudge > 5000) { S.repeated = true; say(T.step[t]); }
 }
 
 // ── the frame loop ──
@@ -473,14 +473,14 @@ function loop() {
         S.okN = 0; S.calibN = 0; S.calibSum = 0;
         const msg = !bd ? T.notSeen : standing ? T.standing : T.noHands;
         if (S.phase === 'calib') { S.phase = 'setup'; }
-        if (S._lastMsg !== msg && now - S.lastWarn > 2600) { say(msg); S._lastMsg = msg; S.lastWarn = now; }
+        if (S._lastMsg !== msg && now - S.lastWarn > 4000) { say(msg); S._lastMsg = msg; S.lastWarn = now; }
         return;
       }
-      if (S.phase === 'setup') { if (++S.okN > 20) { S.phase = 'calib'; S._lastMsg = T.calib; say(T.calib); } return; }
+      if (S.phase === 'setup') { if (++S.okN > 20 && now - S.lastWarn > 4500) { S.phase = 'calib'; S._lastMsg = T.calib; S.calibAt = now; say(T.calib); } return; }
       S.calibSum += bd.lean; S.calibN++;
-      if (S.calibN > 45) {
+      if (S.calibN > 45 && now - (S.calibAt || 0) > 3500) {
         S.base = S.calibSum / S.calibN; S.phase = 'ready'; guide(false); say(T.ready);
-        setTimeout(() => { if (S.phase === 'ready') startLesson(); }, 1800);
+        setTimeout(() => { if (S.phase === 'ready') startLesson(); }, 3000);
       }
       return;
     }
