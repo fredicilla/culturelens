@@ -476,6 +476,10 @@
   document.addEventListener('languageChanged', function () { labels(); });
   if ('speechSynthesis' in window) { try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = function () {}; } catch (e) {} }
   labels(); refresh();
-  if (/[?&]guide=1/.test(location.search)) setTimeout(function () { if (inNajd()) open(); }, 900);
+  // a direct link (?guide=1) goes straight to Najd with the guide open, e.g. to share it for testing
+  if (/[?&]guide=1/.test(location.search)) setTimeout(function () {
+    if (!inNajd() && window.ThemeManager && window.ThemeManager.selectRegion) window.ThemeManager.selectRegion('najd');
+    setTimeout(function () { if (inNajd()) { open(); if (/[?&]talk=1/.test(location.search)) setMode('talk'); } }, 300);
+  }, 700);
   window.__najdGuide = { open: open, close: close, ask: ask, answer: answer, setMode: setMode, KB: KB };
 })();
