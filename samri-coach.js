@@ -399,7 +399,7 @@ function startLesson() {
 function nextStep() {
   if (S.step >= PLAN.length) return finish();
   const t = PLAN[S.step];
-  S.phase = 'lesson'; S.stepAt = performance.now(); S.clapAt = 0; S.leanOkAt = 0; S.holdN = 0; S.oppN = 0; S.stepMiss = false; S.hinted = false; S.repeated = false;
+  S.phase = 'lesson'; S.stepAt = performance.now(); S.crossing = S.step > 0; S.clapAt = 0; S.leanOkAt = 0; S.holdN = 0; S.oppN = 0; S.stepMiss = false; S.hinted = false; S.repeated = false;
   side(t); $('#sc-count').textContent = t === 'R' ? L(T.right) : L(T.left);
   progressRow(); say(T.step[t]);
 }
@@ -430,7 +430,10 @@ function miss(o) {
 function follow(clapped) {
   if (S.phase !== 'lesson') return;
   const t = PLAN[S.step], sign = t === 'R' ? 1 : -1, v = S.leanS * sign, now = performance.now();
-  if (v >= LEAN_OK) { S.holdN++; S.oppN = 0; } else if (v <= -LEAN_OK) { S.oppN++; S.holdN = 0; } else { S.holdN = 0; S.oppN = 0; }
+  // moving across from the last side takes a moment: until the player has passed the middle (or 3 s have gone by),
+  // still leaning the old way is not a mistake
+  if (S.crossing && (Math.abs(S.leanS) < LEAN_OK * 0.6 || now - S.stepAt > 3000)) S.crossing = false;
+  if (v >= LEAN_OK) { S.holdN++; S.oppN = 0; } else if (v <= -LEAN_OK) { if (!S.crossing) S.oppN++; S.holdN = 0; } else { S.holdN = 0; S.oppN = 0; }
   const leaning = S.holdN >= 5;                // held for a moment, not a passing wobble
   if (leaning && S.stepMiss && S.holdN === 5) $('#sc-msg').textContent = L(T.nowClap);   // corrected: show the next thing to do
   if (leaning) S.leanOkAt = now;
@@ -445,13 +448,14 @@ function follow(clapped) {
       judge(T.good[S.step % T.good.length], 'ok');
       S.step++; progressRow();
       setTimeout(() => { if (S.phase === 'pause') nextStep(); }, 3000);
-    } else if (v <= -LEAN_OK * 0.8) miss({ en: T.wrongSide.en[t], ar: T.wrongSide.ar[t] });
+    } else if (S.crossing || now - S.stepAt < 1200) { /* still on the way over: not judged */ }
+    else if (v <= -LEAN_OK * 0.8) miss({ en: T.wrongSide.en[t], ar: T.wrongSide.ar[t] });
     else if (v >= LEAN_SMALL) miss(T.smallLean);
     else miss(T.noLean);
     return;
   }
   if (S.clapAt) return;                         // waiting a moment to judge the clap
-  if (S.oppN === 15) miss({ en: T.wrongSide.en[t], ar: T.wrongSide.ar[t] });   // half a second on the wrong side
+  if (S.oppN === 30) miss({ en: T.wrongSide.en[t], ar: T.wrongSide.ar[t] });   // half a second on the wrong side
   if (leaning && !S.hinted && S.holdN > 90) { S.hinted = true; say(T.nowClap); }   // leaning well for 2.5 s, no clap yet
   if (!S.repeated && now - S.stepAt > 12000 && now - S.lastJudge > 5000) { S.repeated = true; say(T.step[t]); }
 }
@@ -509,11 +513,12 @@ function simPose() {
   // leans the asked way after a second (a quarter of the time the wrong way first), then claps
   const now = performance.now(), t = S.phase === 'lesson' ? PLAN[S.step] : null, dt = (now - S.stepAt) / 1000;
   S._simWrong = S._simWrong || {};
-  if (t && S._simWrong[S.step] == null) S._simWrong[S.step] = Math.random() < 0.25;
+  if (t && S._simWrong[S.step] == null) S._simWrong[S.step] = !window.__simClean && Math.random() < 0.25;
   let lean = 0, hands = 1.2;
   if (t) {
     const sgn = t === 'R' ? 1 : -1, wrongFirst = S._simWrong[S.step];
     if (wrongFirst && dt > 0.8 && dt < 1.9) lean = -sgn * 0.3;
+    if (S.step > 0 && dt < 1.6) lean = -sgn * 0.3 * Math.min(1, (1.6 - dt) / 0.8);   // still leaning from the last move
     const go = wrongFirst ? 2.4 : 1.0;
     if (dt > go) lean = sgn * Math.min(0.3, (dt - go) * 0.8);
     const clapAt = go + 1.0;
