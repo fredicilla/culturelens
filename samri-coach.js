@@ -10,7 +10,7 @@
  * It decides when a lesson is learned (enough good moves in a row), gives a targeted tip when the
  * same mistake repeats (early, late, too small a lean, the wrong side) and, if the player keeps
  * struggling, widens its own tolerance and says so.
- * It opens from a button in part 3 of the Samri page («جرّب بجسمك»). Add ?sim=1 to the address to run it
+ * It opens from a button in part 3 of the Samri page («جرّب السامري بنفسك»). Add ?sim=1 to the address to run it
  * with a simulated player instead of the camera (for testing).
  */
 import { Music } from './samri-music.js';
@@ -101,7 +101,7 @@ const num = (n) => (isAr() ? String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨
 
 const T = {
   who: { en: 'Al-Rawi · your Samri coach', ar: 'الراوي · مدرّبك في السامري' },
-  introH: { en: 'Try the Samri with your body', ar: 'جرّب السامري بجسمك' },
+  introH: { en: 'Try the Samri yourself', ar: 'جرّب السامري بنفسك' },
   introP: { en: 'Al-Rawi watches you through the front camera and coaches you live: he tells you each move and whether you got it right.', ar: 'الراوي يشوفك من الكاميرا الأمامية ويدرّبك مباشرة: يقولك الحركة، ويقولك إذا طريقتك صحيحة أو لا.' },
   introL: [
     { en: '1 · Clap with the drum', ar: '١ · صفّق مع الطار' },
@@ -160,7 +160,7 @@ const T = {
   again: { en: 'Play again', ar: 'العب مرة ثانية' },
   back: { en: 'Back to the Samri', ar: 'رجوع للسامري' },
   skip: { en: 'Skip', ar: 'تخطّي' },
-  entry: { en: 'Try it with your body', ar: 'جرّب بجسمك' }
+  entry: { en: 'Try the Samri yourself', ar: 'جرّب السامري بنفسك' }
 };
 
 // ── state ──
