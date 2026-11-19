@@ -10,9 +10,84 @@
  * It decides when a lesson is learned (enough good moves in a row), gives a targeted tip when the
  * same mistake repeats (early, late, too small a lean, the wrong side) and, if the player keeps
  * struggling, widens its own tolerance and says so.
- * Add ?sim=1 to the address to run it with a simulated player (for testing without a camera).
+ * It opens from a button in part 3 of the Samri page («جرّب بجسمك»). Add ?sim=1 to the address to run it
+ * with a simulated player instead of the camera (for testing).
  */
 import { Music } from './samri-music.js';
+
+// ── the coach lives in an overlay on top of the Samri page; this builds it ──
+const CSS = `
+  #sc-ov [hidden] { display: none !important; }
+  #sc-ov { position: fixed; inset: 0; z-index: 2147483000; background: #070A16; color: #F3EEE6; overflow: hidden; display: none; font-family: var(--font-ui, 'IBM Plex Sans Arabic', system-ui, sans-serif); }
+  #sc-ov.open { display: block; }
+  #sc-ov * { box-sizing: border-box; }
+  .sc-top { position: absolute; top: 0; left: 0; right: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px; background: linear-gradient(#070A16, rgba(7,10,22,0)); }
+  .sc-top a, .sc-top button { color: #F3EEE6; background: rgba(243,238,230,.08); border: 1px solid rgba(243,238,230,.18); border-radius: 999px;
+    padding: 8px 14px; font: inherit; font-size: 14px; text-decoration: none; cursor: pointer; }
+  .sc-title { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+  .sc-title i { font-style: normal; font-size: 11px; color: #070A16; background: #E3C47A; border-radius: 999px; padding: 2px 8px; font-weight: 700; }
+  .sc-stage { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #070A16; }
+  .sc-stage video, .sc-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+  .sc-stage video { opacity: .55; filter: saturate(.7); }
+  .sc-ring { position: absolute; z-index: 10; left: 50%; top: 46%; width: 150px; height: 150px; margin: -75px 0 0 -75px; border-radius: 50%;
+    border: 3px solid rgba(227,196,122,.35); display: flex; align-items: center; justify-content: center; pointer-events: none; }
+  .sc-ring b { width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle, rgba(227,196,122,.55), rgba(227,196,122,0) 70%); opacity: 0; }
+  .sc-ring.hit b { animation: scHit .45s ease-out; }
+  @keyframes scHit { from { opacity: 1; transform: scale(.7); } to { opacity: 0; transform: scale(1.25); } }
+  .sc-ring span { position: absolute; font-size: 28px; font-weight: 700; color: #E3C47A; }
+  .sc-side { position: absolute; z-index: 10; top: 46%; transform: translateY(-50%); font-size: 64px; color: #E3C47A; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .sc-side.r { right: 6%; } .sc-side.l { left: 6%; } .sc-side.on { opacity: 1; }
+  .sc-judge { position: absolute; z-index: 12; left: 0; right: 0; top: 16%; text-align: center; font-size: 34px; font-weight: 800; opacity: 0;
+    transition: opacity .15s; pointer-events: none; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
+  .sc-judge.show { opacity: 1; } .sc-judge.ok { color: #7EE08A; } .sc-judge.near { color: #E3C47A; } .sc-judge.bad { color: #FF8A7A; }
+  .sc-coach { position: absolute; z-index: 15; left: 12px; right: 12px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); max-width: 620px; margin: 0 auto;
+    background: rgba(14,11,26,.9); border: 1px solid rgba(227,196,122,.45); border-radius: 18px; padding: 14px 16px; backdrop-filter: blur(6px); }
+  .sc-who { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #E3C47A; font-weight: 700; margin-bottom: 6px; }
+  .sc-who .dot { width: 8px; height: 8px; border-radius: 50%; background: #7EE08A; box-shadow: 0 0 0 0 rgba(126,224,138,.6); animation: scPulse 1.6s infinite; }
+  @keyframes scPulse { 70% { box-shadow: 0 0 0 8px rgba(126,224,138,0); } 100% { box-shadow: 0 0 0 0 rgba(126,224,138,0); } }
+  .sc-msg { font-size: 17px; line-height: 1.6; min-height: 1.6em; }
+  .sc-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .sc-steps { display: flex; gap: 6px; } .sc-steps i { width: 26px; height: 6px; border-radius: 3px; background: rgba(243,238,230,.18); }
+  .sc-steps i.on { background: #E3C47A; } .sc-steps i.done { background: #7EE08A; }
+  .sc-score { font-size: 14px; color: rgba(243,238,230,.7); }
+  .sc-btn { background: #E3C47A; color: #16121D; border: 0; border-radius: 999px; padding: 11px 22px; font: inherit; font-weight: 700; font-size: 16px; cursor: pointer; }
+  .sc-btn.ghost { background: transparent; color: #F3EEE6; border: 1px solid rgba(243,238,230,.3); }
+  .sc-stars { font-size: 34px; letter-spacing: 4px; color: #E3C47A; text-align: center; margin: 4px 0 2px; }
+  .sc-stars .off { color: rgba(243,238,230,.2); }
+  .sc-intro { position: absolute; inset: 0; z-index: 14; display: flex; align-items: center; justify-content: center; padding: 90px 20px 210px; text-align: center; }
+  .sc-intro h1 { font-size: 30px; margin: 0 0 10px; } .sc-intro p { color: rgba(243,238,230,.75); line-height: 1.7; max-width: 520px; margin: 0 auto; font-size: 16px; }
+  .sc-intro ul { list-style: none; padding: 0; margin: 16px auto 0; max-width: 460px; text-align: start; font-size: 15px; line-height: 1.9; color: rgba(243,238,230,.85); }
+  html[dir="rtl"] #sc-ov .sc-intro ul { text-align: right; }
+  .sc-loading { position: absolute; z-index: 16; left: 50%; top: 46%; transform: translate(-50%,-50%); font-size: 15px; color: rgba(243,238,230,.8); display: none; }
+  .sc-loading.on { display: block; }
+
+  #sc-entry { position: fixed; z-index: 60; left: 50%; transform: translateX(-50%); bottom: calc(var(--qx-bar, 64px) + env(safe-area-inset-bottom, 0px) + 18px);
+    display: none; align-items: center; gap: 8px; background: #E3C47A; color: #16121D; border: 0; border-radius: 999px; padding: 11px 20px;
+    font: inherit; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,.35); white-space: nowrap; }
+  #sc-entry.show { display: inline-flex; }
+  #sc-entry i { font-style: normal; font-size: 11px; background: #16121D; color: #E3C47A; border-radius: 999px; padding: 2px 7px; }
+`;
+const MARKUP = `<div class="sc-stage" id="sc-stage"><video id="sc-video" playsinline muted></video><canvas id="sc-canvas"></canvas></div>
+  <header class="sc-top">
+    <button type="button" id="sc-close" aria-label="Close">✕</button>
+    <div class="sc-title"><span class="translatable" data-en="Samri Coach" data-ar="مدرّب السامري">Samri Coach</span><i>AI</i></div>
+    <button id="sc-lang" type="button"></button>
+  </header>
+  <div class="sc-intro" id="sc-intro"></div>
+  <div class="sc-ring" id="sc-ring" hidden><b></b><span id="sc-count"></span></div>
+  <div class="sc-side r" id="sc-side-r">⟶</div><div class="sc-side l" id="sc-side-l">⟵</div>
+  <div class="sc-judge" id="sc-judge"></div>
+  <div class="sc-loading" id="sc-loading"></div>
+  <section class="sc-coach" id="sc-coach">
+    <div class="sc-who"><span class="dot"></span><span id="sc-who"></span></div>
+    <div class="sc-msg" id="sc-msg" aria-live="polite"></div>
+    <div class="sc-row" id="sc-row"></div>
+  </section>`;
+const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
+const ov = document.createElement('div'); ov.id = 'sc-ov'; ov.setAttribute('role', 'dialog'); ov.innerHTML = MARKUP; document.body.appendChild(ov);
+const entry = document.createElement('button'); entry.id = 'sc-entry'; entry.type = 'button'; document.body.appendChild(entry);
+
 
 const MP = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
 const MODEL = 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task';
@@ -84,7 +159,8 @@ const T = {
   score: { en: 'Your Samri', ar: 'نتيجتك' },
   again: { en: 'Play again', ar: 'العب مرة ثانية' },
   back: { en: 'Back to the Samri', ar: 'رجوع للسامري' },
-  skip: { en: 'Skip', ar: 'تخطّي' }
+  skip: { en: 'Skip', ar: 'تخطّي' },
+  entry: { en: 'Try it with your body', ar: 'جرّب بجسمك' }
 };
 
 // ── state ──
@@ -246,7 +322,8 @@ function finish() {
   say(T.lessons.full.done);
   row('<div style="width:100%"><div class="sc-stars">' + [0, 1, 2].map((i) => '<span class="' + (i < stars ? '' : 'off') + '">★</span>').join('') +
     '</div><div class="sc-row" style="justify-content:center"><button class="sc-btn" id="sc-again">' + L(T.again) +
-    '</button><a class="sc-btn ghost" href="samri.html#play" style="text-decoration:none">' + L(T.back) + '</a></div></div>');
+    '</button><button class="sc-btn ghost" id="sc-back">' + L(T.back) + '</button></div></div>');
+  $('#sc-back').onclick = close;
   $('#sc-again').onclick = () => startLesson(0);
 }
 
@@ -398,9 +475,38 @@ function simPose() {
 }
 
 // ── start ──
+// open and close the coach over the Samri page; the page's own sound pauses while the coach runs
+function mainCtx() { const m = window.__sm && window.__sm.music; return m && m.ctx ? m.ctx : null; }
+function labels() {
+  entry.innerHTML = '<span>' + L(T.entry) + '</span><i>AI</i>';
+  $('#sc-lang').textContent = isAr() ? 'English' : 'العربية';
+}
+function open() {
+  ov.classList.add('open'); entry.classList.remove('show');
+  const c = mainCtx(); S._mainWasRunning = !!(c && c.state === 'running'); if (c) { try { c.suspend(); } catch (e) {} }
+  labels(); showIntro();
+}
+function close() {
+  cancelAnimationFrame(raf); music.stop(); stopCamera(); side(null);
+  try { speechSynthesis.cancel(); } catch (e) {}
+  S.phase = 'intro'; S.lesson = -1; $('#sc-ring').hidden = true; $('#sc-loading').classList.remove('on');
+  ov.classList.remove('open');
+  const c = mainCtx(); if (c && S._mainWasRunning) { try { c.resume(); } catch (e) {} }
+}
+entry.addEventListener('click', open);
+$('#sc-close').addEventListener('click', close);
+$('#sc-lang').addEventListener('click', () => { if (typeof toggleLanguage === 'function') toggleLanguage(); });
+// the button shows in part 3 (the game), when no round is being played
+setInterval(() => {
+  const inGame = (location.hash || '') === '#play' && !document.body.classList.contains('sm-playing') && document.body.classList.contains('mq-ready');
+  entry.classList.toggle('show', inGame && !ov.classList.contains('open'));
+}, 400);
 document.addEventListener('languageChanged', () => {
+  labels();
+  if (!ov.classList.contains('open')) return;
   if (S.phase === 'intro') showIntro(); else if (S.phase === 'lesson') progressRow();
 });
 if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => {};
-showIntro();
-window.__coach = { S, music };
+labels();
+if (SIM && /[?&]coach=1/.test(location.search)) open();
+window.__coach = { S, music, open, close };
