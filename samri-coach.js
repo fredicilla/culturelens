@@ -61,6 +61,14 @@ const CSS = `
   html[dir="rtl"] #sc-ov .sc-intro ul { text-align: right; }
   .sc-loading { position: absolute; z-index: 16; left: 50%; top: 46%; transform: translate(-50%,-50%); font-size: 15px; color: rgba(243,238,230,.8); display: none; }
   .sc-loading.on { display: block; }
+  .sc-guide { position: absolute; z-index: 9; left: 50%; top: 44%; width: min(70vw, 360px); transform: translate(-50%,-50%); pointer-events: none; opacity: 0; transition: opacity .3s; }
+  .sc-guide.on { opacity: 1; }
+  .sc-guide path, .sc-guide circle { fill: none; stroke: rgba(243,238,230,.55); stroke-width: 3; stroke-dasharray: 9 8; stroke-linecap: round; transition: stroke .3s; }
+  .sc-guide.ok path, .sc-guide.ok circle { stroke: #7EE08A; stroke-dasharray: none; }
+  .sc-chks { display: flex; gap: 6px; flex-wrap: wrap; }
+  .sc-chk { font-size: 13px; border-radius: 999px; padding: 5px 11px; border: 1px solid rgba(243,238,230,.25); color: rgba(243,238,230,.65); }
+  .sc-chk.ok { border-color: #7EE08A; color: #7EE08A; background: rgba(126,224,138,.1); }
+  .sc-chk.bad { border-color: #FF8A7A; color: #FF8A7A; background: rgba(255,138,122,.1); }
 
   #sc-entry { position: fixed; z-index: 60; left: 50%; transform: translateX(-50%); bottom: calc(var(--qx-bar, 64px) + env(safe-area-inset-bottom, 0px) + 18px);
     display: none; align-items: center; gap: 8px; background: #E3C47A; color: #16121D; border: 0; border-radius: 999px; padding: 11px 20px;
@@ -79,6 +87,8 @@ const MARKUP = `<div class="sc-stage" id="sc-stage"><video id="sc-video" playsin
   <div class="sc-side r" id="sc-side-r">⟶</div><div class="sc-side l" id="sc-side-l">⟵</div>
   <div class="sc-judge" id="sc-judge"></div>
   <div class="sc-loading" id="sc-loading"></div>
+  <svg class="sc-guide" id="sc-guide" viewBox="0 0 300 300" aria-hidden="true"><circle cx="150" cy="62" r="36"/>
+    <path d="M60 190 C62 140 90 118 150 118 C210 118 238 140 240 190"/><path d="M40 262 C70 236 110 228 150 228 C190 228 230 236 260 262"/></svg>
   <section class="sc-coach" id="sc-coach">
     <div class="sc-who"><span class="dot"></span><span id="sc-who"></span></div>
     <div class="sc-msg" id="sc-msg" aria-live="polite"></div>
@@ -102,21 +112,27 @@ const num = (n) => (isAr() ? String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨
 const T = {
   who: { en: 'Al-Rawi · your Samri coach', ar: 'الراوي · مدرّبك في السامري' },
   introH: { en: 'Try the Samri yourself', ar: 'جرّب السامري بنفسك' },
-  introP: { en: 'Al-Rawi watches you through the front camera and coaches you live: he tells you each move and whether you got it right.', ar: 'الراوي يشوفك من الكاميرا الأمامية ويدرّبك مباشرة: يقولك الحركة، ويقولك إذا طريقتك صحيحة أو لا.' },
+  introP: { en: 'The Samri is performed seated, in two facing rows. Al-Rawi watches you through the front camera and coaches you live: he gives you each move and tells you whether your technique is right.', ar: 'السامري يُؤدّى جلوسًا في صفّين متقابلين. الراوي يتابعك من الكاميرا الأمامية ويدرّبك مباشرة: يعطيك الحركة، ويقولك إذا طريقتك صحيحة أو تحتاج تعديل.' },
   introL: [
     { en: '1 · Clap with the drum', ar: '١ · صفّق مع الطار' },
     { en: '2 · Sway right and left', ar: '٢ · تمايل يمين ويسار' },
     { en: '3 · A full Samri round', ar: '٣ · جولة سامري كاملة' }
   ],
-  privacy: { en: 'The video stays on your phone. Sit or stand so your head, shoulders and hands are in view.', ar: 'الفيديو ما يطلع من جوالك. اجلس أو اوقف بحيث يبان راسك وكتوفك ويدينك.' },
+  privacy: { en: 'Before you start: sit on the floor (or on a chair) facing the camera, place the phone at chest height about one metre away, and make sure your head, shoulders and hands are in view. The video never leaves your device.', ar: 'قبل ما تبدأ: اجلس على الأرض (أو على كرسي) مقابل الكاميرا، وخلّ الجوال على مستوى صدرك وعلى بُعد متر تقريبًا، بحيث يبان راسك وكتوفك ويدينك. الفيديو ما يطلع من جهازك.' },
   start: { en: 'Start with the camera', ar: 'ابدأ بالكاميرا' },
   hello: { en: 'Hello! Tap start and allow the camera.', ar: 'هلا والله! اضغط «ابدأ» واسمح للكاميرا.' },
   loading: { en: 'Waking up the AI…', ar: 'نجهّز الذكاء الاصطناعي…' },
   noCam: { en: 'I could not open the camera. Allow camera access in your browser, then try again.', ar: 'ما قدرت أفتح الكاميرا. اسمح للمتصفح يستخدم الكاميرا وجرّب مرة ثانية.' },
   noModel: { en: 'The AI model did not load. Check your internet connection and try again.', ar: 'نموذج الذكاء الاصطناعي ما تحمّل. تأكد من الإنترنت وجرّب مرة ثانية.' },
   retry: { en: 'Try again', ar: 'جرّب مرة ثانية' },
-  calib: { en: 'Sit straight and look at the camera… I am learning where you are.', ar: 'اجلس معتدل وطالع الكاميرا… أتعرّف على مكانك.' },
-  notSeen: { en: 'I cannot see your shoulders and hands. Step back a little.', ar: 'ما أشوف كتوفك ويدينك. ارجع لورا شوي.' },
+  calib: { en: 'Perfect. Hold still and sit upright for a moment while I calibrate…', ar: 'ممتاز. اثبت جالس ومعتدل لحظة… أضبط مكانك.' },
+  notSeen: { en: 'I cannot see your shoulders clearly. Move the phone back a little or adjust its angle.', ar: 'ما أشوف كتوفك بوضوح. بعّد الجوال شوي أو عدّل زاويته.' },
+  sit: { en: 'The Samri is performed seated. Sit down facing the camera, like the Samri rows, and fit yourself inside the outline.', ar: 'السامري يُؤدّى وأنت جالس. اجلس مقابل الكاميرا مثل صفوف السامري، وخلّ جسمك داخل الإطار.' },
+  standing: { en: 'You seem to be standing. Please sit down: the Samri is performed seated.', ar: 'شكلك واقف. اجلس لو سمحت، السامري يُؤدّى جلوسًا.' },
+  standPause: { en: 'You stood up. Sit back down so we can carry on.', ar: 'وقفت! ارجع اجلس عشان نكمّل.' },
+  noHands: { en: 'Raise your hands in front of your chest so I can see them.', ar: 'ارفع يدينك قدّام صدرك عشان أشوفها.' },
+  slow: { en: 'Loading is taking longer than usual. Check your connection and try again.', ar: 'التحميل أخذ وقت أطول من المعتاد. تأكد من الإنترنت وجرّب مرة ثانية.' },
+  chkSit: { en: 'Seated', ar: 'جالس' }, chkSh: { en: 'Shoulders', ar: 'الكتوف' }, chkHands: { en: 'Hands', ar: 'اليدين' },
   ready: { en: 'I can see you. Let us begin!', ar: 'شايفك زين. يلا نبدأ!' },
   listen: { en: 'Listen to the first round…', ar: 'اسمع أول دورة…' },
   go: { en: 'Now you!', ar: 'دورك الحين!' },
@@ -169,7 +185,8 @@ const S = {
   base: null, calibN: 0, calibSum: 0, seenAt: 0,
   wrist: 'open', claps: [], judged: {}, startBeat: 0,
   good: 0, need: 0, streakBad: 0, lastBad: null, badCount: {}, tries: 0,
-  cyc: -1, leanSamples: [], score: 0, maxScore: 0, ended: false
+  cyc: -1, leanSamples: [], score: 0, maxScore: 0, ended: false,
+  standN: 0, sitN: 0, standing: false, okN: 0, lastWarn: 0
 };
 const LESSONS = ['clap', 'sway', 'full'];
 const NEED = { clap: 5, sway: 4 };
@@ -226,17 +243,26 @@ function showIntro() {
 }
 
 async function begin() {
+  S._slow = false;
   music.unlock(); music.preload();
   try { speechSynthesis && speechSynthesis.getVoices(); } catch (e) {}
   $('#sc-intro').hidden = true;
   const ld = $('#sc-loading'); ld.textContent = L(T.loading); ld.classList.add('on');
   say(T.loading, false); row('');
   try { await startCamera(); } catch (e) { ld.classList.remove('on'); return fail(T.noCam); }
-  try { await loadModel(); } catch (e) { console.warn(e); ld.classList.remove('on'); return fail(T.noModel); }
+  try { await loadModel(); } catch (e) { console.warn(e); ld.classList.remove('on'); return fail(S._slow ? T.slow : T.noModel); }
   ld.classList.remove('on');
-  S.phase = 'calib'; S.calibN = 0; S.calibSum = 0;
-  say(T.calib);
+  S._lastMsg = null; S.lastWarn = performance.now();
+  S.phase = 'setup'; S.calibN = 0; S.calibSum = 0; S.okN = 0; S.standN = 0; S.sitN = 0; S.standing = false;
+  guide(true, false);
+  say(T.sit);
   loop();
+}
+function guide(on, ok) { const g = $('#sc-guide'); g.classList.toggle('on', !!on); g.classList.toggle('ok', !!ok); }
+function checks(bd) {
+  const c = (ok, t) => '<span class="sc-chk ' + (ok === true ? 'ok' : ok === false ? 'bad' : '') + '">' + (ok === true ? '✓ ' : '') + L(t) + '</span>';
+  const html = '<div class="sc-chks">' + c(bd ? !S.standing : null, T.chkSit) + c(bd ? true : false, T.chkSh) + c(bd ? bd.hands != null : null, T.chkHands) + '</div>';
+  if (S._chk !== html) { S._chk = html; row(html); }
 }
 function fail(o) {
   say(o);
@@ -246,28 +272,59 @@ function fail(o) {
 
 async function startCamera() {
   if (SIM) { fitCanvas(640, 480); return; }
-  const st = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
+  const st = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 30, max: 30 } }, audio: false });
   video.srcObject = st; await video.play();
   fitCanvas(video.videoWidth || 640, video.videoHeight || 480);
 }
 function stopCamera() { try { video.srcObject && video.srcObject.getTracks().forEach((t) => t.stop()); } catch (e) {} video.srcObject = null; }
+// the model is fetched once, in the background, as soon as the coach opens, so «start» is quick
+let modelP = null, mpFiles = null, mpVision = null, delegate = 'GPU';
+const mpOpts = (d) => ({ baseOptions: { modelAssetPath: MODEL, delegate: d }, runningMode: 'VIDEO', numPoses: 1 });
+function prepareModel() {
+  if (SIM || landmarker) return Promise.resolve();
+  if (modelP) return modelP;
+  modelP = (async () => {
+    mpVision = await import(MP + '/vision_bundle.mjs');
+    mpFiles = await mpVision.FilesetResolver.forVisionTasks(MP + '/wasm');
+    try { landmarker = await mpVision.PoseLandmarker.createFromOptions(mpFiles, mpOpts('GPU')); delegate = 'GPU'; }
+    catch (e) { landmarker = await mpVision.PoseLandmarker.createFromOptions(mpFiles, mpOpts('CPU')); delegate = 'CPU'; }
+  })();
+  modelP.catch(() => { modelP = null; });
+  return modelP;
+}
 async function loadModel() {
   if (SIM) return;
-  const v = await import(MP + '/vision_bundle.mjs');
-  const files = await v.FilesetResolver.forVisionTasks(MP + '/wasm');
-  const opts = (d) => ({ baseOptions: { modelAssetPath: MODEL, delegate: d }, runningMode: 'VIDEO', numPoses: 1 });
-  try { landmarker = await v.PoseLandmarker.createFromOptions(files, opts('GPU')); }
-  catch (e) { landmarker = await v.PoseLandmarker.createFromOptions(files, opts('CPU')); }
+  let to;
+  const timeout = new Promise((_, rej) => { to = setTimeout(() => rej(new Error('timeout')), 30000); });
+  try { await Promise.race([prepareModel(), timeout]); } catch (e) { if (e && e.message === 'timeout') { S._slow = true; } throw e; } finally { clearTimeout(to); }
+  // one detection now, while the loading note is up, so the first frames of the lesson do not stall
+  try { if (video.readyState >= 2) landmarker.detectForVideo(video, performance.now()); } catch (e) {}
+}
+// if the graphics delegate fails mid-way, switch to the processor once instead of freezing
+async function fallbackCPU() {
+  if (delegate === 'CPU' || !mpVision || S._switching) return;
+  S._switching = true;
+  try { const old = landmarker; landmarker = null; try { old && old.close(); } catch (e) {} landmarker = await mpVision.PoseLandmarker.createFromOptions(mpFiles, mpOpts('CPU')); delegate = 'CPU'; }
+  catch (e) { console.warn('Samri coach: CPU fallback failed', e); }
+  S._switching = false;
 }
 function fitCanvas(w, h) { canvas.width = w; canvas.height = h; canvas.style.objectFit = 'cover'; }
 
 // ── reading the body ──
+let lastDetect = 0, lastStamp = 0, detectErrs = 0;
+const DETECT_EVERY = 33;                  // ms: about 30 readings a second is plenty, and keeps the phone cool
 function detect() {
   if (SIM) return simPose();
-  if (!landmarker || video.readyState < 2 || video.currentTime === lastVideoTime) return lastLm;
-  lastVideoTime = video.currentTime;
-  const r = landmarker.detectForVideo(video, performance.now());
-  lastLm = r && r.landmarks && r.landmarks[0] ? r.landmarks[0] : null;
+  const now = performance.now();
+  if (!landmarker || video.readyState < 2 || video.currentTime === lastVideoTime || now - lastDetect < DETECT_EVERY) return lastLm;
+  lastVideoTime = video.currentTime; lastDetect = now;
+  try {
+    const stamp = Math.max(now, lastStamp + 1); lastStamp = stamp;   // the model needs rising timestamps
+    const r = landmarker.detectForVideo(video, stamp);
+    lastLm = r && r.landmarks && r.landmarks[0] ? r.landmarks[0] : null; detectErrs = 0;
+  } catch (e) {
+    if (++detectErrs > 3) { detectErrs = 0; fallbackCPU(); }
+  }
   return lastLm;
 }
 const vis = (p) => p && (p.visibility == null || p.visibility > 0.5);
@@ -282,7 +339,22 @@ function body(lm) {
   const head = vis(n) ? ((n.x - mx) * ux + (n.y - my) * uy) / w : 0;
   const tilt = (rs.y - ls.y) / w;
   const hands = vis(lw) && vis(rw) ? Math.hypot(lw.x - rw.x, lw.y - rw.y) / w : null;
-  return { lean: 0.6 * head + 0.9 * tilt, hands };
+  let stand = null;
+  const lh = lm[23], rh = lm[24], lk = lm[25], rk = lm[26], on = (p) => p && p.visibility > 0.65 && p.y < 0.98;
+  if (on(lh) && on(rh) && on(lk) && on(rk)) {
+    const AR = (canvas.width || 4) / (canvas.height || 3), wpx = w * Math.max(1, AR);
+    stand = ((lk.y - lh.y) + (rk.y - rh.y)) / 2 / wpx > 0.85;
+  }
+  return { lean: 0.6 * head + 0.9 * tilt, hands, stand };
+}
+// standing or seated, smoothed so one bad frame does not flip it
+function posture(bd) {
+  if (!bd || bd.stand == null) { S.standN = Math.max(0, S.standN - 1); }
+  else if (bd.stand) { S.standN = Math.min(30, S.standN + 1); S.sitN = 0; }
+  else { S.sitN++; S.standN = Math.max(0, S.standN - 2); }
+  if (!S.standing && S.standN >= 15) S.standing = true;
+  else if (S.standing && S.standN === 0) S.standing = false;
+  return S.standing;
 }
 
 // ── the lessons ──
@@ -366,8 +438,13 @@ function afterMove() {
 }
 
 // each frame: the beat, the misses, the sway rounds
-function tick() {
+function tick(paused) {
   if (S.phase !== 'lesson' || !music.playing) return;
+  if (paused) {
+    const b0 = music.beat(), c0 = Math.floor(b0 / 2) - 1;
+    for (let c = Math.max(0, c0 - 1); c <= c0; c++) { S.judged[(c + 1) * 2] = true; S.judged['s' + c] = true; }
+    S.cyc = c0; return;
+  }
   const b = music.beat(), spb = 60 / 48;
   const cyc = Math.floor(b / 2) - 1;                    // round 0 starts at beat 2
   const w = cyc >= 0 ? want(cyc) : null;
@@ -414,11 +491,32 @@ function loop() {
     raf = requestAnimationFrame(step);
     const lm = detect(), bd = body(lm);
     draw(lm, bd);
-    if (S.phase === 'calib') {
-      if (!bd || bd.hands == null) { if (performance.now() - S.seenAt > 2500) { $('#sc-msg').textContent = L(T.notSeen); S.seenAt = performance.now(); } S.calibN = 0; S.calibSum = 0; return; }
+    const standing = posture(bd);
+    if (S.phase === 'setup' || S.phase === 'calib') {
+      checks(bd);
+      const okNow = !!bd && bd.hands != null && !standing;
+      guide(true, okNow);
+      const now = performance.now();
+      if (!okNow) {
+        S.okN = 0; S.calibN = 0; S.calibSum = 0;
+        const msg = !bd ? T.notSeen : standing ? T.standing : T.noHands;
+        if (S.phase === 'calib') { S.phase = 'setup'; }
+        if (S._lastMsg !== msg && now - S.lastWarn > 2600) { say(msg); S._lastMsg = msg; S.lastWarn = now; }
+        return;
+      }
+      if (S.phase === 'setup') { if (++S.okN > 20) { S.phase = 'calib'; S._lastMsg = T.calib; say(T.calib); } return; }
       S.calibSum += bd.lean; S.calibN++;
-      if (S.calibN > 45) { S.base = S.calibSum / S.calibN; S.phase = 'ready'; say(T.ready); setTimeout(() => startLesson(0), 1800); }
+      if (S.calibN > 45) {
+        S.base = S.calibSum / S.calibN; S.phase = 'ready'; guide(false); say(T.ready);
+        setTimeout(() => { if (S.phase === 'ready') startLesson(0); }, 1800);
+      }
       return;
+    }
+    // standing up in the middle of a lesson: nothing is judged until the player sits again
+    if (S.phase === 'lesson' && standing) {
+      if (performance.now() - S.lastWarn > 4000) { say(T.standPause); S.lastWarn = performance.now(); }
+      S.wrist = 'open'; S.leanSamples.length = 0;
+      tick(true); return;
     }
     S.lean = bd ? bd.lean - (S.base || 0) : null;
     if (bd && bd.hands != null) {
@@ -471,6 +569,10 @@ function simPose() {
   const sp = hands * hw;
   lm[16] = { x: cx - sp, y: cy + 0.12, visibility: 1 }; lm[15] = { x: cx + sp, y: cy + 0.12, visibility: 1 };
   lm[14] = { x: cx - hw * 1.3, y: cy + 0.15, visibility: 1 }; lm[13] = { x: cx + hw * 1.3, y: cy + 0.15, visibility: 1 };
+  // knees: just in front of the hips when seated, far below them when standing (?sim=1 with window.__simStand = true)
+  if (window.__simStand) { lm[24].y = lm[23].y = cy + 0.05; }
+  const ky = window.__simStand ? cy + 0.45 : cy + 0.4;
+  lm[26] = { x: cx - 0.1, y: ky, visibility: 0.9 }; lm[25] = { x: cx + 0.1, y: ky, visibility: 0.9 };
   return lm;
 }
 
@@ -485,11 +587,12 @@ function open() {
   ov.classList.add('open'); entry.classList.remove('show');
   const c = mainCtx(); S._mainWasRunning = !!(c && c.state === 'running'); if (c) { try { c.suspend(); } catch (e) {} }
   labels(); showIntro();
+  prepareModel().catch(() => {});
 }
 function close() {
   cancelAnimationFrame(raf); music.stop(); stopCamera(); side(null);
   try { speechSynthesis.cancel(); } catch (e) {}
-  S.phase = 'intro'; S.lesson = -1; $('#sc-ring').hidden = true; $('#sc-loading').classList.remove('on');
+  S.phase = 'intro'; S.lesson = -1; $('#sc-ring').hidden = true; $('#sc-loading').classList.remove('on'); guide(false); S._chk = null;
   ov.classList.remove('open');
   const c = mainCtx(); if (c && S._mainWasRunning) { try { c.resume(); } catch (e) {} }
 }
