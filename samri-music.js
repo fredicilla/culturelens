@@ -47,6 +47,8 @@ export const LINES = {
 };
 // where each recorded sound sits in samri-sounds.mp3: [start, length, lead-in before its beat], in seconds
 export const SOUND_FILE = 'samri-sounds.mp3';
+// the sung verse is switched off: only the drums and claps are heard (set to true to bring the singing back)
+export const SINGING = false;
 const CLICK_AT = 0.25;
 const CLIPS = {
   clap0: [0.5, 0.45, 0.05], clap1: [1.03, 0.45, 0.05], clap2: [1.56, 0.45, 0.05],
@@ -306,7 +308,7 @@ export class Music {
     if (!this.ctx) return { end: t, stop: function () {} };
     var self = this, style = what === 'wan' ? 'heavy' : (o.style || 'heavy'), row = o.row ? 1 : 0, bpm = STYLES[style].bpm;
     var name = what === 'wan' ? 'v_wan' : 'v_' + (row ? 'b' : 'a') + '_' + what + '_' + bpm;
-    var vol = (o.vol == null ? 1 : o.vol) * this.voiceVol, h = null;
+    var vol = (o.vol == null ? 1 : o.vol) * this.voiceVol * (SINGING ? 1 : 0), h = null;
     var c = this.clip(name, t, 0.95 * vol, { pan: what === 'wan' ? 0 : this.rowPan[row], wet: 0.8 });
     if (c) {
       h = { end: c.end, stop: function (at) {
