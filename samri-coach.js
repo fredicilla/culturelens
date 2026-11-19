@@ -61,10 +61,6 @@ const CSS = `
   html[dir="rtl"] #sc-ov .sc-intro ul { text-align: right; }
   .sc-loading { position: absolute; z-index: 16; left: 50%; top: 46%; transform: translate(-50%,-50%); font-size: 15px; color: rgba(243,238,230,.8); display: none; }
   .sc-loading.on { display: block; }
-  .sc-guide { position: absolute; z-index: 9; left: 50%; top: 44%; width: min(70vw, 360px); transform: translate(-50%,-50%); pointer-events: none; opacity: 0; transition: opacity .3s; }
-  .sc-guide.on { opacity: 1; }
-  .sc-guide path, .sc-guide circle { fill: none; stroke: rgba(243,238,230,.55); stroke-width: 3; stroke-dasharray: 9 8; stroke-linecap: round; transition: stroke .3s; }
-  .sc-guide.ok path, .sc-guide.ok circle { stroke: #7EE08A; stroke-dasharray: none; }
   .sc-chks { display: flex; gap: 6px; flex-wrap: wrap; }
   .sc-chk { font-size: 13px; border-radius: 999px; padding: 5px 11px; border: 1px solid rgba(243,238,230,.25); color: rgba(243,238,230,.65); }
   .sc-chk.ok { border-color: #7EE08A; color: #7EE08A; background: rgba(126,224,138,.1); }
@@ -87,8 +83,7 @@ const MARKUP = `<div class="sc-stage" id="sc-stage"><video id="sc-video" playsin
   <div class="sc-side r" id="sc-side-r">⟶</div><div class="sc-side l" id="sc-side-l">⟵</div>
   <div class="sc-judge" id="sc-judge"></div>
   <div class="sc-loading" id="sc-loading"></div>
-  <svg class="sc-guide" id="sc-guide" viewBox="0 0 300 300" aria-hidden="true"><circle cx="150" cy="62" r="36"/>
-    <path d="M60 190 C62 140 90 118 150 118 C210 118 238 140 240 190"/><path d="M40 262 C70 236 110 228 150 228 C190 228 230 236 260 262"/></svg>
+
   <section class="sc-coach" id="sc-coach">
     <div class="sc-who"><span class="dot"></span><span id="sc-who"></span></div>
     <div class="sc-msg" id="sc-msg" aria-live="polite"></div>
@@ -127,7 +122,7 @@ const T = {
   retry: { en: 'Try again', ar: 'جرّب مرة ثانية' },
   calib: { en: 'Perfect. Hold still and sit upright for a moment while I calibrate…', ar: 'ممتاز. اثبت جالس ومعتدل لحظة… أضبط مكانك.' },
   notSeen: { en: 'I cannot see your shoulders clearly. Move the phone back a little or adjust its angle.', ar: 'ما أشوف كتوفك بوضوح. بعّد الجوال شوي أو عدّل زاويته.' },
-  sit: { en: 'The Samri is performed seated. Sit down facing the camera, like the Samri rows, and fit yourself inside the outline.', ar: 'السامري يُؤدّى وأنت جالس. اجلس مقابل الكاميرا مثل صفوف السامري، وخلّ جسمك داخل الإطار.' },
+  sit: { en: 'The Samri is performed seated. Sit on the floor facing the camera, like the Samri rows: on your knees, back straight, hands in front of your chest.', ar: 'السامري يُؤدّى جلوس. اجلس على الأرض مقابل الكاميرا مثل صفوف السامري: على ركبك، وظهرك معتدل، ويدينك قدّام صدرك.' },
   standing: { en: 'You seem to be standing. Please sit down: the Samri is performed seated.', ar: 'شكلك واقف. اجلس لو سمحت، السامري يُؤدّى جلوسًا.' },
   standPause: { en: 'You stood up. Sit back down so we can carry on.', ar: 'وقفت! ارجع اجلس عشان نكمّل.' },
   noHands: { en: 'Raise your hands in front of your chest so I can see them.', ar: 'ارفع يدينك قدّام صدرك عشان أشوفها.' },
@@ -139,7 +134,7 @@ const T = {
   lessons: {
     clap: {
       name: { en: 'Clap with the drum', ar: 'صفّق مع الطار' },
-      say: { en: 'In the heavy Samri of Unaizah, each round opens with one stroke on its own. Clap exactly on that stroke, in front of your chest.', ar: 'في سامري عنيزة الثقيل، كل دورة تبدأ بضربة لحالها. صفّق مع هالضربة بالضبط، قدّام صدرك.' },
+      say: { en: 'In the heavy Samri of Unaizah, each round opens with one drum stroke on its own. Clap exactly with that stroke: hands in front of your chest, palm to palm, then open them again.', ar: 'في سامري عنيزة الثقيل، كل دورة تبدأ بضربة طار لحالها. صفّق مع هالضربة بالضبط: يدينك قدّام صدرك، كف على كف، وبعدها افتحها.' },
       done: { en: 'Your clap is on the beat. Now the sway.', ar: 'تصفيقك مضبوط على الإيقاع. الحين التمايل.' }
     },
     sway: {
@@ -153,16 +148,16 @@ const T = {
       done: { en: 'That is the Samri! Well done.', ar: 'هذا هو السامري! كفو عليك.' }
     }
   },
-  ok: { en: 'On the beat!', ar: 'مضبوط!' },
-  early: { en: 'A bit early', ar: 'بدري شوي' },
-  late: { en: 'A bit late', ar: 'متأخر شوي' },
-  miss: { en: 'Missed it', ar: 'فاتتك' },
-  extra: { en: 'Wait for the stroke', ar: 'استنّ الضربة' },
+  ok: { en: 'Correct!', ar: 'صح!' },
+  early: { en: 'Wrong: too early. Clap with the stroke', ar: 'غلط: بدري. صفّق مع الضربة' },
+  late: { en: 'Wrong: too late. Clap with the stroke', ar: 'غلط: متأخر. صفّق مع الضربة' },
+  miss: { en: 'Wrong: you missed it', ar: 'غلط: ما سوّيت الحركة' },
+  extra: { en: 'Wrong: wait for the stroke', ar: 'غلط: استنّ الضربة' },
   right: { en: 'Right', ar: 'يمين' }, left: { en: 'Left', ar: 'يسار' },
   clapNow: { en: 'Clap', ar: 'صفّق' },
-  swayOk: { en: 'Right way!', ar: 'طريقتك صحيحة!' },
-  swayWrong: { en: 'Wrong side', ar: 'عكس الجهة' },
-  swaySmall: { en: 'Lean more', ar: 'مِل أكثر' },
+  swayOk: { en: 'Correct! Right technique', ar: 'صح! طريقتك صحيحة' },
+  swayWrong: { en: 'Wrong: the other side', ar: 'غلط: الجهة الثانية' },
+  swaySmall: { en: 'Wrong: lean more', ar: 'غلط: مِل أكثر' },
   tips: {
     early: { en: 'You are clapping before the stroke. Listen for it, and clap with it, not ahead of it.', ar: 'تصفّق قبل الضربة. اسمعها أول، وصفّق معها مو قبلها.' },
     late: { en: 'You are a little behind. Get your hands ready just before the stroke.', ar: 'متأخر شوي. جهّز يدينك قبل الضربة بلحظة.' },
@@ -212,8 +207,10 @@ function say(o, speak) {
   } catch (e) {}
 }
 let judgeTimer = 0;
+let lastSpoken = 0;
 function judge(o, kind) {
   const el = $('#sc-judge'); el.textContent = L(o); el.className = 'sc-judge show ' + kind;
+  if (kind !== 'ok' && performance.now() - lastSpoken > 2500) { lastSpoken = performance.now(); say(o); }
   clearTimeout(judgeTimer); judgeTimer = setTimeout(() => el.classList.remove('show'), 900);
 }
 function ringHit() { const r = $('#sc-ring'); r.classList.remove('hit'); void r.offsetWidth; r.classList.add('hit'); }
@@ -258,12 +255,8 @@ async function begin() {
   say(T.sit);
   loop();
 }
-function guide(on, ok) { const g = $('#sc-guide'); g.classList.toggle('on', !!on); g.classList.toggle('ok', !!ok); }
-function checks(bd) {
-  const c = (ok, t) => '<span class="sc-chk ' + (ok === true ? 'ok' : ok === false ? 'bad' : '') + '">' + (ok === true ? '✓ ' : '') + L(t) + '</span>';
-  const html = '<div class="sc-chks">' + c(bd ? !S.standing : null, T.chkSit) + c(bd ? true : false, T.chkSh) + c(bd ? bd.hands != null : null, T.chkHands) + '</div>';
-  if (S._chk !== html) { S._chk = html; row(html); }
-}
+function guide() {}   // no on-screen figure: the coach guides with words only
+function checks() { if (S._chk !== '') { S._chk = ''; row(''); } }
 function fail(o) {
   say(o);
   row('<span></span><button class="sc-btn" id="sc-retry">' + L(T.retry) + '</button>');
@@ -528,19 +521,7 @@ function loop() {
   };
   step();
 }
-function draw(lm, bd) {
-  const W = canvas.width, H = canvas.height; ctx.clearRect(0, 0, W, H);
-  if (!lm) return;
-  const P = (i) => [lm[i].x * W, lm[i].y * H];
-  ctx.lineWidth = Math.max(3, W / 160); ctx.lineCap = 'round'; ctx.strokeStyle = 'rgba(227,196,122,.9)';
-  [[11, 12], [11, 13], [13, 15], [12, 14], [14, 16], [11, 23], [12, 24], [23, 24]].forEach(([a, b]) => {
-    if (!vis(lm[a]) || !vis(lm[b])) return;
-    const p = P(a), q = P(b); ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); ctx.stroke();
-  });
-  const closed = S.wrist === 'closed';
-  [15, 16].forEach((i) => { if (!vis(lm[i])) return; const p = P(i); ctx.fillStyle = closed ? '#7EE08A' : '#E3C47A'; ctx.beginPath(); ctx.arc(p[0], p[1], W / 45, 0, 7); ctx.fill(); });
-  if (vis(lm[0])) { const p = P(0); ctx.strokeStyle = 'rgba(243,238,230,.8)'; ctx.beginPath(); ctx.arc(p[0], p[1], W / 22, 0, 7); ctx.stroke(); }
-}
+function draw() { ctx.clearRect(0, 0, canvas.width, canvas.height); }   // only the camera is shown, no drawn figure
 
 // ── a simulated player, for testing without a camera (?sim=1): mostly right, sometimes off ──
 function simPose() {
