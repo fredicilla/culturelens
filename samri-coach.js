@@ -61,10 +61,6 @@ const CSS = `
   html[dir="rtl"] #sc-ov .sc-intro ul { text-align: right; }
   .sc-loading { position: absolute; z-index: 16; left: 50%; top: 46%; transform: translate(-50%,-50%); font-size: 15px; color: rgba(243,238,230,.8); display: none; }
   .sc-loading.on { display: block; }
-  .sc-bg { position: absolute; z-index: 21; top: calc(62px + env(safe-area-inset-top, 0px)); right: 12px; width: 160px; height: 90px; border-radius: 12px; overflow: hidden;
-    border: 1px solid rgba(227,196,122,.45); background: #000; opacity: 0; pointer-events: none; transition: opacity .3s; }
-  .sc-bg.on { opacity: .9; pointer-events: auto; }
-  .sc-bg iframe { width: 100%; height: 100%; border: 0; display: block; }
   .sc-chks { display: flex; gap: 6px; flex-wrap: wrap; }
   .sc-chk { font-size: 13px; border-radius: 999px; padding: 5px 11px; border: 1px solid rgba(243,238,230,.25); color: rgba(243,238,230,.65); }
   .sc-chk.ok { border-color: #7EE08A; color: #7EE08A; background: rgba(126,224,138,.1); }
@@ -87,7 +83,6 @@ const MARKUP = `<div class="sc-stage" id="sc-stage"><video id="sc-video" playsin
   <div class="sc-side r" id="sc-side-r">⟶</div><div class="sc-side l" id="sc-side-l">⟵</div>
   <div class="sc-judge" id="sc-judge"></div>
   <div class="sc-loading" id="sc-loading"></div>
-  <div class="sc-bg" id="sc-bg"><div id="sc-yt"></div></div>
 
   <section class="sc-coach" id="sc-coach">
     <div class="sc-who"><span class="dot"></span><span id="sc-who"></span></div>
@@ -285,35 +280,20 @@ async function startCamera() {
   fitCanvas(video.videoWidth || 640, video.videoHeight || 480);
 }
 function stopCamera() { try { video.srcObject && video.srcObject.getTracks().forEach((t) => t.stop()); } catch (e) {} video.srcObject = null; }
-// ── background Samri: a YouTube recording, very quiet, playing only while the camera is on ──
-const BG_ID = 'z9Q5GEOHl2A', BG_VOL = 12;      // volume 0–100
-let yt = null, ytReady = false, ytWant = false;
-function loadYT() {
-  if (SIM || yt || document.getElementById('sc-yt-api')) return;
-  const prev = window.onYouTubeIframeAPIReady;
-  window.onYouTubeIframeAPIReady = function () {
-    if (typeof prev === 'function') { try { prev(); } catch (e) {} }
-    yt = new YT.Player('sc-yt', {
-      videoId: BG_ID, width: 160, height: 90,
-      playerVars: { autoplay: 0, controls: 0, loop: 1, playlist: BG_ID, playsinline: 1, modestbranding: 1, rel: 0, disablekb: 1 },
-      events: {
-        onReady: (e) => { ytReady = true; e.target.setVolume(BG_VOL); if (ytWant) bgPlay(); },
-        onStateChange: (e) => { if (e.data === 1) e.target.setVolume(BG_VOL); }
-      }
-    });
-  };
-  const sc = document.createElement('script'); sc.id = 'sc-yt-api'; sc.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(sc);
+// ── background Samri: an audio file played very quietly, only while the camera is on ──
+// put the recording next to this file as samri-bg.mp3; if the file is not there, nothing plays
+const BG_FILE = 'samri-bg.mp3', BG_VOL = 0.12;   // volume 0–1
+let bg = null;
+function loadBG() {
+  if (SIM || bg) return;
+  bg = new Audio(); bg.src = BG_FILE; bg.loop = true; bg.preload = 'auto'; bg.volume = BG_VOL;
+  bg.setAttribute('playsinline', ''); bg.onerror = () => { bg.dataset.missing = '1'; };
 }
 function bgPlay() {
-  ytWant = true;
-  if (!ytReady) return;
-  try { yt.unMute(); yt.setVolume(BG_VOL); yt.playVideo(); $('#sc-bg').classList.add('on'); } catch (e) {}
+  loadBG(); if (!bg || bg.dataset.missing) return;
+  bg.volume = BG_VOL; const p = bg.play(); if (p && p.catch) p.catch(() => {});
 }
-function bgStop() {
-  ytWant = false; $('#sc-bg').classList.remove('on');
-  if (!ytReady) return;
-  try { yt.pauseVideo(); } catch (e) {}
-}
+function bgStop() { if (!bg) return; try { bg.pause(); bg.currentTime = 0; } catch (e) {} }
 
 // the model is fetched once, in the background, as soon as the coach opens, so «start» is quick
 let modelP = null, mpFiles = null, mpVision = null, delegate = 'GPU';
@@ -502,7 +482,7 @@ function tick(paused) {
   const frac = b / 2 - Math.floor(b / 2);
   if (frac < 0.06 && S._lastFlash !== Math.floor(b / 2)) {
     S._lastFlash = Math.floor(b / 2); ringHit();
-    if (part === 1) $('#sc-msg').textContent = L(T.now) + ' ' + mvName(mv);
+    if (part === 1 && !S.judged[(cyc + 1) * 2]) $('#sc-msg').textContent = L(T.now) + ' ' + mvName(mv);
   }
   side((part === 0 || part === 1) && (mv === 'R' || mv === 'L') ? mv : null);
   // a clap round whose stroke passed with no clap
@@ -627,7 +607,7 @@ function open() {
   const c = mainCtx(); S._mainWasRunning = !!(c && c.state === 'running'); if (c) { try { c.suspend(); } catch (e) {} }
   labels(); showIntro();
   prepareModel().catch(() => {});
-  loadYT();
+  loadBG();
 }
 function close() {
   cancelAnimationFrame(raf); music.stop(); stopCamera(); bgStop(); side(null);
