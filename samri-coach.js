@@ -34,6 +34,8 @@ const CSS = `
     border: 3px solid rgba(227,196,122,.35); display: flex; align-items: center; justify-content: center; pointer-events: none; }
   .sc-ring b { width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle, rgba(227,196,122,.55), rgba(227,196,122,0) 70%); opacity: 0; }
   .sc-ring.hit b { animation: scHit .45s ease-out; }
+  .sc-ring.lean { border-color: #7EE08A; box-shadow: 0 0 0 6px rgba(126,224,138,.15); }
+  .sc-ring { transition: border-color .15s, box-shadow .15s; }
   @keyframes scHit { from { opacity: 1; transform: scale(.7); } to { opacity: 0; transform: scale(1.25); } }
   .sc-ring span { position: absolute; font-size: 28px; font-weight: 700; color: #E3C47A; }
   .sc-side { position: absolute; z-index: 10; top: 46%; transform: translateY(-50%); font-size: 64px; color: #E3C47A; opacity: 0; transition: opacity .2s; pointer-events: none; }
@@ -107,11 +109,12 @@ const num = (n) => (isAr() ? String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨
 const T = {
   who: { en: 'I am your Samri coach', ar: 'أنا مدرّبك في السامري' },
   introH: { en: 'Try the Samri yourself', ar: 'جرّب السامري بنفسك' },
-  introP: { en: 'The Samri is performed seated, in two facing rows. I am your Samri coach: I watch you through the front camera and coach you live, giving you each move and telling you whether your technique is right.', ar: 'السامري يُؤدّى جلوسًا في صفّين متقابلين. أنا مدرّبك في السامري: أتابعك من الكاميرا الأمامية وأدرّبك مباشرة، أعطيك الحركة وأقولك إذا طريقتك صحيحة أو تحتاج تعديل.' },
+  introP: { en: 'The Samri is performed seated, in two facing rows. I am your Samri coach: I watch you through the front camera, tell you each move, wait for you, and tell you right away whether you did it right.', ar: 'السامري يُؤدّى جلوس في صفّين متقابلين. أنا مدرّبك في السامري: أشوفك من الكاميرا الأمامية، أقولك الحركة، وأنتظرك لين تسويها، وأقولك على طول صح أو غلط.' },
   introL: [
-    { en: '1 · Clap with the drum', ar: '١ · صفّق مع الطار' },
-    { en: '2 · Sway right and left', ar: '٢ · تمايل يمين ويسار' },
-    { en: '3 · A full Samri round', ar: '٣ · جولة سامري كاملة' }
+    { en: '1 · Sit on your knees facing the camera', ar: '١ · اجلس على ركبك مقابل الكاميرا' },
+    { en: '2 · Lean to your right and clap', ar: '٢ · مِل على يمينك وصفّق' },
+    { en: '3 · Lean to your left and clap', ar: '٣ · مِل على يسارك وصفّق' },
+    { en: '4 · Again, right and left, at your own pace', ar: '٤ · وكرّرها يمين ويسار على راحتك' }
   ],
   privacy: { en: 'Before you start: sit on the floor (or on a chair) facing the camera, place the phone at chest height about one metre away, and make sure your head, shoulders and hands are in view. The video never leaves your device.', ar: 'قبل ما تبدأ: اجلس على الأرض (أو على كرسي) مقابل الكاميرا، وخلّ الجوال على مستوى صدرك وعلى بُعد متر تقريبًا، بحيث يبان راسك وكتوفك ويدينك. الفيديو ما يطلع من جهازك.' },
   start: { en: 'Start with the camera', ar: 'ابدأ بالكاميرا' },
@@ -122,13 +125,27 @@ const T = {
   retry: { en: 'Try again', ar: 'جرّب مرة ثانية' },
   calib: { en: 'Perfect. Hold still and sit upright for a moment while I calibrate…', ar: 'ممتاز. اثبت جالس ومعتدل لحظة… أضبط مكانك.' },
   notSeen: { en: 'I cannot see your shoulders clearly. Move the phone back a little or adjust its angle.', ar: 'ما أشوف كتوفك بوضوح. بعّد الجوال شوي أو عدّل زاويته.' },
-  sit: { en: 'The Samri is performed seated. Sit on the floor facing the camera, like the Samri rows: on your knees, back straight, hands in front of your chest.', ar: 'السامري يُؤدّى جلوس. اجلس على الأرض مقابل الكاميرا مثل صفوف السامري: على ركبك، وظهرك معتدل، ويدينك قدّام صدرك.' },
+  sit: { en: 'Sit on your knees on the floor, facing the camera, with your hands in front of your chest.', ar: 'اجلس على ركبك على الأرض مقابل الكاميرا، ويدينك قدّام صدرك.' },
   standing: { en: 'You seem to be standing. Please sit down: the Samri is performed seated.', ar: 'شكلك واقف. اجلس لو سمحت، السامري يُؤدّى جلوسًا.' },
   standPause: { en: 'You stood up. Sit back down so we can carry on.', ar: 'وقفت! ارجع اجلس عشان نكمّل.' },
   noHands: { en: 'Raise your hands in front of your chest so I can see them.', ar: 'ارفع يدينك قدّام صدرك عشان أشوفها.' },
   slow: { en: 'Loading is taking longer than usual. Check your connection and try again.', ar: 'التحميل أخذ وقت أطول من المعتاد. تأكد من الإنترنت وجرّب مرة ثانية.' },
   chkSit: { en: 'Seated', ar: 'جالس' }, chkSh: { en: 'Shoulders', ar: 'الكتوف' }, chkHands: { en: 'Hands', ar: 'اليدين' },
   ready: { en: 'I can see you. Let us begin!', ar: 'شايفك زين. يلا نبدأ!' },
+  play: {
+    say: { en: 'Easy: when I say «right», lean to your right and clap. When I say «left», lean to your left and clap. Take your time, I will wait for you.', ar: 'بسيطة: لما أقول «يمين» مِل على يمينك وصفّق، ولما أقول «يسار» مِل على يسارك وصفّق. خذ راحتك، أنا أنتظرك.' },
+    done: { en: 'That is the Samri! Well done.', ar: 'هذا هو السامري! كفو عليك.' }
+  },
+  step: {
+    R: { en: 'Lean to your right… and clap.', ar: 'مِل على يمينك… وصفّق.' },
+    L: { en: 'Lean to your left… and clap.', ar: 'مِل على يسارك… وصفّق.' }
+  },
+  good: [{ en: 'Correct! Well done', ar: 'صح! كفو' }, { en: 'Correct!', ar: 'صح!' }, { en: 'Correct, beautiful!', ar: 'صح، جميل!' }],
+  nowClap: { en: 'Good lean. Now clap!', ar: 'زين! الحين صفّق' },
+  wrongSide: { en: { R: 'Wrong: that is your left. Lean to your right', L: 'Wrong: that is your right. Lean to your left' }, ar: { R: 'غلط: هذا يسارك. مِل على يمينك', L: 'غلط: هذا يمينك. مِل على يسارك' } },
+  noLean: { en: 'Wrong: lean first, then clap', ar: 'غلط: مِل أول، وبعدين صفّق' },
+  smallLean: { en: 'Almost! Lean a little more, then clap', ar: 'قريب! مِل أكثر شوي وبعدين صفّق' },
+
   listen: { en: 'Listen to the first round…', ar: 'اسمع أول دورة…' },
   go: { en: 'Now you!', ar: 'دورك الحين!' },
   lessons: {
@@ -188,14 +205,11 @@ const S = {
   wrist: 'open', claps: [], judged: {}, startBeat: 0,
   good: 0, need: 0, streakBad: 0, lastBad: null, badCount: {}, tries: 0,
   cyc: -1, leanSamples: [], score: 0, maxScore: 0, ended: false,
-  standN: 0, sitN: 0, standing: false, okN: 0, lastWarn: 0
+  standN: 0, sitN: 0, standing: false, okN: 0, lastWarn: 0,
+  step: 0, stepAt: 0, holdN: 0, oppN: 0, leanS: 0, lastClap: 0, lastJudge: 0, mistakes: 0, stepMiss: false, hinted: false, repeated: false
 };
-const LESSONS = ['clap', 'sway', 'full'];
-const NEED = { clap: 4, sway: 4 };
-const FULL_PLAN = ['clap', 'clap', 'R', 'L', 'clap', 'R', 'L'];
-// each move is a trial of three rounds of the drum: get ready (the coach says the move and counts down),
-// do it, then hear whether it was right or wrong before the next one
-const TRIAL = 3;
+const LESSONS = ['play'];
+const PLAN = ['R', 'L', 'R', 'L', 'R', 'L'];   // lean right and clap, lean left and clap, three times
 const music = new Music();
 let landmarker = null, video = $('#sc-video'), canvas = $('#sc-canvas'), ctx = canvas.getContext('2d');
 let lastLm = null, lastVideoTime = -1, raf = 0;
@@ -226,14 +240,10 @@ function ringHit() { const r = $('#sc-ring'); r.classList.remove('hit'); void r.
 function side(s) { $('#sc-side-r').classList.toggle('on', s === 'R'); $('#sc-side-l').classList.toggle('on', s === 'L'); }
 function row(html) { $('#sc-row').innerHTML = html; }
 function steps() {
-  return '<div class="sc-steps">' + LESSONS.map((k, i) => '<i class="' + (i < S.lesson ? 'done' : i === S.lesson ? 'on' : '') + '"></i>').join('') + '</div>';
+  return '<div class="sc-steps">' + PLAN.map((k, i) => '<i class="' + (i < S.step ? 'done' : i === S.step ? 'on' : '') + '"></i>').join('') + '</div>';
 }
 function progressRow() {
-  const k = LESSONS[S.lesson];
-  const txt = k === 'full' ? L(T.score) + ': ' + num(Math.round(S.score * 10) / 10) + ' / ' + num(S.maxScore)
-    : L(T.progress) + ': ' + num(S.good) + ' / ' + num(S.need);
-  row(steps() + '<span class="sc-score">' + txt + '</span><button class="sc-btn ghost" id="sc-skip">' + L(T.skip) + '</button>');
-  $('#sc-skip').onclick = () => nextLesson();
+  row(steps() + '<span class="sc-score">' + L(T.progress) + ': ' + num(Math.min(S.step, PLAN.length)) + ' / ' + num(PLAN.length) + '</span>');
 }
 
 // ── screens ──
@@ -356,7 +366,8 @@ function body(lm) {
   // and the right shoulder drops
   const head = vis(n) ? ((n.x - mx) * ux + (n.y - my) * uy) / w : 0;
   const tilt = (rs.y - ls.y) / w;
-  const hands = vis(lw) && vis(rw) ? Math.hypot(lw.x - rw.x, lw.y - rw.y) / w : null;
+  const wv = (p) => p && (p.visibility == null || p.visibility > 0.3);
+  const hands = wv(lw) && wv(rw) ? Math.hypot(lw.x - rw.x, lw.y - rw.y) / w : null;
   let stand = null;
   const lh = lm[23], rh = lm[24], lk = lm[25], rk = lm[26], on = (p) => p && p.visibility > 0.65 && p.y < 0.98;
   if (on(lh) && on(rh) && on(lk) && on(rk)) {
@@ -375,144 +386,74 @@ function posture(bd) {
   return S.standing;
 }
 
-// ── the lessons ──
-function startLesson(i) {
-  S.lesson = i; const k = LESSONS[i];
-  S.good = 0; S.need = NEED[k] || 0; S.streakBad = 0; S.lastBad = null; S.badCount = {}; S.tries = 0;
-  S.judged = {}; S.claps = []; S.cyc = -1; S.pendingTip = null; S._prep = -1; S.leanSamples = []; S.score = 0; S.maxScore = k === 'full' ? FULL_PLAN.length : 0;
-  S.phase = 'lesson'; side(null);
-  say(T.lessons[k].say);
+// ── the lesson: the coach waits for each move, then says right or wrong ──
+const LEAN_OK = 0.12, LEAN_SMALL = 0.05;   // how far the lean must go (shoulder widths, after calibration)
+function startLesson() {
+  S.lesson = 0; S.step = 0; S.mistakes = 0; S.phase = 'intro-say'; side(null);
+  $('#sc-ring').hidden = false; $('#sc-count').textContent = '';
   progressRow();
-  // one listening round, then the player's turn
-  const delay = Math.min(14, 1.5 + L(T.lessons[k].say).length * 0.06);
-  music.drums = true; music.claps = false; music.drumVol = 1;
-  music.start('heavy', delay);
-  S.startBeat = 2;
-  $('#sc-ring').hidden = false;
+  say(T.play.say);
+  const wait = Math.min(9, 1.2 + L(T.play.say).length * 0.06);
+  setTimeout(() => { if (S.phase === 'intro-say') nextStep(); }, wait * 1000);
 }
-function nextLesson() {
-  music.stop(); side(null);
-  if (S.lesson + 1 < LESSONS.length) startLesson(S.lesson + 1); else finish();
+function nextStep() {
+  if (S.step >= PLAN.length) return finish();
+  const t = PLAN[S.step];
+  S.phase = 'lesson'; S.stepAt = performance.now(); S.clapAt = 0; S.leanOkAt = 0; S.holdN = 0; S.oppN = 0; S.stepMiss = false; S.hinted = false; S.repeated = false;
+  side(t); $('#sc-count').textContent = t === 'R' ? L(T.right) : L(T.left);
+  progressRow(); say(T.step[t]);
 }
-function lessonDone() {
-  const k = LESSONS[S.lesson];
-  music.stop(); side(null); $('#sc-count').textContent = '';
-  S.phase = 'between'; say(T.lessons[k].done);
-  setTimeout(() => { if (S.phase === 'between') nextLesson(); }, 3800);
-}
+function lessonDone() { finish(); }
+function nextLesson() { finish(); }
 function finish() {
-  S.phase = 'done'; music.stop(); side(null); $('#sc-ring').hidden = true;
-  const pct = S.maxScore ? S.score / S.maxScore : 0, stars = pct >= 0.85 ? 3 : pct >= 0.6 ? 2 : 1;
+  S.phase = 'done'; side(null); $('#sc-ring').hidden = true; $('#sc-ring').classList.remove('lean');
+  const stars = S.mistakes <= 1 ? 3 : S.mistakes <= 4 ? 2 : 1;
   try {
     const all = JSON.parse(localStorage.getItem('cl_progress') || '{}'), prev = all.samriCoach || {};
     all.samriCoach = { stars: Math.max(stars, prev.stars || 0), last: stars, at: new Date().toISOString() };
     localStorage.setItem('cl_progress', JSON.stringify(all));
   } catch (e) {}
-  say(T.lessons.full.done);
+  say(T.play.done);
   row('<div style="width:100%"><div class="sc-stars">' + [0, 1, 2].map((i) => '<span class="' + (i < stars ? '' : 'off') + '">★</span>').join('') +
     '</div><div class="sc-row" style="justify-content:center"><button class="sc-btn" id="sc-again">' + L(T.again) +
     '</button><button class="sc-btn ghost" id="sc-back">' + L(T.back) + '</button></div></div>');
   $('#sc-back').onclick = close;
-  $('#sc-again').onclick = () => startLesson(0);
+  $('#sc-again').onclick = () => startLesson();
 }
-
-// what the current round asks for
-function moveOf(trial) {
-  const k = LESSONS[S.lesson];
-  if (k === 'clap') return 'clap';
-  if (k === 'sway') return trial % 2 === 0 ? 'R' : 'L';
-  return FULL_PLAN[trial] || null;
+function miss(o) {
+  const now = performance.now();
+  if (now - S.lastJudge < 1400) return;       // one correction at a time
+  S.lastJudge = now; if (!S.stepMiss) { S.stepMiss = true; S.mistakes++; }
+  judge(o, 'bad');
 }
-function want(cycle) { return cycle >= 0 && cycle % TRIAL === 1 ? moveOf(Math.floor(cycle / TRIAL)) : null; }
-
-// a mistake: the coach counts it, and when the same one repeats it gives a tip or eases the judging
-function bad(kind) {
-  S.streakBad++; S.badCount[kind] = (S.badCount[kind] || 0) + 1; S.lastBad = kind;
-  if (S.streakBad === 3 || S.badCount[kind] === 4) {
-    const tip = { early: 'early', late: 'late', miss: 'miss', small: 'small', wrong: 'wrong' }[kind];
-    if (tip) S.pendingTip = T.tips[tip];
-  }
-  if (S.streakBad === 6 && S.tol < 0.3) { S.tol = 0.3; S.pendingTip = T.tips.easier; }
-}
-function good() { S.streakBad = 0; S.good++; }
-
-function onClap(t) {
+// every frame: follow the lean and wait for the clap
+function follow(clapped) {
   if (S.phase !== 'lesson') return;
-  const b = music.beatAt(t - CAM_LAG), spb = 60 / 48;
-  if (b < S.startBeat - 0.3) return;
-  const cycle = Math.round(b / 2) - 1, target = (cycle + 1) * 2;
-  const d = (b - target) * spb;
-  if (want(cycle) !== 'clap' || Math.abs(d) > 0.5 || S.judged[target]) { if (cycle % TRIAL === 0) judge(T.extra, 'near', true); return; }
-  S.judged[target] = true;
-  const k = LESSONS[S.lesson];
-  if (Math.abs(d) <= S.tol) { judge(T.ok, 'ok'); good(); if (k === 'full') S.score += 1; }
-  else { judge(d < 0 ? T.early : T.late, 'near'); if (k === 'full') S.score += 0.5; bad(d < 0 ? 'early' : 'late'); }
-  afterMove();
-}
-function afterMove() {
-  progressRow();
-  const k = LESSONS[S.lesson];
-  if (k !== 'full' && S.good >= S.need) lessonDone();
-}
-
-// each frame: the beat, the misses, the sway rounds
-function tick(paused) {
-  if (S.phase !== 'lesson' || !music.playing) return;
-  if (paused) {
-    const b0 = music.beat(), c0 = Math.floor(b0 / 2) - 1;
-    for (let c = Math.max(0, c0 - 1); c <= c0; c++) { S.judged[(c + 1) * 2] = true; S.judged['s' + c] = true; }
-    S.cyc = c0; return;
+  const t = PLAN[S.step], sign = t === 'R' ? 1 : -1, v = S.leanS * sign, now = performance.now();
+  if (v >= LEAN_OK) { S.holdN++; S.oppN = 0; } else if (v <= -LEAN_OK) { S.oppN++; S.holdN = 0; } else { S.holdN = 0; S.oppN = 0; }
+  const leaning = S.holdN >= 5;                // held for a moment, not a passing wobble
+  if (leaning && S.stepMiss && S.holdN === 5) $('#sc-msg').textContent = L(T.nowClap);   // corrected: show the next thing to do
+  if (leaning) S.leanOkAt = now;
+  $('#sc-ring').classList.toggle('lean', leaning);
+  // a clap is judged with a little give: right if the lean was there just before it, or arrives just after it
+  if (clapped) S.clapAt = now;
+  if (S.clapAt && (leaning || now - S.clapAt > 450 || now - (S.leanOkAt || 0) < 400)) {
+    const okLean = leaning || now - (S.leanOkAt || 0) < 400 + (now - S.clapAt);
+    S.clapAt = 0;
+    if (okLean) {
+      S.phase = 'pause'; S.lastJudge = now; $('#sc-ring').classList.remove('lean'); ringHit();
+      judge(T.good[S.step % T.good.length], 'ok');
+      S.step++; progressRow();
+      setTimeout(() => { if (S.phase === 'pause') nextStep(); }, 1500);
+    } else if (v <= -LEAN_OK * 0.8) miss({ en: T.wrongSide.en[t], ar: T.wrongSide.ar[t] });
+    else if (v >= LEAN_SMALL) miss(T.smallLean);
+    else miss(T.noLean);
+    return;
   }
-  const b = music.beat(), spb = 60 / 48;
-  const cyc = Math.floor(b / 2) - 1;                    // round 0 starts at beat 2
-  const w = cyc >= 0 ? want(cyc) : null;
-  const part = cyc >= 0 ? cyc % TRIAL : -1, trial = cyc >= 0 ? Math.floor(cyc / TRIAL) : 0, mv = moveOf(trial);
-  const mvName = (m) => (m === 'clap' ? L(T.clapNow) : m === 'R' ? L(T.right) : m === 'L' ? L(T.left) : '');
-  // get ready: say the move (and any tip), and count down to the stroke that starts it
-  if (part === 0 && S._prep !== cyc && mv) {
-    S._prep = cyc;
-    const cue = T.cue[mv], tip = S.pendingTip; S.pendingTip = null;
-    say(tip ? { en: tip.en + ' ' + cue.en, ar: tip.ar + ' ' + cue.ar } : cue);
-  }
-  const toStroke = (cyc + 1 - (part === 0 ? 0 : 1)) * 2 + 2 - b;   // beats left until this trial's 'do' stroke
-  $('#sc-count').textContent = cyc < 0 ? ''
-    : part === 0 ? num(Math.max(1, Math.ceil(toStroke * spb)))
-    : part === 1 ? mvName(mv) : '';
-  // the ring flashes on each round's first stroke; «Now!» on the stroke of the move
-  const frac = b / 2 - Math.floor(b / 2);
-  if (frac < 0.06 && S._lastFlash !== Math.floor(b / 2)) {
-    S._lastFlash = Math.floor(b / 2); ringHit();
-    if (part === 1 && !S.judged[(cyc + 1) * 2]) $('#sc-msg').textContent = L(T.now) + ' ' + mvName(mv);
-  }
-  side((part === 0 || part === 1) && (mv === 'R' || mv === 'L') ? mv : null);
-  // a clap round whose stroke passed with no clap
-  for (let c = Math.max(0, cyc - 1); c <= cyc; c++) {
-    const target = (c + 1) * 2;
-    if (want(c) === 'clap' && !S.judged[target] && (b - target) * spb > 0.55) {
-      S.judged[target] = true; judge(T.miss, 'bad'); bad('miss'); afterMove();
-    }
-  }
-  // the sway: gather the lean through the middle of the round, judge it at the end
-  if (cyc !== S.cyc) {
-    if (S.cyc >= 0) judgeSway(S.cyc);
-    S.cyc = cyc; S.leanSamples = [];
-  }
-  if (w === 'R' || w === 'L') {
-    const f = b / 2 - Math.floor(b / 2);
-    if (f > 0.2 && f < 0.9 && S.lean != null) S.leanSamples.push(S.lean);
-  }
-  if (LESSONS[S.lesson] === 'full' && cyc >= FULL_PLAN.length * TRIAL) { judgeSway(S.cyc); S.cyc = 999; lessonDone(); }
-}
-function judgeSway(c) {
-  const w = want(c); if ((w !== 'R' && w !== 'L') || S.judged['s' + c]) return;
-  S.judged['s' + c] = true;
-  const xs = S.leanSamples; if (!xs.length) { judge(T.miss, 'bad'); bad('miss'); afterMove(); return; }
-  const avg = xs.reduce((a, x) => a + x, 0) / xs.length, sign = w === 'R' ? 1 : -1, k = LESSONS[S.lesson];
-  const need = S.tol >= 0.3 ? 0.08 : 0.12;
-  if (avg * sign >= need) { judge(T.swayOk, 'ok'); good(); if (k === 'full') S.score += 1; }
-  else if (avg * sign <= -need) { judge(T.swayWrong, 'bad'); bad('wrong'); }
-  else { judge(T.swaySmall, 'near'); if (k === 'full') S.score += 0.3; bad('small'); }
-  afterMove();
+  if (S.clapAt) return;                         // waiting a moment to judge the clap
+  if (S.oppN === 15) miss({ en: T.wrongSide.en[t], ar: T.wrongSide.ar[t] });   // half a second on the wrong side
+  if (leaning && !S.hinted && S.holdN > 75) { S.hinted = true; say(T.nowClap); }   // leaning well for 2.5 s, no clap yet
+  if (!S.repeated && now - S.stepAt > 8000 && now - S.lastJudge > 3000) { S.repeated = true; say(T.step[t]); }
 }
 
 // ── the frame loop ──
@@ -539,23 +480,25 @@ function loop() {
       S.calibSum += bd.lean; S.calibN++;
       if (S.calibN > 45) {
         S.base = S.calibSum / S.calibN; S.phase = 'ready'; guide(false); say(T.ready);
-        setTimeout(() => { if (S.phase === 'ready') startLesson(0); }, 1800);
+        setTimeout(() => { if (S.phase === 'ready') startLesson(); }, 1800);
       }
       return;
     }
     // standing up in the middle of a lesson: nothing is judged until the player sits again
     if (S.phase === 'lesson' && standing) {
       if (performance.now() - S.lastWarn > 4000) { say(T.standPause); S.lastWarn = performance.now(); }
-      S.wrist = 'open'; S.leanSamples.length = 0;
-      tick(true); return;
+      S.wrist = 'open'; S.holdN = 0; S.oppN = 0; $('#sc-ring').classList.remove('lean'); return;
     }
-    S.lean = bd ? bd.lean - (S.base || 0) : null;
+    const raw = bd ? bd.lean - (S.base || 0) : null;
+    if (raw != null) S.leanS += (raw - S.leanS) * 0.4;            // smoothed, so one shaky frame does not count
+    S.lean = raw;
+    let clapped = false;
     if (bd && bd.hands != null) {
-      // a clap: the hands come together after being apart
-      if (S.wrist === 'open' && bd.hands < 0.42) { S.wrist = 'closed'; onClap(music.time() - music.latency()); }
+      // a clap: the hands come together after being apart (not twice within 0.3 s)
+      if (S.wrist === 'open' && bd.hands < 0.42) { S.wrist = 'closed'; const n = performance.now(); if (n - S.lastClap > 300) { S.lastClap = n; clapped = true; } }
       else if (S.wrist === 'closed' && bd.hands > 0.75) S.wrist = 'open';
     }
-    tick();
+    follow(clapped);
   };
   step();
 }
@@ -563,25 +506,21 @@ function draw() { ctx.clearRect(0, 0, canvas.width, canvas.height); }   // only 
 
 // ── a simulated player, for testing without a camera (?sim=1): mostly right, sometimes off ──
 function simPose() {
-  const t = music.playing ? music.time() - music.latency() : performance.now() / 1000;
-  const b = music.playing ? music.beatAt(t) : 0, cyc = Math.floor(b / 2) - 1;
-  const w = S.phase === 'lesson' && cyc >= 0 ? want(cyc) : null;
-  S._simErr = S._simErr || {};
-  if (S._simErr[cyc] == null) S._simErr[cyc] = (Math.random() - 0.5) * 0.5;
-  // the player claps around each round's first stroke, a little off by a random amount
-  let hands = 1.2;
-  const e = Math.round(b / 2) * 2, c = e / 2 - 1;
-  if (S.phase === 'lesson' && c >= 0 && want(c) === 'clap') {
-    if (S._simErr[c] == null) S._simErr[c] = (Math.random() - 0.5) * 0.5;
-    const tb = e + S._simErr[c] / 1.25;
-    if (Math.abs(b - tb) * 1.25 < 0.08) hands = 0.2;
+  // leans the asked way after a second (a quarter of the time the wrong way first), then claps
+  const now = performance.now(), t = S.phase === 'lesson' ? PLAN[S.step] : null, dt = (now - S.stepAt) / 1000;
+  S._simWrong = S._simWrong || {};
+  if (t && S._simWrong[S.step] == null) S._simWrong[S.step] = Math.random() < 0.25;
+  let lean = 0, hands = 1.2;
+  if (t) {
+    const sgn = t === 'R' ? 1 : -1, wrongFirst = S._simWrong[S.step];
+    if (wrongFirst && dt > 0.8 && dt < 1.9) lean = -sgn * 0.3;
+    const go = wrongFirst ? 2.4 : 1.0;
+    if (dt > go) lean = sgn * Math.min(0.3, (dt - go) * 0.8);
+    const clapAt = go + 1.0;
+    if ((dt > clapAt && dt < clapAt + 0.15) || (wrongFirst && dt > 1.4 && dt < 1.55)) hands = 0.2;
   }
-  let lean = 0;
-  if (w === 'R' || w === 'L') { const f = b / 2 - Math.floor(b / 2); lean = (w === 'R' ? 1 : -1) * Math.sin(Math.PI * f) * (S._simErr[cyc] > 0.2 ? -0.25 : 0.3); }
-  // build landmarks: shoulders tilted by the lean, head shifted, wrists apart or together
   const lm = []; for (let i = 0; i < 33; i++) lm.push({ x: 0.5, y: 0.5, visibility: 0 });
   const cx = 0.5, cy = 0.5, hw = 0.12, tilt = lean * 0.9;
-  // person's right shoulder (12) on the image's left
   lm[12] = { x: cx - hw, y: cy + tilt * hw, visibility: 1 }; lm[11] = { x: cx + hw, y: cy - tilt * hw, visibility: 1 };
   lm[0] = { x: cx - lean * 0.12, y: cy - 0.18, visibility: 1 };
   lm[24] = { x: cx - 0.09, y: cy + 0.35, visibility: 1 }; lm[23] = { x: cx + 0.09, y: cy + 0.35, visibility: 1 };
