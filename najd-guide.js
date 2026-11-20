@@ -57,7 +57,7 @@
       rel: ['masmak', 'founding', 'ardah'] },
 
     { id: 'qassim', title: { ar: 'القصيم', en: 'Al-Qassim' },
-      k: ['القصيم', 'قصيم', 'بريده', 'بريدة', 'عنيزه', 'عنيزة', 'الرس', 'qassim', 'buraydah', 'unaizah'],
+      k: ['القصيم', 'قصيم', 'بريده', 'بريدة', 'الرس', 'qassim', 'buraydah'],
       a: { ar: 'القصيم سلة نجد الزراعية، وأشهر مدنها بريدة وعنيزة والرس. مشهورة بتمر السكري، ومهرجان تمور بريدة من أكبر أسواق التمر في العالم، ومنها الكليجا، والسامري أصله من القصيم.',
            en: 'Al-Qassim is the farming heart of Najd; its best-known towns are Buraydah, Unaizah and Ar-Rass. It is famous for Sukkari dates, and the Buraydah date festival is one of the largest date markets in the world. Kleija comes from here, and so does the Samri.' },
       rel: ['dates', 'kleija', 'samri'] },
@@ -117,7 +117,7 @@
       rel: ['diriyah', 'places', 'masmak'] },
 
     { id: 'clothing', title: { ar: 'اللبس', en: 'Clothing' },
-      k: ['اللبس', 'لبس', 'الملابس', 'ملابس', 'الثوب', 'ثوب', 'الغتره', 'الغترة', 'غتره', 'الشماغ', 'شماغ', 'العقال', 'عقال', 'البشت', 'بشت', 'clothes', 'clothing', 'thobe', 'ghutra', 'shemagh', 'agal', 'bisht'],
+      k: ['اللبس', 'لبس', 'الملابس', 'ملابس', 'الثوب', 'ثوب', 'الغتره', 'الغترة', 'غتره', 'الشماغ', 'شماغ', 'العقال', 'عقال', 'البشت', 'بشت', 'clothes', 'clothing', 'wear', 'dress', 'outfit', 'what do men wear', 'thobe', 'ghutra', 'shemagh', 'agal', 'bisht'],
       a: { ar: 'لبس الرجل في نجد: الثوب، وعلى الراس الغترة البيضاء (وغالبًا في الشتاء الشماغ الأحمر)، وفوقها العقال الأسود. وفي المناسبات يُلبس البشت فوق الثوب.',
            en: 'A man in Najd wears the thobe, with the white ghutra on his head (often the red shemagh in winter) held by the black agal. On special occasions he wears the bisht, a cloak, over the thobe.' },
       rel: ['hospitality', 'ardah'] },
@@ -225,7 +225,7 @@
       rel: ['ushaiger', 'architecture', 'places'] },
 
     { id: 'souqs', title: { ar: 'الأسواق الشعبية', en: 'Old markets' },
-      k: ['سوق', 'اسواق', 'أسواق', 'الاسواق الشعبيه', 'سوق الزل', 'الزل', 'سوق الموسم', 'تسوق', 'اتسوق', 'نتسوق', 'اشتري', 'وين اشتري', 'souq', 'market', 'shopping'],
+      k: ['سوق', 'اسواق', 'أسواق', 'الاسواق الشعبيه', 'سوق الزل', 'الزل', 'سوق الموسم', 'تسوق', 'اتسوق', 'نتسوق', 'اشتري', 'وين اشتري', 'souq', 'souqs', 'market', 'markets', 'shopping', 'shop', 'souvenirs', 'where to shop', 'buy'],
       a: { ar: 'من أشهر أسواق نجد: سوق الزل جنب قصر المصمك في الرياض، من بداية القرن الرابع عشر الهجري، تلقى فيه السجاد والبشوت والمنتجات التراثية. وسوق المسوكف في عنيزة، وسوق التمور في بريدة. وفي الدرعية قديمًا كان سوق الموسم من أوائل أسواق نجد، تجيه القوافل من الهند والعراق واليمن.',
            en: 'Some of Najd\'s best-known markets: Souq Al-Zal next to Al-Masmak in Riyadh, running since the start of the 14th Hijri century, with carpets, bishts and traditional goods; Al-Musawkaf in Unaizah; and the date market in Buraydah. In old Diriyah, Souq Al-Mawsim was one of the first markets of Najd, visited by caravans from India, Iraq and Yemen.' },
       rel: ['masmak', 'unaizah', 'dates'] },
@@ -258,7 +258,7 @@
   // small talk
   var TALK = {
     hello: { k: ['السلام عليكم', 'السلام', 'سلام', 'هلا', 'مرحبا', 'اهلين', 'أهلين', 'هاي', 'hello', 'hi', 'hey', 'salam'],
-      a: { ar: 'وعليكم السلام ورحمة الله، هلا والله وغلا! أنا فهد، دليلك في نجد وبالخدمة. سم، وش تبي تعرف؟ عن تاريخها، أكلها، قهوتها، فنونها، أو قل لي وين تبي تروح.', en: 'Peace be upon you too, welcome! I am your guide to Najd. Ask me about its history, food, coffee, folk arts, or where to go.' } },
+      a: { ar: 'وعليكم السلام ورحمة الله، هلا والله وغلا! أنا فهد، دليلك في نجد وبالخدمة. سم، وش تبي تعرف؟ عن تاريخها، أكلها، قهوتها، فنونها، أو قل لي وين تبي تروح.', en: 'Hello and welcome! I am Fahad, your guide to Najd, at your service. Ask me about its history, food, coffee, folk arts, or where to go.' } },
     howAreYou: { k: ['وش علومك', 'علومك', 'كيف حالك', 'كيفك', 'شلونك', 'كيف الحال', 'how are you'],
       a: { ar: 'علوم الخير، الله يسلمك! أنا بخير وبالخدمة. سم، وش تبي تعرف عن نجد؟', en: 'All good, thank you! I\'m here to help. What would you like to know about Najd?' } },
     thanks: { k: ['شكرا', 'شكراً', 'يعطيك العافيه', 'يعطيك العافية', 'مشكور', 'تسلم', 'thanks', 'thank you'],
@@ -317,10 +317,12 @@
   // he talks like a Najdi host: «أبشر»، «سم»، «أنا بالخدمة»
   var OPEN = ['أبشر، ', 'سم، ', 'أبشر بعزّك، ', 'من عيوني، ', 'أبشر بسعدك، '];
   var CLOSE = [' وأنا بالخدمة.', ' تامر على شي ثاني؟', ' وإذا تبي زود قل لي، أنا بالخدمة.', ' وأي سؤال ثاني أبشر.', ' سم، وش تبي تعرف بعد؟'];
+  var OPEN_EN = ['Sure! ', 'Of course! ', 'Happy to help! ', 'Gladly! ', 'With pleasure! '];
+  var CLOSE_EN = [' At your service.', ' Anything else I can help with?', ' Want to know more? Just ask.', ' Ask me anything else about Najd.', ' What else would you like to know?'];
   var turn = 0;
   function najdi(a) {
     turn++;
-    return { ar: OPEN[turn % OPEN.length] + a.ar + CLOSE[(turn * 3) % CLOSE.length], en: a.en };
+    return { ar: OPEN[turn % OPEN.length] + a.ar + CLOSE[(turn * 3) % CLOSE.length], en: OPEN_EN[turn % OPEN_EN.length] + a.en + CLOSE_EN[(turn * 3) % CLOSE_EN.length] };
   }
   function answer(text) {
     var q = norm(text);
