@@ -34,6 +34,8 @@ const CSS = `
     border: 3px solid rgba(227,196,122,.35); display: flex; align-items: center; justify-content: center; pointer-events: none; }
   .sc-ring b { width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle, rgba(227,196,122,.55), rgba(227,196,122,0) 70%); opacity: 0; }
   .sc-ring.hit b { animation: scHit .45s ease-out; }
+  .sc-time { position: absolute; left: 14%; right: 14%; bottom: -14px; height: 5px; border-radius: 3px; background: #E3C47A; transform-origin: left; }
+  .sc-time.low { background: #FF8A7A; }
   .sc-ring.lean { border-color: #7EE08A; box-shadow: 0 0 0 6px rgba(126,224,138,.15); }
   .sc-ring { transition: border-color .15s, box-shadow .15s; }
   @keyframes scHit { from { opacity: 1; transform: scale(.7); } to { opacity: 0; transform: scale(1.25); } }
@@ -83,7 +85,7 @@ const MARKUP = `<div class="sc-stage" id="sc-stage"><video id="sc-video" playsin
     <button id="sc-lang" type="button"></button>
   </header>
   <div class="sc-intro" id="sc-intro"></div>
-  <div class="sc-ring" id="sc-ring" hidden><b></b><span id="sc-count"></span></div>
+  <div class="sc-ring" id="sc-ring" hidden><b></b><span id="sc-count"></span><i class="sc-time" id="sc-time"></i></div>
   <div class="sc-side r" id="sc-side-r">⟶</div><div class="sc-side l" id="sc-side-l">⟵</div>
   <div class="sc-judge" id="sc-judge"></div>
   <div class="sc-loading" id="sc-loading"></div>
@@ -109,9 +111,9 @@ const L = (o) => (o == null ? '' : typeof o === 'string' ? o : isAr() ? o.ar : o
 const num = (n) => (isAr() ? String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]) : String(n));
 
 const T = {
-  who: { en: 'I am your Samri coach', ar: 'أنا مدرّبك في السامري' },
+  who: { en: 'Fahad · your Samri coach', ar: 'فهد · مدرّبك في السامري' },
   introH: { en: 'Try the Samri yourself', ar: 'جرّب السامري بنفسك' },
-  introP: { en: 'The Samri is performed seated, in two facing rows. I am your Samri coach: I watch you through the front camera, tell you each move, wait for you, and tell you right away whether you did it right.', ar: 'السامري يُؤدّى جلوس في صفّين متقابلين. أنا مدرّبك في السامري: أشوفك من الكاميرا الأمامية، أقولك الحركة، وأنتظرك لين تسويها، وأقولك على طول صح أو غلط.' },
+  introP: { en: 'The Samri is performed seated, in two facing rows. I am Fahad, your Samri coach: I watch you through the front camera, tell you each move, give you a few seconds to do it, and tell you right away whether you did it right.', ar: 'السامري يُؤدّى جلوس في صفّين متقابلين. أنا فهد، مدرّبك في السامري: أشوفك من الكاميرا الأمامية، أقولك الحركة، وأعطيك كم ثانية تسويها، وأقولك على طول صح أو غلط.' },
   introL: [
     { en: '1 · Sit on your knees facing the camera', ar: '١ · اجلس على ركبك مقابل الكاميرا' },
     { en: '2 · Lean to your right and clap', ar: '٢ · مِل على يمينك وصفّق' },
@@ -135,7 +137,7 @@ const T = {
   chkSit: { en: 'Seated', ar: 'جالس' }, chkSh: { en: 'Shoulders', ar: 'الكتوف' }, chkHands: { en: 'Hands', ar: 'اليدين' },
   ready: { en: 'I can see you. Let us begin!', ar: 'شايفك زين. يلا نبدأ!' },
   play: {
-    say: { en: 'Easy: when I say «right», lean to your right and clap. When I say «left», lean to your left and clap. Take your time, I will wait for you.', ar: 'بسيطة: لما أقول «يمين» مِل على يمينك وصفّق، ولما أقول «يسار» مِل على يسارك وصفّق. خذ راحتك، أنا أنتظرك.' },
+    say: { en: 'Easy: when I say «right», lean to your right and clap while you lean. When I say «left», lean to your left and clap. You have a few seconds for each move; the bar shows the time left.', ar: 'بسيطة: لما أقول «يمين» مِل على يمينك وصفّق وأنت مايل، ولما أقول «يسار» مِل على يسارك وصفّق. لكل حركة كم ثانية، والشريط يوريك الوقت الباقي.' },
     done: { en: 'That is the Samri! Well done.', ar: 'هذا هو السامري! كفو عليك.' }
   },
   step: {
@@ -143,6 +145,7 @@ const T = {
     L: { en: 'Lean to your left… and clap.', ar: 'مِل على يسارك… وصفّق.' }
   },
   good: [{ en: 'Correct! Well done', ar: 'صح! كفو' }, { en: 'Correct!', ar: 'صح!' }, { en: 'Correct, beautiful!', ar: 'صح، جميل!' }],
+  timeUp: { en: 'Time is up! A little faster next time', ar: 'خلص الوقت! أسرع شوي المرة الجاية' },
   nowClap: { en: 'Good lean. Now clap!', ar: 'زين! الحين صفّق' },
   wrongSide: { en: { R: 'Wrong: that is your left. Lean to your right', L: 'Wrong: that is your right. Lean to your left' }, ar: { R: 'غلط: هذا يسارك. مِل على يمينك', L: 'غلط: هذا يمينك. مِل على يسارك' } },
   noLean: { en: 'Wrong: lean first, then clap', ar: 'غلط: مِل أول، وبعدين صفّق' },
@@ -389,13 +392,14 @@ function posture(bd) {
 }
 
 // ── the lesson: the coach waits for each move, then says right or wrong ──
-const LEAN_OK = 0.12, LEAN_SMALL = 0.05;   // how far the lean must go (shoulder widths, after calibration)
+const LEAN_OK = 0.12, LEAN_SMALL = 0.05;
+const STEP_MS = 6000;                       // time for one move: enough to lean and clap, not so long it drags   // how far the lean must go (shoulder widths, after calibration)
 function startLesson() {
   S.lesson = 0; S.step = 0; S.mistakes = 0; S.phase = 'intro-say'; side(null);
   $('#sc-ring').hidden = false; $('#sc-count').textContent = '';
   progressRow();
   say(T.play.say);
-  const wait = Math.min(14, 2.5 + L(T.play.say).length * 0.085);   // time to hear it and read it
+  const wait = Math.min(11, 2.5 + L(T.play.say).length * 0.07);   // time to hear it and read it
   setTimeout(() => { if (S.phase === 'intro-say') nextStep(); }, wait * 1000);
 }
 function nextStep() {
@@ -449,7 +453,7 @@ function follow(clapped) {
       S.phase = 'pause'; S.lastJudge = now; $('#sc-ring').classList.remove('lean'); ringHit();
       judge(T.good[S.step % T.good.length], 'ok');
       S.step++; progressRow();
-      setTimeout(() => { if (S.phase === 'pause') nextStep(); }, 3000);
+      setTimeout(() => { if (S.phase === 'pause') nextStep(); }, 2200);
     } else if (S.crossing || now - S.stepAt < 1200) { /* still on the way over: not judged */ }
     else if (v <= -LEAN_OK * 0.8) miss({ en: T.wrongSide.en[t], ar: T.wrongSide.ar[t] });
     else if (v >= LEAN_SMALL) miss(T.smallLean);
@@ -459,7 +463,16 @@ function follow(clapped) {
   if (S.clapAt) return;                         // waiting a moment to judge the clap
   if (S.oppN === 30) miss({ en: T.wrongSide.en[t], ar: T.wrongSide.ar[t] });   // half a second on the wrong side
   if (leaning && !S.hinted && S.holdN > 90) { S.hinted = true; say(T.nowClap); }   // leaning well for 2.5 s, no clap yet
-  if (!S.repeated && now - S.stepAt > 12000 && now - S.lastJudge > 5000) { S.repeated = true; say(T.step[t]); }
+  // the time bar; when it runs out the move counts as late and the next one starts
+  const left = Math.max(0, 1 - (now - S.stepAt) / STEP_MS), tb = $('#sc-time');
+  tb.style.transform = 'scaleX(' + left.toFixed(3) + ')'; tb.classList.toggle('low', left < 0.3);
+  if (left <= 0) {
+    S.phase = 'pause'; $('#sc-ring').classList.remove('lean');
+    if (!S.stepMiss) { S.stepMiss = true; S.mistakes++; }
+    S.lastJudge = now; judge(T.timeUp, 'bad');
+    S.step++; progressRow();
+    setTimeout(() => { if (S.phase === 'pause') nextStep(); }, 2200);
+  }
 }
 
 // ── the frame loop ──
@@ -513,7 +526,7 @@ function draw() { ctx.clearRect(0, 0, canvas.width, canvas.height); }   // only 
 // ── a simulated player, for testing without a camera (?sim=1): mostly right, sometimes off ──
 function simPose() {
   // leans the asked way after a second (a quarter of the time the wrong way first), then claps
-  const now = performance.now(), t = S.phase === 'lesson' ? PLAN[S.step] : null, dt = (now - S.stepAt) / 1000;
+  const now = performance.now(), t = S.phase === 'lesson' && !window.__simIdle ? PLAN[S.step] : null, dt = (now - S.stepAt) / 1000;
   S._simWrong = S._simWrong || {};
   if (t && S._simWrong[S.step] == null) S._simWrong[S.step] = !window.__simClean && Math.random() < 0.25;
   let lean = 0, hands = 1.2;
