@@ -500,7 +500,7 @@
 
   function labels() {
     btn.innerHTML = '<span class="ng-face">' + MANsvg() + '</span><span class="ng-dot" aria-hidden="true"></span>';
-    btn.setAttribute('aria-label', L(TXT.btn)); btn.title = L(TXT.btn);
+    btn.setAttribute('aria-label', L(TXT.peek));
     $('#ng-title', panel).textContent = L(TXT.title); $('#ng-sub', panel).textContent = L(TXT.sub);
     $('#ng-t-chat', panel).textContent = L(TXT.chat); $('#ng-t-talk', panel).textContent = L(TXT.talk);
     input.placeholder = L(TXT.ph); $('#ng-send', panel).textContent = L(TXT.send);
@@ -602,6 +602,21 @@
     peek.classList.add('show');
     peekTimer = setTimeout(hidePeek, 7000);
   }
+  // hovering the button shows the same greeting, every time (the button's own title would only show a plain tooltip)
+  var hoverTimer = 0;
+  function hoverPeek() {
+    if (panel.classList.contains('open')) return;
+    clearTimeout(peekTimer); clearTimeout(hoverTimer);
+    peek.innerHTML = '<span></span>'; peek.firstChild.textContent = L(TXT.peek);
+    peek.onclick = function () { hidePeek(); open(); };
+    peek.classList.add('show');
+  }
+  btn.addEventListener('mouseenter', hoverPeek);
+  btn.addEventListener('focus', hoverPeek);
+  btn.addEventListener('mouseleave', function () { hoverTimer = setTimeout(hidePeek, 500); });
+  btn.addEventListener('blur', function () { hoverTimer = setTimeout(hidePeek, 500); });
+  peek.addEventListener('mouseenter', function () { clearTimeout(hoverTimer); });
+  peek.addEventListener('mouseleave', function () { hoverTimer = setTimeout(hidePeek, 500); });
   function refresh() {
     var ok = inNajd();
     if (!ok || panel.classList.contains('open')) hidePeek();
