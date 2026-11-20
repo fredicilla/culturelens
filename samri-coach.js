@@ -135,7 +135,7 @@ const T = {
   noHands: { en: 'Raise your hands in front of your chest so I can see them.', ar: 'ارفع يدينك قدّام صدرك عشان أشوفها.' },
   slow: { en: 'Loading is taking longer than usual. Check your connection and try again.', ar: 'التحميل أخذ وقت أطول من المعتاد. تأكد من الإنترنت وجرّب مرة ثانية.' },
   chkSit: { en: 'Seated', ar: 'جالس' }, chkSh: { en: 'Shoulders', ar: 'الكتوف' }, chkHands: { en: 'Hands', ar: 'اليدين' },
-  ready: { en: 'I can see you. Let us begin!', ar: 'شايفك زين. يلا نبدأ!' },
+  ready: { en: 'I can see you. Let\'s begin!', ar: 'شايفك زين. يلا نبدأ!' },
   play: {
     say: { en: 'Easy: when I say «right», lean to your right and clap while you lean. When I say «left», lean to your left and clap. You have a few seconds for each move; the bar shows the time left.', ar: 'بسيطة: لما أقول «يمين» مِل على يمينك وصفّق وأنت مايل، ولما أقول «يسار» مِل على يسارك وصفّق. لكل حركة كم ثانية، والشريط يوريك الوقت الباقي.' },
     done: { en: 'That is the Samri! Well done.', ar: 'هذا هو السامري! كفو عليك.' }
