@@ -210,13 +210,13 @@
   // small talk
   var TALK = {
     hello: { k: ['السلام عليكم', 'السلام', 'سلام', 'هلا', 'مرحبا', 'اهلين', 'أهلين', 'هاي', 'hello', 'hi', 'hey', 'salam'],
-      a: { ar: 'وعليكم السلام ورحمة الله، هلا والله وغلا! أنا دليلك في نجد وبالخدمة. سم، وش تبي تعرف؟ عن تاريخها، أكلها، قهوتها، فنونها، أو قل لي وين تبي تروح.', en: 'Peace be upon you too, welcome! I am your guide to Najd. Ask me about its history, food, coffee, folk arts, or where to go.' } },
+      a: { ar: 'وعليكم السلام ورحمة الله، هلا والله وغلا! أنا فهد، دليلك في نجد وبالخدمة. سم، وش تبي تعرف؟ عن تاريخها، أكلها، قهوتها، فنونها، أو قل لي وين تبي تروح.', en: 'Peace be upon you too, welcome! I am your guide to Najd. Ask me about its history, food, coffee, folk arts, or where to go.' } },
     howAreYou: { k: ['وش علومك', 'علومك', 'كيف حالك', 'كيفك', 'شلونك', 'كيف الحال', 'how are you'],
       a: { ar: 'علوم الخير، الله يسلمك! أنا بخير وبالخدمة. سم، وش تبي تعرف عن نجد؟', en: 'All good, thank you! I\'m here to help. What would you like to know about Najd?' } },
     thanks: { k: ['شكرا', 'شكراً', 'يعطيك العافيه', 'يعطيك العافية', 'مشكور', 'تسلم', 'thanks', 'thank you'],
       a: { ar: 'العفو، الله يحييك! أنا بالخدمة، تامر على شي ثاني؟', en: 'You\'re welcome! Ask me anything else about Najd.' } },
     who: { k: ['من انت', 'من أنت', 'وش انت', 'مين انت', 'وش اسمك', 'اسمك', 'who are you', 'your name'],
-      a: { ar: 'أنا دليلك في نجد، وأنا بالخدمة. أعرّفك على تاريخها وناسها وأكلها وفنونها، سم اسأل وأبشر.', en: 'I am your guide to Najd: its history, its people, its food and its folk arts. Ask away.' } },
+      a: { ar: 'أنا فهد، دليلك في نجد، وأنا بالخدمة. أعرّفك على تاريخها وناسها وأكلها وفنونها، سم اسأل وأبشر.', en: 'I am Fahad, your guide to Najd: its history, its people, its food and its folk arts. Ask away.' } },
     help: { k: ['وش تعرف', 'ساعدني', 'وش اسال', 'وش أسأل', 'help', 'what can you'],
       a: { ar: 'أبشر، أقدر أعلّمك عن: الدرعية ويوم التأسيس، الرياض والمصمك، القصيم وتمورها، القهوة وسنعها، العرضة والسامري، الأكلات، العمارة الطينية، اللبس، كلمات نجدية، ووين تروح.', en: 'I can tell you about: Diriyah and Founding Day, Riyadh and Al-Masmak, Al-Qassim and its dates, coffee and its manners, the Ardah and the Samri, food, mud-brick architecture, clothing, Najdi words, and where to go.' } }
   };
@@ -358,7 +358,7 @@
   // ════════════════════════════════════════════════════════════
   var CSS = '' +
     // the site's tokens (app.css), with fallbacks; --acc is the region's colour (Najd: clay brown)
-    '#ng-btn,#ng-panel{--g-paper:var(--paper,#F4EEE4);--g-ink:var(--ink,#16121D);--g-night:var(--night,#0E0B1A);--g-gold:var(--logo-gold,#E3C47A);--g-cream:var(--logo-cream,#F3EADB);' +
+    '#ng-btn,#ng-panel,#ng-peek{--g-paper:var(--paper,#F4EEE4);--g-ink:var(--ink,#16121D);--g-night:var(--night,#0E0B1A);--g-gold:var(--logo-gold,#E3C47A);--g-cream:var(--logo-cream,#F3EADB);' +
     '--g-acc:var(--acc,#8F5427);--g-rule:var(--rule,rgba(22,18,29,.14));--g-r:var(--r,3px);font-family:var(--f,"IBM Plex Sans Arabic",system-ui,sans-serif)}' +
     '#ng-btn{position:fixed;z-index:150;inset-inline-start:14px;bottom:calc(var(--nav,62px) + 14px + env(safe-area-inset-bottom,0px));display:none;align-items:center;gap:10px;' +
     'background:var(--g-night);color:var(--g-cream);border:1px solid rgba(227,196,122,.45);border-radius:var(--g-r);padding:6px 16px 6px 6px;font-weight:700;font-size:14.5px;cursor:pointer;box-shadow:0 10px 26px rgba(14,11,26,.28)}' +
@@ -401,6 +401,11 @@
     '.ng-reply:empty{display:none}' +
     '.ng-mic{width:72px;height:72px;border-radius:50%;border:0;background:var(--g-acc);color:var(--g-paper);cursor:pointer;flex:none;display:grid;place-items:center;box-shadow:0 8px 22px rgba(143,84,39,.35)}' +
     '.ng-mic svg{width:30px;height:30px}.ng-mic.on{background:#3E8E5A;animation:ngPulse 1.2s infinite}@keyframes ngPulse{50%{box-shadow:0 0 0 12px rgba(62,142,90,0)}}' +
+    '#ng-peek{position:fixed;z-index:151;inset-inline-start:14px;bottom:calc(var(--nav,62px) + 74px + env(safe-area-inset-bottom,0px));max-width:min(260px,72vw);background:var(--g-paper);color:var(--g-ink);' +
+    'border:1px solid var(--g-rule);border-inline-start:3px solid var(--g-acc);border-radius:var(--g-r);padding:10px 34px 10px 14px;font-size:14.5px;font-weight:500;line-height:1.6;box-shadow:0 10px 26px rgba(14,11,26,.22);' +
+    'opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;pointer-events:none;cursor:pointer}' +
+    'html[dir="rtl"] #ng-peek{padding:10px 14px 10px 34px}#ng-peek.show{opacity:1;transform:none;pointer-events:auto}' +
+    '#ng-peek button{position:absolute;top:6px;inset-inline-end:6px;width:22px;height:22px;border:0;background:transparent;color:var(--g-ink);opacity:.55;font-size:13px;cursor:pointer}' +
     '.ng-hint{color:rgba(22,18,29,.55);font-size:13px;margin-top:10px;line-height:1.6}';
 
   var PANEL = '<div class="ng-head"><span class="ng-face">' + MANsvg() + '</span><div><b id="ng-title"></b><small id="ng-sub"></small></div>' +
@@ -414,19 +419,20 @@
 
   var TXT = {
     btn: { ar: 'اسأل دليل نجد', en: 'Ask about Najd' },
-    title: { ar: 'دليلك في نجد', en: 'Your Najd guide' },
+    title: { ar: 'فهد · دليلك في نجد', en: 'Fahad · your Najd guide' },
     sub: { ar: 'سم، أنا بالخدمة', en: 'Ask me about its history, people and food' },
     chat: { ar: 'اكتب له', en: 'Chat' },
     talk: { ar: 'كلّمه بصوتك', en: 'Talk to him' },
     ph: { ar: 'سم، وش تبي تعرف عن نجد؟', en: 'Ask anything about Najd…' },
     send: { ar: 'إرسال', en: 'Send' },
-    hello: { ar: 'هلا والله وغلا، وحيّاك الله في نجد! أنا دليلك فيها وبالخدمة. سم، وش تبي تعرف؟ اسألني عن تاريخها، أكلها، قهوتها، فنونها، أو قل لي وين تبي تروح.', en: 'Welcome to Najd! I am your guide here. Ask me about its history, food, coffee, folk arts, or where to go.' },
+    hello: { ar: 'هلا والله وغلا، وحيّاك الله في نجد! أنا فهد، دليلك فيها وبالخدمة. سم، وش تبي تعرف؟ اسألني عن تاريخها، أكلها، قهوتها، فنونها، أو قل لي وين تبي تروح.', en: 'Welcome to Najd! I am Fahad, your guide here. Ask me about its history, food, coffee, folk arts, or where to go.' },
     tapMic: { ar: 'اضغط الميكروفون وتكلّم، أو اكتب تحت', en: 'Tap the microphone and speak, or type below' },
     listening: { ar: 'أسمعك… تكلّم', en: 'Listening… go ahead' },
     noMic: { ar: 'متصفحك ما يدعم الكلام. اكتب سؤالك تحت ويرد عليك بصوته.', en: 'Your browser does not support speech input. Type your question below and he will answer out loud.' },
     noVoice: { ar: 'جهازك ما فيه صوت عربي للقراءة، فالرد مكتوب فوق. (على الآيفون والماك وكروم أندرويد الصوت العربي موجود عادة)', en: 'Your device has no voice for this language, so the answer is written above.' },
     micDenied: { ar: 'ما قدرت أسمعك. اسمح للمتصفح يستخدم الميكروفون، أو اكتب سؤالك تحت.', en: 'I could not hear you. Allow microphone access, or type your question below.' },
     you: { ar: 'سألت: ', en: 'You asked: ' },
+    peek: { ar: 'حيّاك الله، أنا فهد! كيف أقدر أخدمك؟', en: 'Welcome, I am Fahad! How can I help you?' },
     tryIt: { ar: 'جرّبها بنفسك ←', en: 'Try it yourself →' }
   };
 
@@ -435,6 +441,7 @@
   // ════════════════════════════════════════════════════════════
   var st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
   var btn = document.createElement('button'); btn.id = 'ng-btn'; btn.type = 'button'; document.body.appendChild(btn);
+  var peek = document.createElement('div'); peek.id = 'ng-peek'; peek.setAttribute('role', 'status'); document.body.appendChild(peek);
   var panel = document.createElement('aside'); panel.id = 'ng-panel'; panel.setAttribute('aria-hidden', 'true'); panel.innerHTML = PANEL; document.body.appendChild(panel);
   var chat = $('#ng-chat', panel), input = $('#ng-in', panel), stage = $('#ng-stage', panel), man = $('.ng-man', stage);
   var mode = 'chat', greeted = false;
@@ -577,6 +584,7 @@
     } else { stopListen(); hush(); }
   }
   function open() {
+    hidePeek();
     panel.classList.add('open'); panel.setAttribute('aria-hidden', 'false'); btn.classList.remove('show');
     if (!greeted) { greeted = true; bubble('bot', esc(L(TXT.hello))); chips(STARTERS); }
     if (mode === 'chat') setTimeout(function () { input.focus(); }, 300);
@@ -593,8 +601,24 @@
 
   // the button shows only in Najd, when the map is closed
   function inNajd() { return document.body.getAttribute('data-region') === 'najd' && !document.body.classList.contains('map-open'); }
+  // the greeting bubble: once per visitor, a moment after the button first appears, gone after a few seconds
+  var PEEK_KEY = 'cl_najd_peek', peekTimer = 0;
+  function seenPeek() { try { return localStorage.getItem(PEEK_KEY) === '1'; } catch (e) { return true; } }
+  function hidePeek() { clearTimeout(peekTimer); peek.classList.remove('show'); }
+  function showPeek() {
+    if (seenPeek() || peek.classList.contains('show')) return;
+    try { localStorage.setItem(PEEK_KEY, '1'); } catch (e) {}
+    peek.innerHTML = '<span></span><button type="button" aria-label="Close">✕</button>';
+    peek.firstChild.textContent = L(TXT.peek);
+    peek.querySelector('button').onclick = function (e) { e.stopPropagation(); hidePeek(); };
+    peek.onclick = function () { hidePeek(); open(); };
+    peek.classList.add('show');
+    peekTimer = setTimeout(hidePeek, 7000);
+  }
   function refresh() {
     var ok = inNajd();
+    if (!ok || panel.classList.contains('open')) hidePeek();
+    else if (!seenPeek()) setTimeout(function () { if (inNajd() && !panel.classList.contains('open')) showPeek(); }, 1200);
     btn.classList.toggle('show', ok && !panel.classList.contains('open'));
     if (!ok && panel.classList.contains('open')) close();
   }
