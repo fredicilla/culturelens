@@ -68,10 +68,12 @@ const CSS = `
   .sc-chk.ok { border-color: #7EE08A; color: #7EE08A; background: rgba(126,224,138,.1); }
   .sc-chk.bad { border-color: #FF8A7A; color: #FF8A7A; background: rgba(255,138,122,.1); }
 
-  #sc-entry { position: fixed; z-index: 60; left: 50%; transform: translateX(-50%); bottom: calc(var(--qx-bar, 64px) + env(safe-area-inset-bottom, 0px) + 18px);
+  #sc-entry { position: fixed; z-index: 60; left: 50%; transform: translateX(-50%); top: calc(env(safe-area-inset-top, 0px) + 104px);
     display: none; align-items: center; gap: 8px; background: #E3C47A; color: #16121D; border: 0; border-radius: 999px; padding: 11px 20px;
     font: inherit; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,.35); white-space: nowrap; }
-  #sc-entry.show { display: inline-flex; }
+  #sc-entry.show { display: inline-flex; animation: scPop .5s ease-out; }
+  @keyframes scPop { from { transform: translateX(-50%) scale(.8); opacity: 0; } to { transform: translateX(-50%); opacity: 1; } }
+  #sc-entry svg { width: 18px; height: 18px; }
   #sc-entry i { font-style: normal; font-size: 11px; background: #16121D; color: #E3C47A; border-radius: 999px; padding: 2px 7px; }
 `;
 const MARKUP = `<div class="sc-stage" id="sc-stage"><video id="sc-video" playsinline muted></video><canvas id="sc-canvas"></canvas></div>
@@ -543,7 +545,7 @@ function simPose() {
 // open and close the coach over the Samri page; the page's own sound pauses while the coach runs
 function mainCtx() { const m = window.__sm && window.__sm.music; return m && m.ctx ? m.ctx : null; }
 function labels() {
-  entry.innerHTML = '<span>' + L(T.entry) + '</span><i>AI</i>';
+  entry.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>' + L(T.entry) + '</span><i>AI</i>';
   $('#sc-lang').textContent = isAr() ? 'English' : 'العربية';
 }
 function open() {
@@ -565,7 +567,7 @@ $('#sc-close').addEventListener('click', close);
 $('#sc-lang').addEventListener('click', () => { if (typeof toggleLanguage === 'function') toggleLanguage(); });
 // the button shows in part 3 (the game), when no round is being played
 setInterval(() => {
-  const inGame = (location.hash || '') === '#play' && !document.body.classList.contains('sm-playing') && document.body.classList.contains('mq-ready');
+  const inGame = !document.body.classList.contains('sm-playing') && document.body.classList.contains('mq-ready');
   entry.classList.toggle('show', inGame && !ov.classList.contains('open'));
 }, 400);
 document.addEventListener('languageChanged', () => {
