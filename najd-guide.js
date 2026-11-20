@@ -28,8 +28,8 @@
 
     { id: 'riyadh', title: { ar: 'الرياض', en: 'Riyadh' },
       k: ['الرياض', 'رياض', 'العاصمه', 'العاصمة', 'riyadh', 'capital'],
-      a: { ar: 'الرياض عاصمة المملكة وأكبر مدن نجد، واسمها جمع «روضة» وهي الأرض الخضراء اللي يجتمع فيها الماي. فيها قصر المصمك والمتحف الوطني، وجنبها الدرعية ووادي حنيفة.',
-           en: 'Riyadh is the capital of the Kingdom and the largest city in Najd. Its name is the plural of "rawdah", a green meadow where rainwater gathers. It has Al-Masmak Fort and the National Museum, with Diriyah and Wadi Hanifa right next to it.' },
+      a: { ar: 'الرياض عاصمة المملكة وأكبر مدن نجد، واسمها القديم «حَجْر»، واسمها الحين جمع «روضة» وهي الأرض الخضراء اللي يجتمع فيها الماي. صارت عاصمة من سنة ١٨٢٤م مع الإمام تركي بن عبدالله. فيها قصر المصمك والمتحف الوطني، وجنبها الدرعية ووادي حنيفة.',
+           en: 'Riyadh is the capital of the Kingdom and the largest city in Najd; its old name was Hajr. It became the capital in 1824 under Imam Turki bin Abdullah. Its name is the plural of "rawdah", a green meadow where rainwater gathers. It has Al-Masmak Fort and the National Museum, with Diriyah and Wadi Hanifa right next to it.' },
       rel: ['masmak', 'diriyah', 'places'] },
 
     { id: 'diriyah', title: { ar: 'الدرعية', en: 'Diriyah' },
@@ -46,8 +46,8 @@
 
     { id: 'masmak', title: { ar: 'قصر المصمك', en: 'Al-Masmak Fort' },
       k: ['المصمك', 'مصمك', 'قصر المصمك', 'masmak'],
-      a: { ar: 'قصر المصمك حصن من الطين في وسط الرياض القديمة، بأبراجه الأربعة وبابه الخشبي الكبير. شهد استرداد الملك عبدالعزيز للرياض سنة ١٩٠٢م (١٣١٩هـ)، واليوم صار متحف يحكي القصة.',
-           en: 'Al-Masmak is a mud-brick fort in the heart of old Riyadh, with four towers and a great wooden gate. It saw King Abdulaziz take back Riyadh in 1902 (1319 AH), and today it is a museum that tells that story.' },
+      a: { ar: 'قصر المصمك حصن من الطين واللبن في وسط الرياض القديمة، بدأ بناؤه سنة ١٨٦٥م (١٢٨٢هـ) في عهد الإمام عبدالله بن فيصل، وله أربعة أبراج وباب خشبي كبير. شهد استرداد الملك عبدالعزيز للرياض فجر ٥ شوال ١٣١٩هـ (١٩٠٢م)، وتقدر تشوف رأس الحربة المكسور في بابه للحين. وصار متحف من سنة ١٩٩٥م.',
+           en: 'Al-Masmak is a mud-brick fort in the heart of old Riyadh, begun in 1865 (1282 AH) under Imam Abdullah bin Faisal, with four towers and a great wooden gate. It saw King Abdulaziz take back Riyadh at dawn in 1902 (1319 AH); the broken spearhead is still lodged in its door. It has been a museum since 1995.' },
       rel: ['unification', 'riyadh', 'architecture'] },
 
     { id: 'unification', title: { ar: 'توحيد المملكة', en: 'The unification' },
@@ -100,7 +100,7 @@
 
     { id: 'kleija', title: { ar: 'الكليجا', en: 'Kleija' },
       k: ['الكليجا', 'كليجا', 'كليجه', 'kleija', 'kleicha'],
-      a: { ar: 'الكليجا قرص من عجين البر محشي بالتمر أو السكر والهيل، يُخبز ويُقدَّم مع القهوة. تشتهر فيها القصيم، ولها مهرجان سنوي في بريدة.',
+      a: { ar: 'الكليجا قرص من عجين البر محشي بالتمر أو دبس التمر والهيل، يُخبز ويُقدَّم مع القهوة. تشتهر فيها القصيم، ولها مهرجان سنوي في بريدة، واختارتها هيئة فنون الطهي سنة ٢٠٢٤م «طبق منطقة القصيم».',
            en: 'Kleija is a round pastry of wheat dough filled with dates or sugar and cardamom, baked and served with coffee. Al-Qassim is famous for it, and Buraydah holds a yearly kleija festival.' },
       rel: ['qassim', 'food', 'coffee'] },
 
@@ -200,6 +200,54 @@
            en: 'The National Museum in Riyadh, inside the King Abdulaziz Historical Center, tells the story of the Arabian Peninsula from ancient times to the unification of the Kingdom. Al-Murabba Palace is right next to it.' },
       rel: ['riyadh', 'masmak', 'unification'] },
 
+    { id: 'secondState', title: { ar: 'الدولة السعودية الثانية', en: 'The second Saudi state' },
+      k: ['الدوله السعوديه الثانيه', 'الدولة السعودية الثانية', 'الدوله الثانيه', 'تركي بن عبدالله', 'الامام تركي', 'سقوط الدرعيه', 'الدوله السعوديه الاولى', 'second saudi state', 'turki bin abdullah'],
+      a: { ar: 'بعد سقوط الدرعية ونهاية الدولة السعودية الأولى سنة ١٨١٨م (١٢٣٣هـ)، أسس الإمام تركي بن عبدالله بن محمد بن سعود الدولة السعودية الثانية سنة ١٨٢٤م (١٢٤٠هـ)، ونقل الحكم إلى الرياض وصارت عاصمتها، واستمرت لين ١٨٩١م (١٣٠٩هـ).',
+           en: 'After Diriyah fell and the first Saudi state ended in 1818 (1233 AH), Imam Turki bin Abdullah bin Muhammad bin Saud founded the second Saudi state in 1824 (1240 AH). He moved the seat of rule to Riyadh, which became its capital, and the state lasted until 1891 (1309 AH).' },
+      rel: ['founding', 'riyadh', 'unification'] },
+
+    { id: 'murabba', title: { ar: 'قصر المربع', en: 'Al-Murabba Palace' },
+      k: ['المربع', 'قصر المربع', 'قصر الملك عبدالعزيز', 'murabba'],
+      a: { ar: 'قصر المربع أول قصر يُبنى للملك عبدالعزيز برا أسوار الرياض القديمة. أمر ببنائه سنة ١٩٣٦م (١٣٥٥هـ) وانتقل له سنة ١٩٣٨م (١٣٥٧هـ)، وهو على الطراز النجدي بالطين وسعف النخل. منه صدرت قرارات مهمة مثل إصدار العملة وإنشاء سكة حديد الرياض والدمام، واليوم هو داخل مركز الملك عبدالعزيز التاريخي.',
+           en: 'Al-Murabba was the first palace built for King Abdulaziz outside the old walls of Riyadh. He ordered it in 1936 (1355 AH) and moved in in 1938 (1357 AH). It is built in the Najdi style of mud and palm fronds, and key decisions such as issuing the currency and building the Riyadh-Dammam railway were made there. Today it stands inside the King Abdulaziz Historical Center.' },
+      rel: ['museum', 'masmak', 'unification'] },
+
+    { id: 'unaizah', title: { ar: 'عنيزة «باريس نجد»', en: 'Unaizah, "the Paris of Najd"' },
+      k: ['عنيزه', 'عنيزة', 'باريس نجد', 'المسوكف', 'سوق المسوكف', 'بيت البسام', 'unaizah', 'paris of najd'],
+      a: { ar: 'عنيزة من أكبر مدن القصيم، ولقّبها الأديب أمين الريحاني لما زارها سنة ١٣٤١هـ «باريس نجد» لجمالها ومزارعها وعلم أهلها وذوقهم. من معالمها سوق المسوكف الشعبي اللي انبنى من جديد على الطراز القديم سنة ٢٠٠٩م، وبيت البسام التراثي.',
+           en: 'Unaizah is one of the largest towns in Al-Qassim. The writer Ameen Rihani, visiting in 1341 AH, called it "the Paris of Najd" for its beauty, its farms and the learning and taste of its people. Its sights include the Al-Musawkaf market, rebuilt in the old style in 2009, and the Al-Bassam heritage house.' },
+      rel: ['qassim', 'kleija', 'samri'] },
+
+    { id: 'sudair', title: { ar: 'سدير والمجمعة', en: 'Sudair and Al-Majma\'ah' },
+      k: ['سدير', 'المجمعه', 'المجمعة', 'مجمعه', 'روضه سدير', 'روضة سدير', 'جلاجل', 'مرقب منيخ', 'الغاط', 'sudair', 'majmaah'],
+      a: { ar: 'سدير شمال الرياض، فيها بلدات تراثية جميلة. في المجمعة البلدة القديمة المرمّمة ومرقب جبل منيخ اللي انبنى سنة ٨٣٠هـ وهو أقدم مبانيها، وفي روضة سدير بلدة تراثية من أقدم حواضر سدير على بعد حوالي ١٨٠ كيلو من الرياض، وجلاجل على منحدرات طويق، وقرية الغاط التراثية.',
+           en: 'Sudair lies north of Riyadh and has lovely heritage towns: Al-Majma\'ah\'s restored old town and its Muneekh watchtower, built in 830 AH and the oldest building there; the heritage village of Rawdat Sudair, one of the oldest settlements in Sudair, about 180 km from Riyadh; Jalajil on the slopes of Tuwaiq; and the heritage village of Al-Ghat.' },
+      rel: ['ushaiger', 'architecture', 'places'] },
+
+    { id: 'souqs', title: { ar: 'الأسواق الشعبية', en: 'Old markets' },
+      k: ['سوق', 'اسواق', 'أسواق', 'الاسواق الشعبيه', 'سوق الزل', 'الزل', 'سوق الموسم', 'تسوق', 'اتسوق', 'نتسوق', 'اشتري', 'وين اشتري', 'souq', 'market', 'shopping'],
+      a: { ar: 'من أشهر أسواق نجد: سوق الزل جنب قصر المصمك في الرياض، من بداية القرن الرابع عشر الهجري، تلقى فيه السجاد والبشوت والمنتجات التراثية. وسوق المسوكف في عنيزة، وسوق التمور في بريدة. وفي الدرعية قديمًا كان سوق الموسم من أوائل أسواق نجد، تجيه القوافل من الهند والعراق واليمن.',
+           en: 'Some of Najd\'s best-known markets: Souq Al-Zal next to Al-Masmak in Riyadh, running since the start of the 14th Hijri century, with carpets, bishts and traditional goods; Al-Musawkaf in Unaizah; and the date market in Buraydah. In old Diriyah, Souq Al-Mawsim was one of the first markets of Najd, visited by caravans from India, Iraq and Yemen.' },
+      rel: ['masmak', 'unaizah', 'dates'] },
+
+    { id: 'marasee', title: { ar: 'المراصيع وقرص عقيل', en: 'Marasee and Qurs Ogaili' },
+      k: ['المراصيع', 'مراصيع', 'المصابيب', 'مصابيب', 'قرص عقيل', 'العقيلات', 'القشد', 'قشد', 'حلويات', 'حلا', 'marasee', 'masabeeb', 'sweets'],
+      a: { ar: 'من حلويات نجد: المراصيع (وتسمى المصابيب) خليط من دقيق البر يختمر ويُصب على مقلاة حارة، ويُقدّم بالعسل أو الدبس والسمن. وقرص عقيل جابه رجال العقيلات من الشام وانتشر في نجد، وصار ثاني أكثر أكلة تنقدّم للزوار في القصيم بعد الكليجا. ومنها بعد الحنيني والقشد في الشتاء.',
+           en: 'Najdi sweets include marasee (also called masabeeb): a wheat batter left to rise and poured onto a hot pan, served with honey or date syrup and ghee. Qurs Ogaili was brought from the Levant by the Ogailat traders and spread across Najd; in Al-Qassim it is the most offered treat to visitors after kleija. In winter there are also haneeni and qashd.' },
+      rel: ['kleija', 'haneeni', 'food'] },
+
+    { id: 'sadu', title: { ar: 'السدو', en: 'Al-Sadu weaving' },
+      k: ['السدو', 'سدو', 'النسيج', 'الحياكه', 'بيت الشعر', 'sadu', 'weaving'],
+      a: { ar: 'السدو نسيج تقليدي تحيكه نساء البادية من صوف الغنم ووبر الإبل وشعر الماعز، بنقوش هندسية ملوّنة، ومنه بيوت الشعر والمساند والزينة. وسجلته اليونسكو سنة ٢٠٢٠م في قائمة التراث غير المادي باسم المملكة والكويت.',
+           en: 'Al-Sadu is the traditional weaving of Bedouin women, made from sheep\'s wool, camel hair and goat hair in bright geometric patterns, used for tents, cushions and decoration. UNESCO inscribed it in 2020 on its intangible heritage list for Saudi Arabia and Kuwait.' },
+      rel: ['clothing', 'hospitality', 'architecture'], page: 'sadu.html' },
+
+    { id: 'plants', title: { ar: 'نباتات نجد والربيع', en: 'Plants and spring' },
+      k: ['النباتات', 'نباتات', 'نبات', 'الخزامى', 'خزامى', 'العرفج', 'عرفج', 'الطلح', 'طلح', 'السدر', 'الرمث', 'الربيع', 'ربيع', 'الكشته', 'الكشتة', 'كشته', 'plants', 'flowers', 'spring', 'lavender'],
+      a: { ar: 'بعد أمطار الشتاء تخضر برّ نجد وتطلع الخزامى بلونها البنفسجي وريحتها، والعرفج بزهره الأصفر، والنفل والأقحوان. ومن أشجارها الطلح النجدي والسدر والرمث والأرطى. وهذا وقت الكشتة: يطلع الناس للبر ويخيّمون ويشبّون النار ويسوّون القهوة.',
+           en: 'After the winter rains the Najdi desert turns green: wild lavender (khuzama) with its purple flowers and scent, arfaj with yellow blooms, clover and chamomile. Its trees include the Najdi talh acacia, sidr, rimth and arta. This is the season for kashta: people head to the desert to camp, light a fire and make coffee.' },
+      rel: ['nature', 'edge', 'coffee'] },
+
     { id: 'masaqil', title: { ar: 'المصاقيل', en: 'Al-Masaqil' },
       k: ['المصاقيل', 'مصاقيل', 'الالعاب', 'الألعاب', 'العاب', 'لعبه', 'لعبة', 'games', 'game', 'marbles', 'masaqil'],
       a: { ar: 'المصاقيل لعبة شعبية من المنطقة الوسطى يلعبها الصغار في الحواري بحبيبات زجاج صغيرة: يرسمون مربع على الرمل ويصوّبون الحبيبات من بعيد، واللي يفوز ياخذ الحبيبات اللي في الحفرة.',
@@ -222,7 +270,7 @@
   };
   var UNKNOWN = { ar: 'السموحة، هذي ما عندي فيها علم أكيد، وما أحب أقولك شي مو متأكد منه. بس سم، اسألني عن نجد: تاريخها، أكلها، قهوتها، فنونها، أو قل لي وين تبي تروح وأنا بالخدمة.',
                   en: 'I don\'t have reliable information on that, and I\'d rather not guess. Ask me about Najd: its history, food, coffee, folk arts, or where to go.' };
-  var STARTERS = ['diriyah', 'food', 'coffeeHow', 'dialect', 'places', 'edge'];
+  var STARTERS = ['diriyah', 'food', 'coffeeHow', 'unaizah', 'places', 'plants'];
 
   // ── matching: Arabic is normalized (hamza forms, taa marbuta, alif maqsura, diacritics) ──
   // the same word can be written many ways: unify letters, drop diacritics, and turn other dialects' words into Najdi ones
@@ -360,11 +408,16 @@
     // the site's tokens (app.css), with fallbacks; --acc is the region's colour (Najd: clay brown)
     '#ng-btn,#ng-panel,#ng-peek{--g-paper:var(--paper,#F4EEE4);--g-ink:var(--ink,#16121D);--g-night:var(--night,#0E0B1A);--g-gold:var(--logo-gold,#E3C47A);--g-cream:var(--logo-cream,#F3EADB);' +
     '--g-acc:var(--acc,#8F5427);--g-rule:var(--rule,rgba(22,18,29,.14));--g-r:var(--r,3px);font-family:var(--f,"IBM Plex Sans Arabic",system-ui,sans-serif)}' +
-    '#ng-btn{position:fixed;z-index:150;inset-inline-start:14px;bottom:calc(var(--nav,62px) + 14px + env(safe-area-inset-bottom,0px));display:none;align-items:center;gap:10px;' +
-    'background:var(--g-night);color:var(--g-cream);border:1px solid rgba(227,196,122,.45);border-radius:var(--g-r);padding:6px 16px 6px 6px;font-weight:700;font-size:14.5px;cursor:pointer;box-shadow:0 10px 26px rgba(14,11,26,.28)}' +
-    'html[dir="rtl"] #ng-btn{padding:6px 6px 6px 16px}#ng-btn:active{transform:translateY(1px)}' +
-    '#ng-btn.show{display:inline-flex}#ng-btn .ng-face{width:40px;height:40px;border-radius:var(--g-r);background:#2A2235;overflow:hidden;flex:none}' +
-    '#ng-btn .ng-face svg,.ng-head .ng-face svg{width:100%;height:100%;transform:scale(1.5) translateY(9%)}' +
+    '#ng-btn{position:fixed;z-index:150;inset-inline-start:16px;bottom:calc(var(--nav,62px) + 16px + env(safe-area-inset-bottom,0px));display:none;width:64px;height:64px;padding:0;' +
+    'border-radius:50%;background:radial-gradient(circle at 50% 35%,#3A2E46,var(--g-night) 75%);border:2.5px solid var(--g-gold);cursor:pointer;box-shadow:0 10px 26px rgba(14,11,26,.35),0 0 0 5px rgba(227,196,122,.18);overflow:visible;transition:transform .2s}' +
+    '#ng-btn.show{display:block;animation:ngIn .5s var(--ease,cubic-bezier(.22,1,.36,1))}@keyframes ngIn{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}' +
+    '#ng-btn:hover{transform:translateY(-2px)}#ng-btn:active{transform:scale(.96)}' +
+    '#ng-btn .ng-face{position:absolute;inset:0;border-radius:50%;overflow:hidden}' +
+    '#ng-btn .ng-face svg{width:100%;height:100%;transform:scale(1.55) translateY(10%)}' +
+    '#ng-btn .ng-dot{position:absolute;bottom:2px;inset-inline-end:2px;width:14px;height:14px;border-radius:50%;background:#3E8E5A;border:2.5px solid var(--g-paper)}' +
+    '#ng-btn::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--g-gold);opacity:0;animation:ngRing 3.2s 1.2s infinite}' +
+    '@keyframes ngRing{0%{transform:scale(.9);opacity:.7}70%,100%{transform:scale(1.25);opacity:0}}' +
+    '.ng-head .ng-face svg{width:100%;height:100%;transform:scale(1.5) translateY(9%)}' +
     '#ng-panel{position:fixed;z-index:2147482000;top:0;bottom:0;inset-inline-end:0;width:min(420px,100vw);background:var(--g-paper);color:var(--g-ink);display:flex;flex-direction:column;' +
     'transform:translateX(105%);transition:transform .32s var(--ease,cubic-bezier(.22,1,.36,1));box-shadow:-14px 0 40px rgba(14,11,26,.25)}' +
     'html[dir="rtl"] #ng-panel{transform:translateX(-105%)}#ng-panel.open{transform:none!important}#ng-panel *{box-sizing:border-box}' +
@@ -399,9 +452,7 @@
     '.ng-said{min-height:1.6em;margin:14px 0 4px;color:rgba(22,18,29,.6);font-size:14px}' +
     '.ng-reply{font-size:16.5px;line-height:1.85;margin:2px 0 14px;font-weight:500;background:#FFFDF9;border:1px solid var(--g-rule);border-inline-start:3px solid var(--g-acc);border-radius:var(--g-r);padding:12px 14px;text-align:start;width:100%}' +
     '.ng-reply:empty{display:none}' +
-    '.ng-mic{width:72px;height:72px;border-radius:50%;border:0;background:var(--g-acc);color:var(--g-paper);cursor:pointer;flex:none;display:grid;place-items:center;box-shadow:0 8px 22px rgba(143,84,39,.35)}' +
-    '.ng-mic svg{width:30px;height:30px}.ng-mic.on{background:#3E8E5A;animation:ngPulse 1.2s infinite}@keyframes ngPulse{50%{box-shadow:0 0 0 12px rgba(62,142,90,0)}}' +
-    '#ng-peek{position:fixed;z-index:151;inset-inline-start:14px;bottom:calc(var(--nav,62px) + 74px + env(safe-area-inset-bottom,0px));max-width:min(260px,72vw);background:var(--g-paper);color:var(--g-ink);' +
+    '#ng-peek{position:fixed;z-index:151;inset-inline-start:16px;bottom:calc(var(--nav,62px) + 92px + env(safe-area-inset-bottom,0px));max-width:min(260px,72vw);background:var(--g-paper);color:var(--g-ink);' +
     'border:1px solid var(--g-rule);border-inline-start:3px solid var(--g-acc);border-radius:var(--g-r);padding:10px 34px 10px 14px;font-size:14.5px;font-weight:500;line-height:1.6;box-shadow:0 10px 26px rgba(14,11,26,.22);' +
     'opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;pointer-events:none;cursor:pointer}' +
     'html[dir="rtl"] #ng-peek{padding:10px 14px 10px 34px}#ng-peek.show{opacity:1;transform:none;pointer-events:auto}' +
@@ -414,7 +465,7 @@
     '<div class="ng-chat" id="ng-chat" aria-live="polite"></div>' +
     '<div class="ng-talk"><div class="ng-stage" id="ng-stage">' + MANsvg() + '</div>' +
     '<div class="ng-said" id="ng-said"></div><div class="ng-reply" id="ng-reply"></div>' +
-    '<button class="ng-mic" id="ng-mic" type="button" aria-label="Talk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><div class="ng-hint" id="ng-hint"></div></div>' +
+    '<div class="ng-hint" id="ng-hint"></div></div>' +
     '<form class="ng-form" id="ng-form"><input id="ng-in" autocomplete="off"><button type="submit" id="ng-send"></button></form>';
 
   var TXT = {
@@ -422,10 +473,11 @@
     title: { ar: 'فهد · دليلك في نجد', en: 'Fahad · your Najd guide' },
     sub: { ar: 'سم، أنا بالخدمة', en: 'Ask me about its history, people and food' },
     chat: { ar: 'اكتب له', en: 'Chat' },
-    talk: { ar: 'كلّمه بصوتك', en: 'Talk to him' },
+    talk: { ar: 'تكلّم مع فهد', en: 'Talk with Fahad' },
     ph: { ar: 'سم، وش تبي تعرف عن نجد؟', en: 'Ask anything about Najd…' },
     send: { ar: 'إرسال', en: 'Send' },
     hello: { ar: 'هلا والله وغلا، وحيّاك الله في نجد! أنا فهد، دليلك فيها وبالخدمة. سم، وش تبي تعرف؟ اسألني عن تاريخها، أكلها، قهوتها، فنونها، أو قل لي وين تبي تروح.', en: 'Welcome to Najd! I am Fahad, your guide here. Ask me about its history, food, coffee, folk arts, or where to go.' },
+    typeBelow: { ar: 'اكتب سؤالك تحت، وفهد يرد عليك.', en: 'Type your question below and Fahad will answer.' },
     tapMic: { ar: 'اضغط الميكروفون وتكلّم، أو اكتب تحت', en: 'Tap the microphone and speak, or type below' },
     listening: { ar: 'أسمعك… تكلّم', en: 'Listening… go ahead' },
     noMic: { ar: 'متصفحك ما يدعم الكلام. اكتب سؤالك تحت ويرد عليك بصوته.', en: 'Your browser does not support speech input. Type your question below and he will answer out loud.' },
@@ -447,11 +499,12 @@
   var mode = 'chat', greeted = false;
 
   function labels() {
-    btn.innerHTML = '<span class="ng-face">' + MANsvg() + '</span><span>' + L(TXT.btn) + '</span>';
+    btn.innerHTML = '<span class="ng-face">' + MANsvg() + '</span><span class="ng-dot" aria-hidden="true"></span>';
+    btn.setAttribute('aria-label', L(TXT.btn)); btn.title = L(TXT.btn);
     $('#ng-title', panel).textContent = L(TXT.title); $('#ng-sub', panel).textContent = L(TXT.sub);
     $('#ng-t-chat', panel).textContent = L(TXT.chat); $('#ng-t-talk', panel).textContent = L(TXT.talk);
     input.placeholder = L(TXT.ph); $('#ng-send', panel).textContent = L(TXT.send);
-    $('#ng-hint', panel).textContent = SR ? L(TXT.tapMic) : L(TXT.noMic);
+    $('#ng-hint', panel).textContent = L(TXT.typeBelow);
   }
 
   function bubble(cls, html) { var d = document.createElement('div'); d.className = 'ng-msg ' + cls; d.innerHTML = html; chat.appendChild(d); chat.scrollTop = chat.scrollHeight; return d; }
@@ -476,48 +529,14 @@
     if (r.near) chips(r.near); else if (r.starters) chips(STARTERS); else if (r.e && r.e.rel) chips(r.e.rel);
     if (mode === 'talk') {
       $('#ng-said', panel).textContent = L(TXT.you) + text;
-      $('#ng-reply', panel).textContent = reply;
       speak(reply);
     }
   }
 
   // ════════════════════════════════════════════════════════════
-  // VOICE — he speaks (speech synthesis, mouth moves) and listens (speech recognition)
+  // HE «SPEAKS» — the answer appears word by word under him while his mouth moves (no sound)
   // ════════════════════════════════════════════════════════════
   var flap = 0;
-  // voices ranked best first: natural (neural) voices, then Google's, then Apple's, then any Saudi or Arabic voice.
-  // A non-Arabic voice is never used for Arabic: it only garbles the words.
-  function pickVoice() {
-    if (!('speechSynthesis' in window)) return null;
-    var vs = speechSynthesis.getVoices(), ar = isAr();
-    var mine = vs.filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf(ar ? 'ar' : 'en') === 0; });
-    if (!mine.length) return null;
-    var rank = ar
-      ? [/hamed.*natural|natural.*hamed/i, /(online|natural).*(sa|saudi)/i, /natural|online|neural/i, /google/i, /maged|majed/i, /naayf|tarik|shakir/i, /ar[-_]sa/i]
-      : [/natural|online|neural/i, /google us english|google uk english male/i, /daniel|alex|fred|guy|david/i];
-    for (var i = 0; i < rank.length; i++) {
-      var hit = mine.filter(function (v) { return rank[i].test(v.name + ' ' + v.lang); })[0];
-      if (hit) return hit;
-    }
-    return mine[0];
-  }
-  // text as it should be heard: no quotes or brackets, digits the voice can read, years said in full
-  function forSpeech(t) {
-    return String(t)
-      .replace(/[٠-٩]/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'.indexOf(d); })
-      .replace(/(\d+)م\b/g, '$1 ميلادي').replace(/(\d+)هـ/g, '$1 هجري').replace(/(\d+)\s*كم/g, '$1 كيلو')
-      .replace(/[«»"()\[\]←→…]/g, ' ').replace(/\s+/g, ' ').trim();
-  }
-  // short sentences sound more natural and do not get cut off by the browser
-  function sentences(t) {
-    var out = [];
-    t.split(/(?<=[.!؟?:])\s+/).forEach(function (s) {
-      if (s.length <= 140) { if (s.trim()) out.push(s.trim()); return; }
-      var cur = ''; s.split(/(?<=،|,)\s*/).forEach(function (p) { if ((cur + ' ' + p).length > 140 && cur) { out.push(cur.trim()); cur = p; } else cur += (cur ? ' ' : '') + p; });
-      if (cur.trim()) out.push(cur.trim());
-    });
-    return out;
-  }
   function mouth(on) {
     clearInterval(flap); man.classList.remove('open', 'half');
     stage.classList.toggle('speaking', !!on);
@@ -529,49 +548,17 @@
   }
   var talkId = 0;
   function speak(text) {
-    stopListen();
-    var my = ++talkId;
-    var v = pickVoice();
-    if (!('speechSynthesis' in window) || !v) {
-      // no voice for this language on the device: show it, move the mouth, and say so once
-      if (!S_noVoiceSaid) { S_noVoiceSaid = true; $('#ng-hint', panel).textContent = L(TXT.noVoice); }
-      mouth(true); setTimeout(function () { if (my === talkId) mouth(false); }, Math.min(9000, 600 + text.length * 50)); return;
-    }
-    try {
-      speechSynthesis.cancel();
-      var parts = sentences(forSpeech(text)), i = 0;
-      var next = function () {
-        if (my !== talkId) return;
-        if (i >= parts.length) { mouth(false); return; }
-        var u = new SpeechSynthesisUtterance(parts[i++]);
-        u.voice = v; u.lang = v.lang; u.rate = isAr() ? 0.9 : 0.95; u.pitch = 1;
-        var guard = setTimeout(next, Math.min(20000, 1200 + u.text.length * 95));
-        u.onend = u.onerror = function () { clearTimeout(guard); next(); };
-        speechSynthesis.speak(u);
-      };
-      mouth(true); next();
-    } catch (e) { mouth(false); }
-  }
-  var S_noVoiceSaid = false;
-  function hush() { talkId++; try { speechSynthesis.cancel(); } catch (e) {} mouth(false); }
-
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition, rec = null, listening = false;
-  function stopListen() { if (rec && listening) { try { rec.stop(); } catch (e) {} } listening = false; $('#ng-mic', panel).classList.remove('on'); stage.classList.remove('listening'); }
-  function listen() {
-    if (!SR) { $('#ng-hint', panel).textContent = L(TXT.noMic); input.focus(); return; }
-    if (listening) { stopListen(); return; }
-    hush();
-    rec = new SR(); rec.lang = isAr() ? 'ar-SA' : 'en-US'; rec.interimResults = true; rec.maxAlternatives = 1; rec.continuous = false;
-    var final = '';
-    rec.onresult = function (e) {
-      var t = ''; for (var i = e.resultIndex; i < e.results.length; i++) { t += e.results[i][0].transcript; if (e.results[i].isFinal) final += e.results[i][0].transcript; }
-      $('#ng-said', panel).textContent = L(TXT.you) + (final || t);
+    var my = ++talkId, box = $('#ng-reply', panel), words = String(text).split(' '), i = 0;
+    box.textContent = ''; mouth(true);
+    var step = function () {
+      if (my !== talkId) return;
+      if (i >= words.length) { mouth(false); return; }
+      box.textContent += (i ? ' ' : '') + words[i++];
+      setTimeout(step, 70 + Math.min(120, words[i - 1].length * 12));
     };
-    rec.onerror = function (e) { if (e && (e.error === 'not-allowed' || e.error === 'service-not-allowed')) $('#ng-hint', panel).textContent = L(TXT.micDenied); };
-    rec.onend = function () { var was = listening; stopListen(); $('#ng-hint', panel).textContent = L(TXT.tapMic); if (was && final.trim()) ask(final); };
-    try { rec.start(); listening = true; $('#ng-mic', panel).classList.add('on'); stage.classList.add('listening'); $('#ng-hint', panel).textContent = L(TXT.listening); }
-    catch (e) { listening = false; }
+    step();
   }
+  function hush() { talkId++; mouth(false); }
 
   // ════════════════════════════════════════════════════════════
   // OPEN, CLOSE, MODES
@@ -580,8 +567,9 @@
     mode = m; panel.classList.toggle('talk', m === 'talk');
     $('#ng-t-chat', panel).classList.toggle('on', m === 'chat'); $('#ng-t-talk', panel).classList.toggle('on', m === 'talk');
     if (m === 'talk') {
-      if (!$('#ng-reply', panel).textContent) { $('#ng-reply', panel).textContent = L(TXT.hello); speak(L(TXT.hello)); }
-    } else { stopListen(); hush(); }
+      if (!$('#ng-reply', panel).textContent) speak(L(TXT.hello));
+      setTimeout(function () { input.focus(); }, 200);
+    } else { hush(); }
   }
   function open() {
     hidePeek();
@@ -589,13 +577,12 @@
     if (!greeted) { greeted = true; bubble('bot', esc(L(TXT.hello))); chips(STARTERS); }
     if (mode === 'chat') setTimeout(function () { input.focus(); }, 300);
   }
-  function close() { panel.classList.remove('open'); panel.setAttribute('aria-hidden', 'true'); stopListen(); hush(); }
+  function close() { panel.classList.remove('open'); panel.setAttribute('aria-hidden', 'true'); hush(); }
 
   btn.addEventListener('click', open);
   $('#ng-x', panel).addEventListener('click', close);
   $('#ng-t-chat', panel).addEventListener('click', function () { setMode('chat'); });
   $('#ng-t-talk', panel).addEventListener('click', function () { setMode('talk'); });
-  $('#ng-mic', panel).addEventListener('click', listen);
   $('#ng-form', panel).addEventListener('submit', function (e) { e.preventDefault(); var t = input.value; input.value = ''; ask(t); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && panel.classList.contains('open')) close(); });
 
@@ -624,7 +611,6 @@
   }
   new MutationObserver(refresh).observe(document.body, { attributes: true, attributeFilter: ['data-region', 'class'] });
   document.addEventListener('languageChanged', function () { labels(); });
-  if ('speechSynthesis' in window) { try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = function () {}; } catch (e) {} }
   labels(); refresh();
   // a direct link (?guide=1) goes straight to Najd with the guide open, e.g. to share it for testing
   if (/[?&]guide=1/.test(location.search)) setTimeout(function () {
