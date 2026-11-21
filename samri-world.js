@@ -1279,6 +1279,8 @@ export class World {
 
   // ── the loop ──
   tick(t, frame) {
+    // asleep while a full-screen layer covers the page (the Samri perform mode): no drawing, no battery
+    if (this.asleep && !this.renderer.xr.isPresenting) { this.last = performance.now(); return; }
     var now = performance.now(), dt = Math.min(window.CL_SM_DTMAX || 0.05, (now - this.last) / 1000);
     this.last = now; this.clock += dt;
     if (frame && this.hitSource && !this.placed) {

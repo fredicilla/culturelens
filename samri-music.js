@@ -47,8 +47,9 @@ export const LINES = {
 };
 // where each recorded sound sits in samri-sounds.mp3: [start, length, lead-in before its beat], in seconds
 export const SOUND_FILE = 'samri-sounds.mp3';
-// the sung verse is switched off: only the drums and claps are heard (set to true to bring the singing back)
-export const SINGING = false;
+// the rows sing (false = only the drums and claps are heard). While the Samri coach (samri-coach.js) is open,
+// samri.js sets music.voicesOff, so only the drums play under him
+export const SINGING = true;
 const CLICK_AT = 0.25;
 const CLIPS = {
   clap0: [0.5, 0.45, 0.05], clap1: [1.03, 0.45, 0.05], clap2: [1.56, 0.45, 0.05],
@@ -87,7 +88,7 @@ export class Music {
   constructor() {
     this.ctx = null; this.muted = false;
     this.segs = [{ t0: 0, b0: 0, bpm: STYLES.heavy.bpm, style: 'heavy' }];
-    this.playing = false; this.drums = true; this.claps = false; this.drumVol = 1; this.voiceVol = 1;
+    this.playing = false; this.drums = true; this.claps = false; this.drumVol = 1; this.voiceVol = 1; this.voicesOff = false;
     this.step = 0; this.slot = 0; this.timer = 0;
     this.t0perf = performance.now() / 1000;
     this.buf = null; this.off = 0; this.bytes = null; this.loading = null;   // the recorded sounds
@@ -97,6 +98,7 @@ export class Music {
     this.rowPan = [-0.3, 0.3];    // where each row is heard, left to right (set from the camera)
     this.singer = null;           // the row that sings and claps now (the other one holds the drums)
     this.onRunning = null;        // called when the audio clock starts running
+    this.rests = [];              // [t0, t1) windows where the drums and claps rest: your turn to answer alone (samri-perform.js)
   }
 
   // ── loading the recordings ──
@@ -227,12 +229,17 @@ export class Music {
   }
   // play one of the recorded sounds so that its beat falls at time t
   clip(name, t, vol, o) {
-    var c = CLIPS[name], ctx = this.ctx; if (!this.buf || !c || !ctx) return null;
+    var c = CLIPS[name]; if (!this.buf || !c || !this.ctx) return null;
+    return this.playSeg({ buf: this.buf, at: c[0] + this.off, len: c[1], lead: c[2] }, t, vol, o);
+  }
+  // play part of any decoded sound, { buf, at, len, lead }, so that the moment `lead` seconds into it falls at time t
+  playSeg(seg, t, vol, o) {
+    var ctx = this.ctx; if (!ctx || !seg || !seg.buf) return null;
     o = o || {};
     var rate = o.rate || 1, now = ctx.currentTime;
-    var when = t - c[2] / rate, at = c[0] + this.off, len = c[1];
+    var when = t - seg.lead / rate, at = seg.at, len = seg.len;
     if (when < now) { var skip = (now - when) * rate; if (skip > len - 0.03) return null; at += skip; len -= skip; when = now; }
-    var src = ctx.createBufferSource(); src.buffer = this.buf; src.playbackRate.value = rate;
+    var src = ctx.createBufferSource(); src.buffer = seg.buf; src.playbackRate.value = rate;
     var g = ctx.createGain(); g.gain.value = vol; src.connect(g);
     var last = g;
     if (o.pan && ctx.createStereoPanner) { var p = ctx.createStereoPanner(); p.pan.value = Math.max(-1, Math.min(1, o.pan)); g.connect(p); last = p; }
@@ -305,7 +312,7 @@ export class Music {
   // first beat falls at time t. o.row: 0 or 1, o.style: 'heavy' or 'light', o.vol
   voice(t, what, o) {
     o = o || {};
-    if (!SINGING) return { end: t, stop: function () {} };   // no singing at all: only the drums and claps play
+    if (!SINGING || this.voicesOff) return { end: t, stop: function () {} };   // no singing: only the drums and claps play
     if (!this.ctx) return { end: t, stop: function () {} };
     var self = this, style = what === 'wan' ? 'heavy' : (o.style || 'heavy'), row = o.row ? 1 : 0, bpm = STYLES[style].bpm;
     var name = what === 'wan' ? 'v_wan' : 'v_' + (row ? 'b' : 'a') + '_' + what + '_' + bpm;
@@ -321,6 +328,23 @@ export class Music {
       h = this.hum(t, LINES[what], 60 / bpm, { voices: what === 'wan' ? 1 : 3, vol: 0.09 * vol });
     } else return { end: t, stop: function () {} };
     h.row = what === 'wan' ? -1 : row; h.what = what; h.t0 = t; h.pulse = 60 / bpm / 3;
+    this.voices = this.voices.filter(function (x) { return x.end > self.time() - 0.5; });
+    this.voices.push(h);
+    return h;
+  }
+  // a row sings a phrase that isn't in the sound file (a poem written by AI): `seg` is its sound,
+  // { buf, at, len, lead }, and `what` names it (its syllables are in SUNG[what], for the mouths and the words)
+  voiceSeg(t, what, seg, o) {
+    o = o || {};
+    if (!this.ctx || !SINGING || this.voicesOff) return { end: t, stop: function () {} };
+    var self = this, row = o.row ? 1 : 0, vol = (o.vol == null ? 1 : o.vol) * this.voiceVol;
+    var c = this.playSeg(seg, t, 0.95 * vol, { pan: this.rowPan[row], wet: 0.8 });
+    if (!c) return { end: t, stop: function () {} };
+    var h = { end: c.end, row: row, what: what, t0: t, pulse: 60 / STYLES.heavy.bpm / 3, stop: function (at) {
+      var ctx = self.ctx; at = Math.max(at || ctx.currentTime, ctx.currentTime);
+      try { c.gain.gain.cancelScheduledValues(at); c.gain.gain.setValueAtTime(c.gain.gain.value, at); c.gain.gain.linearRampToValueAtTime(0.0001, at + 0.14); c.src.stop(at + 0.18); } catch (e) {}
+      h.end = Math.min(h.end, at + 0.14);
+    } };
     this.voices = this.voices.filter(function (x) { return x.end > self.time() - 0.5; });
     this.voices.push(h);
     return h;
@@ -430,6 +454,7 @@ export class Music {
     this.segs.push({ t0: t, b0: atBeat, bpm: STYLES[style].bpm, style: style });
   }
   stop() { this.playing = false; clearInterval(this.timer); this.timer = 0; this.hush(); }
+  resting(t) { for (var i = 0; i < this.rests.length; i++) if (t >= this.rests[i][0] - 0.02 && t < this.rests[i][1] - 0.02) return true; return false; }
   // walks the pulses: the strokes of the style fall on their pulses, the marjaf on the first stroke
   // of each cycle, and the singing row claps with the strokes. Every four beats a half of the verse
   // can begin: the plan says which row sings it
@@ -440,7 +465,7 @@ export class Music {
       var b = this.step / 3, t = this.timeOf(b);
       if (t > horizon) break;
       var st = STYLES[this.segAtBeat(b).style], inC = this.step % PULSES;
-      if (t >= now - 0.05) {
+      if (t >= now - 0.05 && !this.resting(t)) {
         st.strokes.forEach(function (e) {
           if (e[0] !== inC) return;
           if (this.drums) { this[e[1]](t, e[2] * this.drumVol); if (inC === 0) this.marjaf(t, 0.8 * this.drumVol); }
@@ -455,7 +480,8 @@ export class Music {
       if (ts > now + 0.5) break;
       if (this.plan && ts > now - 0.3) {
         var who = this.plan(this.slot, sb);
-        if (who) this.voice(ts, who.what, { row: who.row, style: this.segAtBeat(sb).style, vol: who.vol });
+        if (who && who.seg) this.voiceSeg(ts, who.what, who.seg, { row: who.row, vol: who.vol });
+        else if (who) this.voice(ts, who.what, { row: who.row, style: this.segAtBeat(sb).style, vol: who.vol });
       }
       this.slot++;
     }

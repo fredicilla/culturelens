@@ -1,0 +1,9 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+anthropic>=0.40
+numpy
+scipy
+pyworld==0.3.5
+onnx
+onnxruntime
+lameenc

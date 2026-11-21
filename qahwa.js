@@ -26,6 +26,9 @@
   function num(n) { return isAr() ? String(n).replace(/\d/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'[d]; }) : String(n); }
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   function pct(v) { return num(Math.round(v * 100)) + (isAr() ? '٪' : '%'); }
+  // Rawi, the CultureLens agent (rawi.js), plays Abu Fahad: it hears what happens here and answers as the host
+  function rawi(name, data) { (window.rawiQ = window.rawiQ || []).push(['event', name, data]); }
+  (window.rawiQ = window.rawiQ || []).push(['on', 'guide_step', function (a) { if (a && a.tip) toast({ en: a.tip, ar: a.tip }); }]);
 
   var ICON = {
     close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
@@ -821,6 +824,7 @@
     stopAction();
     S.done = true; S.act.doneMsg = msg;
     setStatus('good', msg);
+    rawi('step_done', { step: currentStep().key, result: msg && msg.en });
     sfx('ok'); buzz(20);
     renderStepBar();
     renderParts();
@@ -908,6 +912,7 @@
         else if (r < GOLD[0]) { S.act.msg = { en: 'Still green. Keep roasting.', ar: 'لسا أخضر. كمّل التحميص.' }; S.act.msgKind = 'info'; setStatus('info', S.act.msg); }
         else {
           sfx('bad'); buzz([20, 40, 20]);
+          rawi('mistake', { step: 'roast', what: 'roasted the beans too dark' });
           S.act.msg = { en: 'Too dark. Najdi coffee is a light, golden roast. Try a fresh batch.', ar: 'غامق زيادة. القهوة النجدية تحميصتها خفيفة ذهبية. جرّب حمسة جديدة.' }; S.act.msgKind = 'bad';
           setStatus('bad', S.act.msg);
           setTimeout(function () { if (!S.done && currentStep().action === 'roast') { S.act.r = 0; paintBeans(0); var b = $('#qx-cta'); if (b) b.style.setProperty('--p', 0); } }, 1400);
@@ -964,6 +969,7 @@
     var sp = SPICES[k];
     if (!sp.ok) {
       sfx('bad'); buzz([20, 40, 20]);
+      rawi('mistake', { step: 'spices', what: 'tried to add ' + k + ' to the coffee' });
       el.classList.remove('is-wrong'); void el.getBoundingClientRect(); el.classList.add('is-wrong');
       S.act.msg = sp.why; S.act.msgKind = 'bad';
       setStatus('bad', sp.why);
@@ -1169,6 +1175,7 @@
     var g = S.game;
     if (!g || g.phase !== 'pick' || g.served[k] || g.busy) return;
     var want = ORDER[g.turn];
+    rawi('serve_pick', { picked: GUESTS[k].name.en + ' (' + GUESTS[k].role.en + ')', right: k === want, should_be: GUESTS[want].name.en + ' (' + GUESTS[want].role.en + ')', cup: g.turn + 1 });
     if (k === want) {
       g.score += 1; sfx('ok'); buzz(15);
       g.fb = PICK_GOOD[g.turn]; g.fbKind = 'good';
@@ -1196,6 +1203,7 @@
 
   function answerHand(h) {
     var g = S.game;
+    rawi('serve_hand', { finjan_in: h + ' hand', right: h === 'right' });
     if (h === 'right') { g.score += 1; g.fb = HAND_GOOD; g.fbKind = 'good'; sfx('ok'); }
     else { g.learned.hand = false; g.fb = HAND_BAD; g.fbKind = 'bad'; sfx('bad'); buzz([20, 40, 20]); }
     g.phase = 'pour'; g.l = 0;
@@ -1222,6 +1230,7 @@
         pourSound(false);
         var g = S.game, k = g.current, l = g.l;
         if (l < 0.04) return;              // a tap, not a pour
+        rawi('serve_pour', { guest: GUESTS[k].name.en, fill_percent: Math.round(l * 100), right: l >= QUARTER[0] && l <= QUARTER[1] });
         if (l >= QUARTER[0] && l <= QUARTER[1]) { g.score += 1; g.fb = POUR_GOOD; g.fbKind = 'good'; sfx('ok'); }
         else { g.learned.pour = false; g.fb = l < QUARTER[0] ? POUR_LOW : POUR_HIGH; g.fbKind = 'bad'; sfx('bad'); }
         g.served[k] = true;
@@ -1251,6 +1260,7 @@
     var g = S.game, r = READS[g.readIdx];
     if (g.busy) return;
     var right = r.shake ? 'take' : 'pour';
+    rawi('read_cup', { guest: GUESTS[r.key].name.en, guest_shook_cup: r.shake, choice: choice === 'take' ? 'took the cup' : 'poured more', right: choice === right });
     if (choice === right) { g.score += 1; g.fb = READ_GOOD[right]; g.fbKind = 'good'; sfx('ok'); buzz(15); }
     else { g.learned.read = false; g.fb = READ_BAD[choice]; g.fbKind = 'bad'; sfx('bad'); buzz([20, 40, 20]); }
     if (right === 'pour') bubble(r.key, THANKS.other);
@@ -1287,6 +1297,7 @@
 
   function renderResult() {
     var g = S.game, stars = starsFor(g.score);
+    rawi('game_end', { score: g.score, max: MAX_SCORE, learned: g.learned });
     var title = RESULT_TITLES.filter(function (r) { return g.score >= r.min; })[0].t;
     var best = null;
     try { best = (JSON.parse(localStorage.getItem('cl_progress') || '{}').qahwa || {}).score; } catch (e) {}

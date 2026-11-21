@@ -57,6 +57,8 @@ culturelens/
 ├── masaqeel.html   — Al-Masaqil: 3D marble game with AR
 ├── sadu.html       — Al-Sadu: Bedouin weaving, 3D loom with AR + weaving race
 ├── samri.html      — Al-Samri: a Samri night in 3D with AR + rhythm game
+├── samri-ai.js, samri-ai/ — the AI Samri: six topic poems written by AI and their singing
+├── samri-ai-server/ — the AI Samri server for typed topics (see its README)
 └── style.css, ui.css, studio.css — Shared styles of the four full experiences
 ```
 
@@ -84,6 +86,7 @@ culturelens/
   - Singing: a machine voice, not a recording of a Samri group. An Arabic text-to-speech voice (Piper "ar_JO-kareem") says the verse in the Najdi way, and each syllable is put on the rhythm, held and tuned (WORLD vocoder), seven times over to make a row. The tune is ours, in the style, not a transcription. To be replaced by a real group when one can be recorded
 - The poem is a real Samri verse: يا جر قلبي جر لدن الغصوني / وغصون سدر جرها السيل جرا (one of the best-known Samri poems, attributed to the 19th-century poet Dakhilallah al-Dujaima). The rows sing it half by half, and each word lights up on screen as it is sung
 - History: where it began (Al-Qassim, in Najd), the two rows, the drums and both rhythms (tap Heavy or Light to hear them), the call and answer of the poetry (waneen, yisheel, marrad) with the verse, and where it is sung today
+- AI Samri: the story's "A Samri on any topic" lets you pick a topic (the palm, coffee, rain, the falcon, a night of samar, the homeland) and the rows sing a Samri about it: two abyat written by AI (Claude) in the meter of the verse above, sung by the same machine voices, the first row carrying each verse and the second singing it back, each word lighting up as it is sung. These six play with no server. Typing any other topic needs the AI Samri server (samri-ai-server/, see its README): Claude writes the poem, the server checks the meter and the rhyme in code, sends bad tries back to be fixed, then sings it. The AI verses still need a native speaker's review
 - How it's performed, done with your fingers on the scene: take your seat at the end of the row (drag), tune your drum by wetting the skin (tap, rub), sing the line back (hold through your half of the verse), play the beat of Unaizah (tap on every stroke), sway right and left (swipe), then lift and lower the drums on the leader's call and slap them down with everyone
 - Game: round 1 asks the mu'allim's 4 questions; round 2 is a whole Samri, heavy then light, where you clap with the drum strokes when your row sings and every passage you keep up with moves you one seat closer to the mu'allim
 - AR on Android, Quick Look on iPhone
@@ -94,6 +97,7 @@ culturelens/
 ## 🔊 AUDIO NOTES
 - Sounds are played with the Web Audio API. Qahwa, Al-Masaqil and Al-Sadu make theirs in code, with no audio files
 - Al-Samri plays recorded drums and claps and a sung verse from samri-sounds.mp3 (see its section), and falls back to sounds made in code if that file cannot be loaded
+- The AI Samri topics play from samri-ai/<topic>.mp3 (about 300 KB each, loaded when you pick one); typed topics are sung by the AI Samri server
 - **Must interact with page first** before audio works (browser requirement): the first tap anywhere starts it
 - On iPhone, Al-Samri asks to play as media, so it should sound even with the silent switch on (iOS 16.4 and later; older ones use a silent track for the same effect)
 
@@ -125,6 +129,7 @@ culturelens/
 2. Open Qahwa — tap through 2 story panels, do the mini-game
 3. Open Al-Sadu (Northern Region) — weave a few rows and pick up the tree, then race Grandma Haya
 4. Open Al-Samri (Najd): hear the heavy and light beats, sing the verse back, slap the drums down, then play a whole Samri and move up the row
+5. In Al-Samri's story, open "A Samri on any topic" and pick the palm: the rows sing a Samri the AI wrote about it. With the AI Samri server running, type any topic (see samri-ai-server/README.md for a demo-day setup)
 
 **Talking point:** "PNU has students from all 13 regions of Saudi Arabia — CultureLens lets a student from Asir and a student from Najd learn each other's heritage through experience, not just text."
 

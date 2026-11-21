@@ -47,6 +47,23 @@ body.sm .mq-panel.is-game .mq-title { font-size: 25px; margin: 4px 0 12px; }
 .sm-verse-by { margin: 6px 0 0; font-size: 12px; line-height: 1.45; color: var(--qx-ink-3); text-align: center; }
 .sm-verse-who { min-height: 18px; margin-top: 6px; font-size: 12.5px; font-weight: 600; color: #FFD27A; text-align: center; }
 .sm-verse-who:empty { min-height: 0; margin: 0; }
+/* a Samri written by AI: topics, your own topic, and the poem as the rows sing it */
+.sm-ai-label { margin: 12px 0 6px; font-size: 12.5px; font-weight: 600; color: var(--qx-ink-3); }
+.sm-topics { margin-top: 0; }
+.sm-ai-ask { display: flex; gap: 8px; margin-top: 10px; }
+.sm-ai-ask input { flex: 1; min-width: 0; height: 40px; padding: 0 14px; border-radius: 20px; border: 1px solid rgba(244, 236, 224, 0.22); background: rgba(7, 10, 22, 0.55);
+  color: var(--qx-ink); font: 500 15px var(--f-body, sans-serif); outline: none; }
+.sm-ai-ask input:focus { border-color: #FFD27A; }
+.sm-ai-ask input::placeholder { color: var(--qx-ink-3); }
+.sm-ai-ask button { flex: none; margin: 0; }
+.sm-ai-status { display: flex; align-items: center; gap: 8px; min-height: 20px; margin-top: 10px; font-size: 13px; color: #FFD27A; }
+.sm-ai-status:empty { min-height: 0; margin: 0; }
+.sm-ai-status.is-bad { color: #F2C1B9; }
+.sm-ai-status .qx-spinner { width: 14px; height: 14px; flex: none; }
+.sm-ai-by { margin-bottom: 4px; font-size: 11.5px; font-weight: 600; color: var(--qx-ink-3); text-align: center; }
+.sm-ai-poem .sm-verse-ar { gap: 8px; }
+.sm-ai-bayt { display: flex; flex-direction: column; gap: 0; }
+.sm-ai-bayt span { display: block; }
 /* the half verse being sung in the call and answer step */
 .sm-ph-line { margin-top: 12px; font-family: var(--qx-serif); font-size: 19px; line-height: 1.6; text-align: center; color: var(--qx-ink-2); }
 /* the line being sung, floating over the gathering wherever the verse is not already on the page */
@@ -272,3 +289,8 @@ body.sm.sm-playing .sm-track { bottom: calc(env(safe-area-inset-bottom, 0px) + 3
   .sm-g-dot, .sm-g-icon, .sm-g-icon .ring, .sm-markl i::after { animation: none !important; }
   .g-up .sm-g-dot, .g-down .sm-g-dot, .g-left .sm-g-dot, .g-right .sm-g-dot, .g-drag .sm-g-dot { opacity: 1; }
 }
+
+/* the Samri coach's button (samri-coach.js) sits on the start side, so it never covers the AR button */
+body #sc-entry { left: auto; inset-inline-start: 16px; transform: none; top: calc(env(safe-area-inset-top, 0px) + 118px); }
+body #sc-entry.show { animation: smCoachIn .4s ease-out; }
+@keyframes smCoachIn { from { transform: scale(.85); opacity: 0; } to { transform: none; opacity: 1; } }

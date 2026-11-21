@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rawi Live Trace</title>
+<meta name="description" content="Watch Rawi, the CultureLens heritage agent, think and act in real time.">
+<link rel="icon" href="favicon-32.png">
+<style>
+@font-face { font-family: 'CL Saudi'; font-weight: 500; font-display: swap; src: url('https://cdn.jsdelivr.net/gh/mokhtarbsaid/saudi-font/Saudi-Medium.ttf') format('truetype'); unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF; }
+:root { --bg: #0A0E1C; --card: #121830; --card2: #182040; --line: rgba(243,238,230,.14); --ink: #F3EEE6; --dim: rgba(243,238,230,.62); --gold: #E3C47A; --green: #7EE08A; --coral: #FF9B85; --blue: #8FB8FF; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'CL Saudi', 'IBM Plex Sans Arabic', system-ui, -apple-system, sans-serif; }
+header { display: flex; align-items: center; gap: 14px; padding: 18px 20px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: rgba(10,14,28,.95); backdrop-filter: blur(6px); z-index: 2; flex-wrap: wrap; }
+header h1 { margin: 0; font-size: 20px; } header h1 span { color: var(--gold); }
+.live { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--dim); }
+.live i { width: 9px; height: 9px; border-radius: 50%; background: #8A8F9E; } .live.on i { background: var(--green); box-shadow: 0 0 0 0 rgba(126,224,138,.6); animation: pulse 1.6s infinite; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(126,224,138,0); } 100% { box-shadow: 0 0 0 0 rgba(126,224,138,0); } }
+.stats { margin-inline-start: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.stat { border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: 13px; color: var(--dim); } .stat b { color: var(--ink); }
+main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 340px); gap: 16px; padding: 16px 20px 40px; max-width: 1400px; margin: 0 auto; }
+@media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+.turn { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; margin-bottom: 12px; }
+.turn.new { animation: in .4s ease-out; } @keyframes in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.turn-h { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--dim); }
+.exp { color: #16121D; background: var(--gold); border-radius: 999px; padding: 2px 9px; font-weight: 700; font-size: 12px; }
+.exp.qahwa { background: #E8A26B; } .exp.masaqil { background: var(--blue); } .exp.sadu { background: var(--coral); } .exp.general { background: #BFC4D4; }
+.step { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 6px 0; border-top: 1px dashed rgba(243,238,230,.1); font-size: 13.5px; }
+.step:first-of-type { border-top: 0; }
+.k { font: 12px ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: .6px; }
+.k.input { color: var(--green); } .k.ear { color: var(--blue); } .k.model { color: var(--gold); } .k.tool { color: #D9B3FF; } .k.reply { color: var(--ink); } .k.error { color: var(--coral); }
+.v { min-width: 0; overflow-wrap: anywhere; } .v code { font: 12px ui-monospace, Menlo, monospace; color: var(--dim); }
+.ms { font: 12px ui-monospace, Menlo, monospace; color: var(--dim); white-space: nowrap; }
+.say { font-size: 16px; line-height: 1.65; }
+aside .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 12px; }
+aside h2 { margin: 0 0 10px; font-size: 13px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--dim); font-weight: 600; }
+.bar { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 6px 0; } .bar span { width: 90px; color: var(--dim); }
+.bar i { flex: 1; height: 8px; border-radius: 4px; background: rgba(243,238,230,.08); overflow: hidden; } .bar i b { display: block; height: 100%; background: var(--gold); }
+.empty { color: var(--dim); font-size: 14px; padding: 30px 10px; text-align: center; line-height: 1.7; }
+.setup { color: var(--dim); font-size: 14px; line-height: 1.7; }
+.setup code { color: var(--gold); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Rawi <span>راوي</span> · live trace</h1>
+  <span class="live" id="live"><i></i><span id="live-t">connecting</span></span>
+  <div class="stats"><span class="stat">turns <b id="s-turns">0</b></span><span class="stat">tool calls <b id="s-tools">0</b></span><span class="stat">avg model <b id="s-ms">–</b></span><span class="stat">tokens <b id="s-tok">0</b></span></div>
+</header>
+<main>
+  <section id="turns"><div class="empty" id="empty">Waiting for the agent. Open any experience on a phone (Samri, Saudi Coffee, Masaqil, Sadu) and talk to Rawi: every step it takes appears here as it happens.</div></section>
+  <aside>
+    <div class="card"><h2>Agent loop</h2><div class="setup">Each turn: <b style="color:var(--green)">perceive</b> (an event, a measured attempt, speech) → <b style="color:var(--blue)">ear</b> (Whisper, for sung answers) → <b style="color:var(--gold)">think</b> (Qwen with tools, memory and the learner's progress in the prompt) → <b style="color:#D9B3FF">act</b> (validated tools) → <b>reply</b> (spoken on the phone).</div></div>
+    <div class="card"><h2>Which experience</h2><div id="mix"></div></div>
+    <div class="card"><h2>Tools used</h2><div id="toolmix"></div></div>
+  </aside>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script type="module">
+import { RAWI_SUPABASE_URL, RAWI_ANON_KEY } from './rawi-config.js';
+const q = (n) => { const m = location.search.match(new RegExp('[?&]' + n + '=([^&]+)')); return m ? decodeURIComponent(m[1]) : null; };
+let URL_ = q('rawi') || localStorage.getItem('cl_rawi_url') || RAWI_SUPABASE_URL, KEY = q('rawikey') || localStorage.getItem('cl_rawi_key') || RAWI_ANON_KEY;
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const turns = new Map(), mix = {}, toolmix = {};
+let nTools = 0, modelMs = [], tokens = 0;
+function card(row) {
+  const id = row.session_id + ':' + row.turn;
+  let t = turns.get(id);
+  if (!t) {
+    t = document.createElement('div'); t.className = 'turn new';
+    t.innerHTML = '<div class="turn-h"><span class="exp ' + esc(row.experience) + '">' + esc(row.experience) + '</span><span>session ' + esc(String(row.session_id).slice(0, 8)) + ' · turn ' + row.turn + '</span><span style="margin-inline-start:auto">' + new Date(row.created_at || Date.now()).toLocaleTimeString() + '</span></div><div class="steps"></div>';
+    turns.set(id, t); $('#turns').prepend(t); $('#empty') && $('#empty').remove();
+    mix[row.experience] = (mix[row.experience] || 0) + 1; $('#s-turns').textContent = turns.size;
+    while ($('#turns').children.length > 60) { const last = $('#turns').lastElementChild; last.remove(); }
+  }
+  return t;
+}
+function render(row) {
+  const t = card(row), p = row.payload || {};
+  let v = '';
+  if (row.kind === 'input') v = esc(p.text);
+  else if (row.kind === 'ear') v = 'heard «' + esc(p.heard || p.text) + '»' + (p.accuracy != null ? ' · <b>' + Math.round(p.accuracy * 100) + '%</b> of «' + esc(p.expected) + '»' : '');
+  else if (row.kind === 'model') { v = esc(row.name) + (p.usage ? ' <code>' + (p.usage.total_tokens || '?') + ' tokens</code>' : '') + (p.tries ? ' <code>' + esc(p.tries.join(' → ')) + '</code>' : ''); if (row.ms) modelMs.push(row.ms); tokens += (p.usage && p.usage.total_tokens) || 0; }
+  else if (row.kind === 'tool') { v = '<b>' + esc(row.name) + '</b> <code>' + esc(JSON.stringify(p.args)) + '</code> → <code>' + esc(JSON.stringify(p.result)).slice(0, 220) + '</code>'; nTools++; toolmix[row.name] = (toolmix[row.name] || 0) + 1; }
+  else if (row.kind === 'reply') v = '<div class="say">' + esc(p.say) + '</div>';
+  else v = '<code>' + esc(JSON.stringify(p)).slice(0, 300) + '</code>';
+  const s = document.createElement('div'); s.className = 'step';
+  s.innerHTML = '<span class="k ' + esc(row.kind) + '">' + esc(row.kind) + '</span><span class="v">' + v + '</span><span class="ms">' + (row.ms != null ? row.ms + ' ms' : '') + '</span>';
+  t.querySelector('.steps').appendChild(s);
+  $('#s-tools').textContent = nTools; $('#s-tok').textContent = tokens.toLocaleString();
+  $('#s-ms').textContent = modelMs.length ? Math.round(modelMs.reduce((a, b) => a + b, 0) / modelMs.length) + ' ms' : '–';
+  bars('#mix', mix); bars('#toolmix', toolmix);
+}
+function bars(sel, o) {
+  const max = Math.max(1, ...Object.values(o));
+  $(sel).innerHTML = Object.entries(o).sort((a, b) => b[1] - a[1]).map(([k, n]) => '<div class="bar"><span>' + esc(k) + '</span><i><b style="width:' + (n / max * 100) + '%"></b></i><code>' + n + '</code></div>').join('');
+}
+async function boot() {
+  if (!URL_ || !KEY) { $('#live-t').textContent = 'not connected'; $('#empty').innerHTML = 'Rawi is not connected to a Supabase project yet. Fill in <code>rawi-config.js</code>, or open this page with <code>?rawi=https://&lt;project&gt;.supabase.co&amp;rawikey=&lt;anon key&gt;</code>.'; return; }
+  const db = supabase.createClient(URL_, KEY);
+  const { data } = await db.from('traces').select('*').order('id', { ascending: false }).limit(200);
+  (data || []).reverse().forEach(render);
+  document.querySelectorAll('.turn.new').forEach((e) => e.classList.remove('new'));
+  db.channel('rawi-traces').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'traces' }, (m) => render(m.new))
+    .subscribe((st) => { const on = st === 'SUBSCRIBED'; $('#live').classList.toggle('on', on); $('#live-t').textContent = on ? 'live' : st.toLowerCase(); });
+}
+boot();
+</script>
+</body>
+</html>

@@ -26,7 +26,7 @@
  * against wind, rain and sand.
  */
 import { World, LOOM } from './sadu-world.js';
-import { bandCanvas, drawBand, YARN, YARN_KEYS, NAMES, DEMO, COLS, ZONES } from './sadu-weave.js';
+import { bandCanvas, drawBand, YARN, YARN_KEYS, NAMES, DEMO, COLS, ZONES, rowsFor } from './sadu-weave.js';
 
 // ════════════════════════════════════════════════════════════
 // helpers
@@ -332,6 +332,38 @@ var SCALE = [293.7, 311.1, 370, 392, 440, 466.2, 554.4, 587.3];
 // ════════════════════════════════════════════════════════════
 // state
 // ════════════════════════════════════════════════════════════
+// Rawi, the CultureLens agent (rawi.js), plays Grandma Haya: it hears your steps and answers, and can weave your story
+function rawi(name, data) { (window.rawiQ = window.rawiQ || []).push(['event', name, data]); }
+// the band Grandma Haya weaves for you: one to three strips from the real patterns and yarns (the agent's weave_band)
+function showStoryBands(a) {
+  if (!a || !Array.isArray(a.bands) || !a.bands.length) return;
+  var old = document.getElementById('sd-story'); if (old) old.remove();
+  var box = document.createElement('div'); box.id = 'sd-story';
+  box.setAttribute('style', 'position:fixed;inset:0;z-index:2147482000;background:rgba(7,10,22,.86);display:flex;align-items:center;justify-content:center;padding:16px');
+  var card = document.createElement('div');
+  card.setAttribute('style', 'width:min(560px,100%);max-height:92vh;overflow:auto;background:#17111A;border:1px solid rgba(227,196,122,.5);border-radius:20px;padding:16px;color:#F3EEE6;font-family:var(--font-ui,inherit)');
+  var head = document.createElement('div'); head.setAttribute('style', 'display:flex;align-items:center;gap:10px;margin-bottom:10px');
+  head.innerHTML = HAYA.replace('<svg', '<svg style="width:44px;height:44px;flex:none"') + '<div style="flex:1"><div style="color:#E3C47A;font-weight:700;font-size:13px">' + L({ en: 'Woven for you by Grandma Haya', ar: 'نسجتها لك الجدة هيا' }) + '</div><div style="font-size:20px;font-weight:700"></div></div>';
+  head.lastChild.lastChild.textContent = a.title || '';
+  var x = document.createElement('button'); x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', 'Close');
+  x.setAttribute('style', 'background:rgba(243,238,230,.08);color:#F3EEE6;border:1px solid rgba(243,238,230,.2);border-radius:999px;width:36px;height:36px;font-size:16px;cursor:pointer');
+  x.onclick = function () { box.remove(); };
+  head.appendChild(x); card.appendChild(head);
+  a.bands.slice(0, 3).forEach(function (b) {
+    var spec = { center: b.center, edge: b.edge, ground: b.ground, figure: b.figure };
+    if (NAMES[spec.center] == null || NAMES[spec.edge] == null || !YARN[spec.ground] || !YARN[spec.figure]) return;
+    var c = bandCanvas(spec, rowsFor(spec.center, 3, true), { cw: 4, ch: 6, dir: 'h', scale: 2 });
+    c.setAttribute('style', 'width:100%;height:auto;display:block;border-radius:6px;margin-top:10px;box-shadow:0 6px 18px rgba(0,0,0,.4)');
+    var cap = document.createElement('div'); cap.setAttribute('style', 'font-size:14.5px;line-height:1.6;margin-top:6px');
+    var nm = document.createElement('b'); nm.setAttribute('style', 'color:#E3C47A'); nm.textContent = L(NAMES[spec.center]) + ' · ' + L(NAMES[spec.edge]) + ' · ' + L(YARN[spec.figure]) + '/' + L(YARN[spec.ground]);
+    var mean = document.createElement('div'); mean.textContent = b.meaning || '';
+    cap.appendChild(nm); cap.appendChild(mean);
+    card.appendChild(c); card.appendChild(cap);
+  });
+  box.appendChild(card); box.addEventListener('click', function (e) { if (e.target === box) box.remove(); });
+  document.body.appendChild(box);
+}
+(window.rawiQ = window.rawiQ || []).push(['on', 'weave_band', showStoryBands]);
 var S = { part: 'story', ch: 0, fiber: null, motif: null, how: 0, hs: {}, howDone: false, game: null, sound: true, arMode: null, inAR: false, arPlaced: false, gest: null, touching: false };
 try { S.sound = localStorage.getItem('cl_sound') !== 'off'; } catch (e) {}
 var world, panel, bar, parts, toastEl, touch, callout, arBtn, root;
@@ -683,6 +715,7 @@ function stepDone() {
   hs.ok = true;
   setGesture(null); clearGuide(); setMarks(null); gaugeOff();
   sfx('star'); buzz(20);
+  rawi('step_done', { step: HOW[S.how].key });
   renderHow(false); renderParts();
 }
 function skipStep() {
@@ -1227,6 +1260,7 @@ function answer(k) {
   var g = S.game, q = QUESTIONS[g.qi];
   if (g.answered) return;
   g.answered = k;
+  rawi('quiz_answer', { question: q.key, answer: k, right: k === q.answer });
   if (k === q.answer) { g.score++; sfx('ok'); buzz(15); }
   else { sfx('bad'); buzz([20, 40, 20]); }
   renderQuestion();
@@ -1378,6 +1412,7 @@ function racePoints(r) {
 function endRace(won) {
   var g = S.game, r = g.race, my = token;
   r.phase = 'done'; r.won = won;
+  rawi('race_end', { learner_won: won, level: r.level, slips: r.slips, best_streak: r.best });
   clearTimeout(cueTimer); promptEl.classList.remove('show'); promptEl.hidden = true;
   setGesture(null);
   r.pts = racePoints(r).reduce(function (a, p) { return a + (p.ok ? p.v : 0); }, 0);
@@ -1430,6 +1465,7 @@ function endGame() {
 }
 function renderResults() {
   var g = S.game, total = g.score + g.racePts, stars = starsFor(total);
+  rawi('game_end', { reading_score: g.score + '/' + QUESTIONS.length, race_points: g.racePts + '/4' });
   var title = RESULT_TITLES.filter(function (r) { return total >= r.min; })[0].t;
   panel.className = 'mq-panel mq-results qx-enter';
   panel.innerHTML = '<div class="mq-stars">' + [0, 1, 2].map(function (i) { return '<i class="' + (i < stars ? 'on' : '') + '">' + ICON.star + '</i>'; }).join('') + '</div>' +

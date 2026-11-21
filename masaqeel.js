@@ -22,6 +22,8 @@ function isAr() { return window.currentLang === 'ar'; }
 function L(o) { if (o == null) return ''; if (typeof o === 'string') return o; return isAr() ? (o.ar != null ? o.ar : o.en) : o.en; }
 function num(n) { return isAr() ? String(n).replace(/\d/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'[d]; }) : String(n); }
 function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+// Rawi, the CultureLens agent (rawi.js), plays Fahad: it hears every shot, talks back, and sets how well he shoots
+function rawi(name, data) { (window.rawiQ = window.rawiQ || []).push(['event', name, data]); }
 function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
 var ICON = {
@@ -165,6 +167,7 @@ var MAX_SHOTS = 4, ROUNDS = 3, START_MARBLES = 5;
 // ════════════════════════════════════════════════════════════
 // state
 // ════════════════════════════════════════════════════════════
+(window.rawiQ = window.rawiQ || []).push(['on', 'set_fahad_skill', function (a) { if (a && typeof a.skill === 'number') S.fahadSkill = Math.max(0, Math.min(1, a.skill)); }]);
 var S = {
   part: 'story', ch: 0, how: 0, howState: {}, practice: { tries: 0, made: false },
   game: null, sound: true, arMode: null, inAR: false, arPlaced: false, view: 'behind',
@@ -634,7 +637,7 @@ function startRound() {
     if (my !== token) return;
     renderHUD();
     nextTurn(g.round % 2 === 1 ? 'me' : 'fahad', true);
-    if (g.round === 1) bubble(SAY.start);
+    if (g.round === 1) { bubble(SAY.start); rawi('match_start', { rounds: ROUNDS, marbles_each: START_MARBLES }); }
   }, 1500);
 }
 
@@ -698,8 +701,9 @@ function fahadShoot() {
   var dx = target.x - P.x, dz = target.y - P.y, d = Math.hypot(dx, dz);
   var lead = g.pocket.fahad - g.pocket.me;           // ahead: a bit sloppier; behind: sharper
   var sigA = (0.046 + 0.016 * d) * (1 + 0.22 * clamp(lead, -2, 3));
+  if (S.fahadSkill != null) sigA *= 1.7 - 1.3 * S.fahadSkill;   // the agent keeps the match close: 0 is sloppy, 1 is sharp
   var ang = Math.atan2(dz, dx) + gauss() * sigA;
-  var v = Math.sqrt(2 * K.DECEL * (d + extra)) * (1 + gauss() * 0.085);
+  var v = Math.sqrt(2 * K.DECEL * (d + extra)) * (1 + gauss() * 0.085 * (S.fahadSkill != null ? 1.6 - 1.2 * S.fahadSkill : 1));
   v = Math.min(v, K.V_MAX);
   world.markShooter(null);
   g.phase = 'roll'; g.shots.fahad++;
@@ -731,6 +735,8 @@ function afterShot(who, start, dir) {
   var winner = null, msg = null;
   if (mine.state === 'hole') { winner = who; }
   else if (his.state === 'hole') { winner = other; msg = who === 'me' ? FB.knockedIn : FB.heKnockedIn; }
+  rawi('shot', { shooter: who === 'me' ? 'learner' : 'fahad', result: winner ? (winner === who ? 'in the hole' : 'knocked the other marble in') : (mine.state === 'rest' ? (inSquare(mine) ? 'missed, stayed in the square' : 'missed, out of the square') : 'missed'),
+    distance_to_hole_cm: mine.state === 'rest' ? Math.round(mine.pos.length() * 100) : 0, round: g.round, marbles: { learner: g.pocket.me, fahad: g.pocket.fahad } });
   if (winner) {
     g.sinks += winner === 'me' ? 1 : 0;
     // the shooter itself goes back to its owner; everything else in the hole goes to the winner
@@ -803,6 +809,7 @@ function endMatch() {
   if (world.inHole().length) world.collectHole(K.LINE_Z, 0);
   g.over = true; g.turn = null;
   renderHUD(); renderParts();
+  rawi('match_end', { learner_marbles: g.pocket.me, fahad_marbles: g.pocket.fahad, started_with: START_MARBLES, rounds: g.round });
   var net = g.pocket.me - START_MARBLES;
   var stars = net >= 2 ? 3 : net >= 1 ? 2 : 1;
   try {

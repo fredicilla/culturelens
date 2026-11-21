@@ -3,7 +3,8 @@
  *
  * One live 3D scene (samri-world.js) carries the whole experience, with its sound played on the beat
  * by samri-music.js (recorded frame drums and claps, and a machine voice singing the verse):
- *   1. History (#story)           a Samri night in the dunes outside Unaizah while the story is told
+ *   1. History (#story)           a Samri night in the dunes outside Unaizah while the story is told,
+ *                                 and a Samri written by AI on a topic you pick, sung by the rows (samri-ai.js)
  *   2. How it's performed (#how)  done with your fingers: take your seat at the end of the row,
  *                                 tune your drum, sing a line of the poem back, play the heavy
  *                                 Samri beat of Unaizah, sway, lift the drums and slap them down
@@ -46,6 +47,7 @@
  */
 import { World, ROW } from './samri-world.js';
 import { Music, STYLES, SUNG } from './samri-music.js';
+import { BANK as AI_BANK, TOPICS as AI_TOPICS, aiUrl, loadTopic, composeLive, singLive } from './samri-ai.js';
 
 // ════════════════════════════════════════════════════════════
 // helpers
@@ -167,6 +169,10 @@ var STORY = [
     more: { en: 'Every first half of a verse ends on one rhyme and every second half on another, like -ūnī and -rā here. The poems speak of love, longing, praise and parting, and Muhsin Al-Hazzani of Najd is named among the first Samri poets.', ar: 'كل صدر بيت ينتهي بقافية، وكل عجز بقافية ثانية، مثل «ـوني» و«ـرا» هنا. والقصايد عن الحب والشوق والمدح والفراق، ومن أوائل شعراء السامري محسن الهزاني من نجد.' }
   },
   {
+    scene: 'poetry', compose: true, title: { en: 'A Samri on any topic', ar: 'سامري على أي موضوع' },
+    body: { en: 'Pick a topic and hear a Samri the AI wrote on it: two verses in the meter of the verse you just heard, with one rhyme for the first halves and another for the second. The first row carries each verse and the second sings it back.', ar: 'اختر موضوع واسمع سامري كتبه عليه الذكاء الاصطناعي: بيتين بنفس وزن البيت اللي سمعته، بقافية للصدور وقافية للأعجاز. الصف الأول يشيل البيت والثاني يرده.' }
+  },
+  {
     scene: 'today', title: { en: 'Still sung today', ar: 'ما زال يُغنّى' },
     timeline: [
       { year: { en: 'Every week', ar: 'كل أسبوع' }, text: { en: 'Unaizah still holds Samri evenings every week, kept up by its young men and its elders.', ar: 'ما زالت عنيزة تقيم حفلات السامري كل أسبوع، يحييها شبابها وكبارها.' } },
@@ -177,6 +183,25 @@ var STORY = [
   }
 ];
 var LISTEN = { en: 'Listen to the call and answer', ar: 'اسمع الشيلة والرد' };
+var AIT = {
+  pick: { en: 'Pick a topic', ar: 'اختر موضوع' },
+  ask: { en: 'Or write your own topic', ar: 'أو اكتب موضوعك' },
+  ph: { en: 'The sea, your city, a friend...', ar: 'البحر، مدينتك، الصديق...' },
+  go: { en: 'Write it', ar: 'اكتبها' },
+  by: { en: 'Written by AI', ar: 'كتبها الذكاء الاصطناعي' },
+  loading: { en: 'The rows are getting ready...', ar: 'الصفوف تتجهز...' },
+  composing: { en: 'The AI is writing your Samri...', ar: 'الذكاء الاصطناعي يكتب السامري...' },
+  teaching: { en: 'The rows are learning the tune...', ar: 'الصفوف تحفظ اللحن...' },
+  singing: { en: 'Listen to the rows sing it', ar: 'اسمع الصفوف تغنيها' },
+  again: { en: 'Sing it again', ar: 'غنّوها مرة ثانية' },
+  whoA: { en: 'The first row carries the verse', ar: 'الصف الأول يشيل البيت' },
+  whoB: { en: 'The second row sings it back', ar: 'الصف الثاني يرده' },
+  errTopic: { en: 'That topic doesn\'t suit a Samri for everyone. Try another one.', ar: 'هذا الموضوع ما يناسب سامري للكل. جرّب موضوع ثاني.' },
+  errMeter: { en: 'The AI couldn\'t fit that topic to the meter this time. Try again, or pick another one.', ar: 'ما ضبط الوزن هالمرة. جرّب مرة ثانية أو اختر موضوع ثاني.' },
+  errBusy: { en: 'Lots of poems are being written right now. Try again in a little while.', ar: 'فيه طلبات كثيرة الحين. جرّب بعد شوي.' },
+  errNet: { en: 'The AI can\'t be reached right now. Try one of the topics above.', ar: 'ما قدرنا نوصل للذكاء الاصطناعي الحين. جرّب واحد من المواضيع اللي فوق.' },
+  errLoad: { en: 'The singing didn\'t load. Check your connection and try again.', ar: 'ما تحمّل الغناء. تأكد من الاتصال وجرّب مرة ثانية.' }
+};
 var LISTENING = { en: 'Listening...', ar: 'نسمع...' };
 var DRUMS = {
   heavy: { en: 'Heavy · Unaizah', ar: 'الثقيل · عنيزة' },
@@ -552,9 +577,10 @@ function ambient(vol) {
 // behind the story each row takes the whole verse in turn: the first half, then the second
 function ambientPlan(slot) {
   if (S.listen || S.solo) return null;
+  if (S.part === 'story' && STORY[S.ch].compose) return null;   // the AI chapter keeps the voices for its own poems
   return { row: Math.floor(slot / 2) % 2, what: slot % 2 ? 'h2' : 'h1' };
 }
-function quiet() { S.ambient = false; S.wantAmbient = 0; S.listen = null; S.solo = null; music.plan = null; music.stop(); music.claps = false; music.drums = true; music.drumVol = 1; music.voiceVol = 1; }
+function quiet() { if (S.ai && S.ai.perf) S.ai.perf.done = true; S.ambient = false; S.wantAmbient = 0; S.listen = null; S.solo = null; music.plan = null; music.stop(); music.claps = false; music.drums = true; music.drumVol = 1; music.voiceVol = 1; }
 function resetSeats() {
   world.figs.forEach(function (f, i) { world.setSeat(f, i % ROW.N, true); world.setShow(f, 1, true); world.setDrumTint(i, 1); });
   world.setYou(-1); world.youManual = false;
@@ -584,7 +610,7 @@ function goCh(i, fresh) {
   S.ch = clamp(i, 0, STORY.length - 1);
   var c = STORY[S.ch];
   if (changed) {
-    S.place = null; S.who = null; setMarks(null);
+    S.place = null; S.who = null; setMarks(null); stopAI();
     if (!S.inAR) world.view(c.scene, { k: 1.4 });
   }
   var html = '<div class="mq-dots">' + stepsDots(STORY.length, S.ch) + '</div>' +
@@ -605,6 +631,7 @@ function goCh(i, fresh) {
   }
   if (c.verse) html += verseHtml();
   if (c.listen) html += '<div class="sm-chips"><button class="sm-chip' + (S.listen ? ' is-on' : '') + '" data-listen="1"' + (S.listen ? ' disabled' : '') + '>' + ICON.play + L(S.listen ? LISTENING : LISTEN) + '</button></div>';
+  if (c.compose) html += composeHtml();
   if (c.more && !c.drum) html += '<p class="sm-note">' + L(c.more) + '</p>';
   if (c.timeline) {
     html += '<div class="qx-timeline sm-timeline">' + c.timeline.map(function (t) {
@@ -631,6 +658,7 @@ function goCh(i, fresh) {
   }
   if (c.drum) $$('[data-drum]', panel).forEach(function (b) { b.addEventListener('click', function () { playDrumPattern(b.getAttribute('data-drum')); }); });
   if (c.listen) { var lb = $('[data-listen]', panel); if (lb) lb.addEventListener('click', listenCallAnswer); }
+  if (c.compose) wireCompose();
   S.lyKey = null;
   var last = S.ch === STORY.length - 1;
   setBar({
@@ -693,10 +721,168 @@ function listenCallAnswer() {
     if (S.part === 'story') goCh(S.ch);
   }, (t + 12.5 * spb - music.time()) * 1000);
 }
+// ── a Samri written by AI on a topic you pick ──
+// S.ai: { n, key (a topic that ships with the app, or 'live'), status, poem, seg: { 'b0s0': sound, ... }, perf }
+var AI_N = 0;
+function aiBusy() { var a = S.ai; return !!(a && (a.status === 'loading' || a.status === 'composing' || a.status === 'teaching' || (a.perf && !a.perf.done))); }
+// the order the rows sing a poem in: for each verse, the first row carries it (both halves), then the second sings it back
+function aiSteps(poem) {
+  var out = [];
+  poem.abyat.forEach(function (b, bi) { [0, 1].forEach(function (row) { ['s', 'a'].forEach(function (pt) { out.push({ bi: bi, part: pt, row: row, name: 'b' + bi + pt + row }); }); }); });
+  return out;
+}
+function aiKey(a, bi, pt) { return 'ai' + a.n + ':' + bi + ':' + pt; }
+function aiHalf(b, pt) { return pt === 's' ? b.sadr : b.ajz; }
+function aiWords(h) { return h.words || h.text.split(' '); }
+// a poem from the server is shown as text, never as markup
+function escH(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function composeHtml() {
+  var a = S.ai || {}, busy = aiBusy(), html = '<div class="sm-ai-label">' + L(AIT.pick) + '</div><div class="sm-chips sm-topics">';
+  html += AI_TOPICS.map(function (k) { return '<button class="sm-chip' + (a.key === k ? ' is-on' : '') + '" data-topic="' + k + '"' + (busy ? ' disabled' : '') + '>' + L(AI_BANK[k].topic) + '</button>'; }).join('') + '</div>';
+  if (aiUrl()) html += '<form class="sm-ai-ask" id="sm-ai-ask" autocomplete="off"><input id="sm-ai-topic" type="text" maxlength="40" dir="auto" placeholder="' + L(AIT.ph) + '" aria-label="' + L(AIT.ask) + '" value="' + (a.key === 'live' && a.topic ? escH(a.topic) : '') + '"' + (busy ? ' disabled' : '') + '><button type="submit" class="sm-chip"' + (busy ? ' disabled' : '') + '>' + L(AIT.go) + '</button></form>';
+  html += '<div class="sm-ai-status' + (a.status === 'error' ? ' is-bad' : '') + '" id="sm-ai-status" aria-live="polite">' + aiStatusText() + '</div>';
+  if (a.poem) {
+    html += '<div class="sm-verse sm-ai-poem" id="sm-ai-poem"><div class="sm-ai-by">' + L(AIT.by) + ' · ' + escH(L(a.poem.topic)) + '</div><div class="sm-verse-ar" lang="ar" dir="rtl">' +
+      a.poem.abyat.map(function (b, bi) {
+        return '<div class="sm-ai-bayt">' + ['s', 'a'].map(function (pt) {
+          return '<span data-key="' + aiKey(a, bi, pt) + '">' + aiWords(aiHalf(b, pt)).map(function (w, i) { return '<i data-w="' + i + '">' + escH(w) + '</i>'; }).join(' ') + '</span>';
+        }).join('') + '</div>';
+      }).join('') + '</div>' +
+      (a.poem.mean ? '<p class="sm-verse-mean">' + escH(L(a.poem.mean)) + '</p>' : '') +
+      '<div class="sm-verse-who" id="sm-ai-who"></div></div>';
+    if (a.status === 'done') html += '<div class="sm-chips"><button class="sm-chip" data-again="1">' + ICON.play + L(AIT.again) + '</button></div>';
+  }
+  return html;
+}
+function aiStatusText() {
+  var a = S.ai; if (!a) return '';
+  if (a.status === 'error') return L(a.msg || AIT.errNet);
+  if (a.status === 'loading') return '<i class="qx-spinner"></i>' + L(AIT.loading);
+  if (a.status === 'composing') return '<i class="qx-spinner"></i>' + L(AIT.composing);
+  if (a.status === 'teaching') return '<i class="qx-spinner"></i>' + L(AIT.teaching);
+  if (a.status === 'singing') return L(AIT.singing);
+  return '';
+}
+function aiRender() { if (S.part === 'story' && STORY[S.ch].compose) goCh(S.ch); }
+function wireCompose() {
+  $$('[data-topic]', panel).forEach(function (b) { b.addEventListener('click', function () { sfx('tap'); pickTopic(b.getAttribute('data-topic')); }); });
+  var f = $('#sm-ai-ask', panel);
+  if (f) f.addEventListener('submit', function (e) { e.preventDefault(); var v = ($('#sm-ai-topic', panel).value || '').trim(); if (v) { sfx('tap'); askTopic(v); } });
+  var ag = $('[data-again]', panel); if (ag) ag.addEventListener('click', function () { sfx('tap'); startAIPerf(); });
+}
+// the syllables of each half, so the words light up and the mouths move as they are sung
+function aiRegister(a) {
+  a.poem.abyat.forEach(function (b, bi) { ['s', 'a'].forEach(function (pt) { var h = aiHalf(b, pt); SUNG[aiKey(a, bi, pt)] = { words: aiWords(h), syl: h.timing }; }); });
+}
+// a topic that ships with the app: its poem and singing are already here
+function pickTopic(key) {
+  if (aiBusy() || !AI_BANK[key]) return;
+  music.unlock();
+  var a = S.ai = { n: ++AI_N, key: key, status: 'loading', poem: AI_BANK[key], seg: {} };
+  aiRegister(a); aiRender();
+  loadTopic(key, music.ensure()).then(function (r) {
+    if (S.ai !== a) return;
+    a.seg = r.seg; startAIPerf();
+  }).catch(function () { if (S.ai !== a) return; a.status = 'error'; a.msg = AIT.errLoad; aiRender(); });
+}
+// any other topic: the AI Samri server writes it (Claude), then sings each half for each row
+function askTopic(topic) {
+  if (aiBusy() || !aiUrl()) return;
+  music.unlock();
+  var a = S.ai = { n: ++AI_N, key: 'live', topic: topic, status: 'composing', poem: null, seg: {} };
+  aiRender();
+  composeLive(topic).then(function (r) {
+    if (S.ai !== a) return;
+    if (!r || !r.ok) {
+      a.status = 'error'; a.msg = !r ? AIT.errNet : r.error === 'topic' ? AIT.errTopic : r.error === 'meter' ? AIT.errMeter : r.error === 'busy' ? AIT.errBusy : AIT.errNet;
+      aiRender(); return;
+    }
+    a.poem = r.poem; a.status = 'teaching'; aiRegister(a); aiRender();
+    // two at a time, in the order the rows will need them; the singing starts once the first verse is ready
+    var order = aiSteps(a.poem), i = 0, ctx = music.ensure();
+    function next() {
+      if (i >= order.length || S.ai !== a) return;
+      var st = order[i++];
+      singLive(aiHalf(a.poem.abyat[st.bi], st.part), st.part === 's' ? 'sadr' : 'ajz', st.row, ctx).then(function (seg) {
+        if (S.ai !== a) return;
+        a.seg[st.name] = seg;
+        if (!a.perf && order.slice(0, 2).every(function (o) { return a.seg[o.name]; })) startAIPerf();
+        next();
+      }).catch(function (e) {
+        if (S.ai !== a) return;
+        if (!a.perf) { a.status = 'error'; a.msg = e && e.message === 'busy' ? AIT.errBusy : AIT.errNet; aiRender(); } else a.lost = true;
+      });
+    }
+    next(); next();
+  });
+}
+// the rows sing the poem over soft drums; the chips wait until they're done
+function startAIPerf() {
+  var a = S.ai; if (!a || !a.poem) return;
+  S.listen = null; S.solo = null; music.hush();
+  a.perf = { i: 0, steps: aiSteps(a.poem), done: false, wan: false };
+  a.status = 'singing';
+  music.unlock();
+  // the drums start over with the poem: the waneen opens it, then the rows sing
+  music.drumVol = 0.32; music.claps = false; music.plan = aiPlan;
+  music.start('heavy', 0.25);
+  S.ambient = true;
+  aiRender();
+}
+function aiPlan(slot, b) {
+  var a = S.ai, p = a && a.perf;
+  if (!p || p.done) return null;
+  if (!p.wan) { p.wan = true; p.lastB = b; return { row: 0, what: 'wan' }; }
+  if (p.i >= p.steps.length) return null;
+  var st = p.steps[p.i], seg = a.seg[st.name];
+  if (!seg) return null;                         // not sung yet: the drums go on and the rows wait a cycle
+  p.i++; p.lastB = b;
+  return { row: st.row, what: aiKey(a, st.bi, st.part), seg: seg, vol: 1 };
+}
+// every frame: once the last phrase has been sung, the night goes back to the rows taking turns
+function aiFrame(b) {
+  var a = S.ai, p = a && a.perf;
+  if (!p || p.done) return;
+  if (p.i >= p.steps.length && b > p.lastB + 4.3 && !music.singing(0) && !music.singing(1)) { stopAI(); aiRender(); }
+}
+// the Samri coach (samri-coach.js) opens its own screen over this page and pauses this page's sound while it's
+// open (it has its own). So while the coach is open, a tap must not wake this page's sound again, and no row
+// starts a phrase; when he closes, everything carries on where it was
+function watchCoach() {
+  var seen = null;
+  function hook(ov) {
+    if (!ov || ov === seen) return;
+    seen = ov;
+    new MutationObserver(function () {
+      var open = ov.classList.contains('open');
+      if (open === !!S.coach) return;
+      S.coach = open; music.voicesOff = open;
+    }).observe(ov, { attributes: true, attributeFilter: ['class'] });
+  }
+  hook(document.getElementById('sc-ov'));
+  if (!seen) {
+    var mo = new MutationObserver(function () { var ov = document.getElementById('sc-ov'); if (ov) { hook(ov); mo.disconnect(); } });
+    mo.observe(document.body, { childList: true });
+  }
+}
+function stopAI() {
+  var a = S.ai, p = a && a.perf;
+  if (!p || p.done) return;
+  p.done = true; music.hush();
+  if (a.status === 'singing') a.status = 'done';
+  if (music.plan === aiPlan) { music.plan = S.ambient ? ambientPlan : null; music.drumVol = 0.5; music.claps = !!S.ambient; }
+}
+
 // behind the story, the rows take turns singing and swaying; the chips above take over for a moment
 function ambientRows(b) {
   var A = world.rows[0], B = world.rows[1], Ls = S.listen;
   A.lift = null; B.lift = null;
+  if (S.ai && S.ai.perf && !S.ai.perf.done) {
+    // the row singing the AI's poem sings with its drums held; the other one listens
+    aiFrame(b);
+    A.mode = music.singing(0) ? 'voice' : 'hold'; B.mode = music.singing(1) ? 'voice' : 'hold';
+    return;
+  }
   if (Ls && b >= Ls.b0 - 0.4) {
     if (b < Ls.b0 + 4) { A.mode = 'hold'; B.mode = 'hold'; }        // the opening, the waneen
     else if (b < Ls.b0 + 8) { A.mode = 'voice'; B.mode = 'hold'; }  // the first row sings the line
@@ -1535,8 +1721,8 @@ function frameVoices() {
   var key = cur ? cur.what + '|' + cur.word + '|' + row : '';
   if (key === S.lyKey) return;
   S.lyKey = key;
-  var h = cur && cur.what !== 'wan' ? (cur.what === 'h2' ? 1 : 0) : -1, word = cur ? cur.word : -1;
-  var ph = !cur ? '' : cur.what === 'wan' ? 'waneen' : row ? 'b' : 'a';
+  var h = cur && (cur.what === 'h1' || cur.what === 'h2') ? (cur.what === 'h2' ? 1 : 0) : -1, word = cur ? cur.word : -1;
+  var ph = !cur ? '' : cur.what === 'wan' ? 'waneen' : h < 0 ? '' : row ? 'b' : 'a';
   // the verse card on the poetry page
   var card = document.getElementById('sm-verse');
   if (card) {
@@ -1544,11 +1730,17 @@ function frameVoices() {
     paintWords($('[data-h="0"]', card), h === 0 ? word : -1); paintWords($('[data-h="1"]', card), h === 1 ? word : -1);
     var who = document.getElementById('sm-verse-who'); if (who) who.textContent = ph ? L(VERSE.who[ph]) : '';
   }
+  // the AI's poem
+  var aic = document.getElementById('sm-ai-poem');
+  if (aic) {
+    $$('[data-key]', aic).forEach(function (el) { paintWords(el, cur && el.getAttribute('data-key') === cur.what ? cur.word : -1); });
+    var aw = document.getElementById('sm-ai-who'); if (aw) aw.textContent = cur && /^ai/.test(cur.what) ? L(row ? AIT.whoB : AIT.whoA) : '';
+  }
   // the line in the call and answer step
   var ln = document.getElementById('sm-ph-line');
   if (ln) paintWords(ln, h === +ln.getAttribute('data-h') ? word : -1);
   // everywhere else, the line being sung floats over the gathering
-  var show = h >= 0 && !card && !ln && !(S.inAR && !S.arPlaced);
+  var show = h >= 0 && !card && !ln && !aic && !(S.part === 'story' && STORY[S.ch].compose) && !(S.inAR && !S.arPlaced);
   if (lyricEl.hidden === show) lyricEl.hidden = !show;
   if (show) {
     var box = lyricEl.lastChild;
@@ -1593,10 +1785,10 @@ async function boot() {
   music.loading.then(function () { if (music.ready()) music.onRunning(); });
   setTimeout(function () { if (music.ready()) music.onRunning(); }, 7200);
   ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'].forEach(function (ev) {
-    document.addEventListener(ev, function () { music.unlock(); if (S.wantAmbient && music.ready()) music.onRunning(); }, true);
+    document.addEventListener(ev, function () { if (S.coach) return; music.unlock(); if (S.wantAmbient && music.ready()) music.onRunning(); }, true);
   });
   // coming back to the page (after a call, or another app) the clock may have been put to sleep
-  document.addEventListener('visibilitychange', function () { if (!document.hidden && music.ctx) music.wake(); });
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && music.ctx && !S.coach) music.wake(); });
   if (window.ThemeManager && !window.ThemeManager.current()) window.ThemeManager.applyRegionTheme('najd');
   document.title = L(T.title) + ' — CultureLens';
   $('#mq-loading span').textContent = L(T.loading);
@@ -1628,7 +1820,8 @@ async function boot() {
   world.view(world.rig.mode || 'cover', { snap: true });
   setTimeout(function () { $('#mq-loading').classList.add('gone'); }, 250);
 
-  window.__sm = { world: world, music: music, S: S, setPart: setPart, goCh: goCh, HOW: HOW, CTRL: CTRL, stepDone: stepDone, startStep: startStep, howNext: howNext, rowInput: rowInput, SECS: SECS, startRow: startRow, listen: listenCallAnswer };
+  watchCoach();
+  window.__sm = { world: world, music: music, S: S, setPart: setPart, goCh: goCh, HOW: HOW, CTRL: CTRL, stepDone: stepDone, startStep: startStep, howNext: howNext, rowInput: rowInput, SECS: SECS, startRow: startRow, listen: listenCallAnswer, pickTopic: pickTopic, askTopic: askTopic, ai: function () { return S.ai; } };
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
