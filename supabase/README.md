@@ -12,7 +12,8 @@ It runs as one Supabase Edge Function (`functions/rawi`) and costs nothing on fr
 ## How a turn works
 
 1. **Perceive**: the phone sends what happened: a game event, a measured attempt (Samri strikes timed by an
-   AudioWorklet against the drum clock, plus the sung answer as audio), or something the learner said.
+   AudioWorklet against the drum clock, the sung answer as audio, and the moves the front camera saw: a pose model
+   on the phone times each sway, lift, lowering and the khallu slap against the beat), or something the learner said.
 2. **Hear**: a sung or spoken answer goes to Whisper (large-v3-turbo, free on Groq); the transcript is aligned
    word by word with the expected verse after Arabic normalization (`arabic.ts`).
 3. **Recall**: the learner's memories (from every experience), their recent attempts, and the last four turns
@@ -61,7 +62,9 @@ model call; the teacher and the guide search the notes.
 | `functions/rawi/knowledge.ts` | the heritage passages |
 
 On the phone: `rawi.js` (the agent's client, with no face of its own), `samri-perform.js` (the Samri teacher: the
-last step of the Samri experience, and an option on its experience page), `rawi-session.js` (the same kind of screen
+last step of the Samri experience, and an option on its experience page; you do the Samri for real in front of the
+front camera, and `samri-body.js`, MediaPipe Pose on the phone, follows your head, shoulders and hands, with no video
+leaving the phone), `rawi-session.js` (the same kind of screen
 for Abu Fahad and Grandma Haya: their line out loud, hold to talk or type, finish), the Masaqil rematch inside
 `masaqeel.js` (Fahad's lines come from the agent and it sets how well he shoots), `najd-guide.js` (Fahad, the Najd
 guide, who answers through the agent and falls back to his own notes offline), and `rawi-judge.html` (the live trace).

@@ -9,6 +9,7 @@ export type ToolCtx = { store: Store; learnerId: string; experience: string; lan
 type Tool = { def: ToolDef; kind: 'server' | 'client'; needsResult: boolean; run: (a: any, c: ToolCtx) => Promise<any> };
 
 const POEMS: Record<string, number> = { classic: 2, palm: 4, coffee: 4, rain: 4, falcon: 4, night: 4, homeland: 4 };
+const MOVES = ['answer', 'sway', 'lift', 'row'];
 const YARN = ['black', 'white', 'brown', 'beige', 'red', 'orange'];
 const CENTERS = ['tree', 'chain', 'camels'], EDGES = ['teeth', 'grains', 'stripes'];
 const PAGES: Record<string, string> = { samri: 'samri.html', qahwa: 'qahwa.html', sadu: 'sadu.html', masaqil: 'masaqeel.html' };
@@ -64,21 +65,24 @@ export const TOOLS: Record<string, Tool> = {
   },
   start_drill: {
     kind: 'client', needsResult: false,
-    def: fn('start_drill', 'Start the next Samri drill: the row sings a half-verse and the learner answers it on their tar.',
+    def: fn('start_drill', 'Start the next Samri drill: the rows sing a half-verse and the learner does it with them in front of the camera.',
       {
+        move: { type: 'string', enum: MOVES, description: 'answer: strike the tar on the strokes and sing the line back; sway: lean right then left with each cycle while the rows sing; lift: lift and lower the tar on the calls, then the khallu slap; row: the whole Samri (sway, answer, lift and lower, khallu)' },
         poem: { type: 'string', enum: Object.keys(POEMS) },
         half: { type: 'integer', minimum: 0, maximum: 3, description: 'classic has halves 0-1, topic poems 0-3' },
-        level: { type: 'integer', minimum: 1, maximum: 4, description: '1: the other row answers first, then the learner, words shown; 2: the learner answers right after the call, words shown; 3: from memory, no words shown; 4: the learner leads the call' },
+        level: { type: 'integer', minimum: 1, maximum: 4, description: '1: the other row answers first, words and cues shown; 2: right after the call, words shown; 3: from memory, no words, no sway arrows; 4: the learner leads the call (answer only)' },
         style: { type: 'string', enum: ['heavy', 'light'] },
         focus: { type: 'string', enum: ['strikes', 'words', 'both'], description: 'what the learner should pay attention to' },
       }, ['poem', 'half', 'level']),
     async run(a, c) {
-      const poem = String(a.poem), half = a.half | 0, level = a.level | 0, style = a.style === 'light' ? 'light' : 'heavy';
+      const poem = String(a.poem), half = a.half | 0, level = a.level | 0, style = a.style === 'light' ? 'light' : 'heavy', move = a.move == null ? 'answer' : String(a.move);
+      if (!MOVES.includes(move)) return { ok: false, error: 'move is one of ' + MOVES.join(', ') };
       if (!(poem in POEMS)) return { ok: false, error: 'unknown poem; use one of ' + Object.keys(POEMS).join(', ') };
       if (half < 0 || half >= POEMS[poem]) return { ok: false, error: poem + ' has halves 0 to ' + (POEMS[poem] - 1) };
       if (level < 1 || level > 4) return { ok: false, error: 'level is 1 to 4' };
       if (style === 'light' && poem !== 'classic') return { ok: false, error: 'only the classic verse is sung light; use heavy' };
-      c.actions.push({ name: 'start_drill', args: { poem, half, level, style, focus: a.focus || 'both' } });
+      if (level === 4 && move !== 'answer') return { ok: false, error: 'only the answer is led (level 4); moves go up to level 3' };
+      c.actions.push({ name: 'start_drill', args: { move, poem, half, level, style, focus: a.focus || 'both' } });
       return { ok: true, queued: true };
     },
   },

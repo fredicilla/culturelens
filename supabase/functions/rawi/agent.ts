@@ -35,7 +35,7 @@ function standLines(running: Record<string, any>) {
   return Object.entries(running || {}).map(([name, g]: [string, any]) => {
     g = g || {};
     switch (name) {
-      case 'start_drill': return `- the last drill you set: the ${g.poem} poem, half ${g.half}, level ${g.level} (${LEVELS[g.level] || '?'}), ${g.style}` + (g.focus && g.focus !== 'both' ? `, focus on ${g.focus}` : '') + ' (an attempt ends it)';
+      case 'start_drill': return `- the last drill you set: move ${g.move || 'answer'}, the ${g.poem} poem, half ${g.half}, level ${g.level} (${LEVELS[g.level] || '?'}), ${g.style}` + (g.focus && g.focus !== 'both' ? `, focus on ${g.focus}` : '') + ' (an attempt ends it)';
       case 'guide_step': return `- you last pointed them at the ${g.step} step`;
       case 'set_fahad_skill': return `- your own shooting skill is set to ${g.skill}`;
       case 'weave_band': return `- you already wove them a piece called ${g.title} (${g.bands?.length || 1} band(s))`;
@@ -126,7 +126,12 @@ function compactMetrics(m: Record<string, any>) {
   const out: string[] = [];
   if (m.strikes) out.push(`strikes ${m.strikes.hit}/${m.strikes.expected}` + (m.strikes.mean_offset_ms != null ? ` offset ${m.strikes.mean_offset_ms > 0 ? '+' : ''}${m.strikes.mean_offset_ms}ms` : ''));
   if (m.words) out.push(`words ${Math.round((m.words.accuracy ?? 0) * 100)}%` + (m.words.missed?.length ? ` missed ${m.words.missed.slice(0, 3).join(' ')}` : ''));
-  for (const k of Object.keys(m)) if (!['strikes', 'words', 'voice', 'drill'].includes(k) && typeof m[k] !== 'object') out.push(`${k} ${m[k]}`);
+  const mv = m.moves || {};
+  for (const k of ['sway', 'lift']) if (mv[k]) out.push(`${k} ${mv[k].on_time}/${mv[k].expected} on time` + (mv[k].wrong_side ? `, ${mv[k].wrong_side} wrong side` : '') + (mv[k].late ? `, ${mv[k].late} late` : '') + (mv[k].early ? `, ${mv[k].early} early` : ''));
+  if (mv.khallu) out.push('khallu ' + (mv.khallu.on_time ? 'on time' : mv.khallu.result || 'missed'));
+  if (m.body?.posture === 'standing') out.push('was standing');
+  if (m.body && m.body.seen < 0.6) out.push(`in view ${Math.round(m.body.seen * 100)}%`);
+  for (const k of Object.keys(m)) if (!['strikes', 'words', 'voice', 'drill', 'moves', 'body'].includes(k) && typeof m[k] !== 'object') out.push(`${k} ${m[k]}`);
   return out.join(', ');
 }
 
@@ -134,7 +139,7 @@ function progressLines(as: Attempt[]) {
   if (!as.length) return 'None yet.';
   return as.slice(0, 6).map((a) => {
     const d = a.metrics?.drill;
-    const what = d ? `${d.poem} half ${d.half} level ${d.level} (${LEVELS[d.level] || '?'}) ${d.style || ''}`.trim() : a.skill;
+    const what = d ? `${d.move || 'answer'}, ${d.poem} half ${d.half} level ${d.level} (${LEVELS[d.level] || '?'}) ${d.style || ''}`.trim() : a.skill;
     return `- ${what}: score ${a.score == null ? '?' : Math.round(a.score * 100)}; ${compactMetrics(a.metrics || {})}`;
   }).join('\n');
 }
@@ -165,6 +170,9 @@ export function scoreOf(m: Record<string, any>): number | null {
   const parts: [number, number][] = [];
   if (m.strikes?.expected) parts.push([Math.min(1, m.strikes.hit / m.strikes.expected), 0.5]);
   if (m.words?.expected_count) parts.push([m.words.accuracy ?? 0, 0.5]);
+  const mv = m.moves || {}, evs = ['sway', 'lift'].map((k) => mv[k]).filter(Boolean);
+  const expected = evs.reduce((a, x) => a + (x.expected || 0), 0) + (mv.khallu ? 1 : 0);
+  if (expected) parts.push([(evs.reduce((a, x) => a + (x.on_time || 0), 0) + (mv.khallu?.on_time ? 1 : 0)) / expected, 0.5]);
   if (typeof m.score === 'number') parts.push([Math.max(0, Math.min(1, m.score)), 1]);
   if (!parts.length) return null;
   const w = parts.reduce((a, p) => a + p[1], 0);
@@ -240,7 +248,7 @@ export async function handleTurn(body: TurnBody, deps: Deps) {
     // said plainly, so the model does not fill the gap: "no words this time" beats a missing key
     const unmeasured = (persona.measures || []).filter((k) => metrics[k] == null || metrics[k]?.error);
     userText = `[Attempt ${String(input.skill).slice(0, 40)}${score != null ? ', score ' + Math.round(score * 100) : ''}] ` + JSON.stringify(metrics).slice(0, 900) +
-      (unmeasured.length ? ` Not measured this time: ${unmeasured.join(', ')}.` : '');
+      (unmeasured.length ? ` Not measured this time, so say nothing about it: ${unmeasured.join(', ')}.` : '');
   }
   log('input', input.type, { text: userText }, undefined, userText.slice(0, 140));
 
