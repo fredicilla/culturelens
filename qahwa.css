@@ -606,6 +606,10 @@ html[dir="rtl"] .qx-prompt { line-height: 1.5; }
 .qx-learned svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; }
 .qx-learned .y svg { color: var(--qx-good); }
 .qx-learned .n svg { color: var(--qx-ink-3); }
+.qx-ai { text-align: start; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--qx-line, rgba(244,236,224,.12)); }
+.qx-ai-t { margin: 4px 0 4px; font-size: 18px; color: var(--qx-ink); }
+.qx-ai .qx-sub { margin: 0; text-align: start; }
+.qx-ai .qx-btn { width: 100%; margin-top: 12px; }
 
 /* toast */
 .qx-toast {

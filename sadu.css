@@ -270,6 +270,9 @@ body.sd.sd-racing .mq-stage::after { height: 26%; }
 .sd-stats b { font-size: 19px; }
 .sd-split { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px; font-size: 13px; color: var(--qx-ink-3); }
 .sd-split b { color: var(--qx-ink); }
+.sd-ai-t { margin: 2px 0 4px; font-size: 18px; color: var(--qx-ink); }
+.sd-ai .mq-p { margin: 0; }
+.sd-ai .qx-btn { width: 100%; margin-top: 12px; }
 
 /* short phones: tighter words so the scene keeps room for your fingers */
 @media (max-height: 700px) {

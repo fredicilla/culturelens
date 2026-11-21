@@ -26,9 +26,8 @@
   function num(n) { return isAr() ? String(n).replace(/\d/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'[d]; }) : String(n); }
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   function pct(v) { return num(Math.round(v * 100)) + (isAr() ? '٪' : '%'); }
-  // Rawi, the CultureLens agent (rawi.js), plays Abu Fahad: it hears what happens here and answers as the host (when the page loads rawi.js; for now it does not, so these calls wait unused)
-  function rawi(name, data) { (window.rawiQ = window.rawiQ || []).push(['event', name, data]); }
-  (window.rawiQ = window.rawiQ || []).push(['on', 'guide_step', function (a) { if (a && a.tip) toast({ en: a.tip, ar: a.tip }); }]);
+  // the agent hears nothing during the experience: Abu Fahad (rawi-session.js) is only the last step, so these page hooks do nothing
+  function rawi() {}
 
   var ICON = {
     close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
@@ -254,7 +253,12 @@
     again: { en: 'Play again', ar: 'العب مرة ثانية' },
     done: { en: 'Finish', ar: 'إنهاء' },
     best: { en: 'Your best: ', ar: 'أفضل نتيجة لك: ' },
-    learned: { en: 'What you learned', ar: 'وش تعلمت' }
+    learned: { en: 'What you learned', ar: 'وش تعلمت' },
+    // the last step: Abu Fahad (Rawi, the AI agent) puts you in his majlis and asks what you would do
+    aiK: { en: 'The last step · AI', ar: 'الخطوة الأخيرة · ذكاء اصطناعي' },
+    aiT: { en: 'Serve in Abu Fahad\'s majlis', ar: 'قهوِ في مجلس أبو فهد' },
+    aiP: { en: 'Guests are arriving. Abu Fahad gives you one moment at a time, and you tell him what you would do, by voice or in writing. He tells you if it is right, and why.', ar: 'الضيوف جايين. أبو فهد يعطيك موقف ورا موقف، وأنت تقول له وش تسوي، بصوتك أو كتابة. ويقول لك إذا صح، وليش.' },
+    aiGo: { en: 'Join his majlis', ar: 'ادخل مجلسه' }
   };
   var PICK_GOOD = [
     { en: 'Right. The first cup, the haif, goes to the host. He tastes it so his guests know the coffee is good.', ar: 'صح. أول فنجال، الهيف، للمضيف. يذوقه عشان يطمّن ضيوفه إن القهوة زينة.' },
@@ -1312,13 +1316,27 @@
       (best != null && best > g.score ? '<p class="qx-sub">' + L(G_TEXT.best) + num(best) + '</p>' : '') +
       '<div class="qx-learned"><div class="qx-kicker" style="margin-bottom:2px">' + L(G_TEXT.learned) + '</div>' +
         LEARN.map(function (r) { var y = g.learned[r.key]; return '<div class="' + (y ? 'y' : 'n') + '">' + (y ? ICON.check : ICON.info) + '<span>' + L(r.text) + '</span></div>'; }).join('') +
-      '</div>';
+      '</div>' +
+      '<div class="qx-ai"><div class="qx-kicker">' + L(G_TEXT.aiK) + '</div><h3 class="qx-ai-t">' + L(G_TEXT.aiT) + '</h3><p class="qx-sub">' + L(G_TEXT.aiP) + '</p>' +
+        '<button class="qx-btn qx-btn-solid" id="qx-ai-go" type="button"><span>' + L(G_TEXT.aiGo) + '</span></button></div>';
     sfx('star');
     setBar({ buttons: [
       { label: G_TEXT.again, kind: 'line', icon: 'replay', onClick: function () { S.game = newGame(); renderGame(); renderParts(); } },
       { label: G_TEXT.done, onClick: function () { window.location.href = 'experience.html?x=qahwa'; } }
     ] });
+    var go = $('#qx-ai-go');
+    if (go) go.addEventListener('click', function () { sfx('tap'); openMajlis('end'); });
     drawGuests();
+  }
+  // Abu Fahad's majlis (rawi-session.js, loaded only now): serving situations, one at a time, answered by voice or text
+  function openMajlis(from) {
+    var g = S.game, learned = g && g.learned ? Object.keys(g.learned).filter(function (k) { return g.learned[k]; }) : [];
+    import('./rawi-session.js').then(function (m) {
+      m.openSession({
+        experience: 'qahwa', title: G_TEXT.aiT, intro: G_TEXT.aiP, start: G_TEXT.aiGo,
+        context: { page: 'qahwa', from: from, results: from === 'end' && g ? { score: g.score + '/' + MAX_SCORE, got_right: learned } : undefined }
+      });
+    }).catch(function (e) { console.error(e); toast({ en: 'Abu Fahad could not be reached. Try again.', ar: 'ما قدرنا نوصل لأبو فهد. جرّب مرة ثانية.' }); });
   }
 
   // ════════════════════════════════════════════════════════════
@@ -1366,6 +1384,8 @@
     S.part = ['story', 'brew', 'game'].indexOf(h) > -1 ? h : 'story';
     setPart(S.part);
     renderSound();
+    // qahwa.html?ai=1 (the option on the experience page) opens Abu Fahad's majlis straight away
+    if (/[?&]ai=1/.test(location.search)) setTimeout(function () { openMajlis('page'); }, 400);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

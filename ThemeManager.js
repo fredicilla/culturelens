@@ -653,13 +653,19 @@
       go.className = 'g-go';
       go.innerHTML = '<a class="btn btn-solid" href="' + it.page + '"><span></span>' + ARROW + '</a>';
       setT(go.querySelector('span'), progress()[id] ? 'Play again' : 'Start the experience', progress()[id] ? 'العبها مرة ثانية' : 'ابدأ التجربة');
-      if (id === 'samri') {
-        // the AI teacher, as an option right here (it also waits at the end of the experience): perform it in his row
+      // the experience's AI character, as an option right here (it also waits at the end of the experience)
+      var AI_STEP = {
+        samri: { href: 'samri.html?perform=1', en: 'Perform it with the AI teacher', ar: 'أدِّها مع المعلّم (ذكاء اصطناعي)' },
+        qahwa: { href: 'qahwa.html?ai=1', en: 'Serve in Abu Fahad\'s majlis (AI)', ar: 'قهوِ في مجلس أبو فهد (ذكاء اصطناعي)' },
+        sadu: { href: 'sadu.html?ai=1', en: 'Weave your story with Grandma Haya (AI)', ar: 'انسج حكايتك مع الجدة هيا (ذكاء اصطناعي)' },
+        masaqil: { href: 'masaqeel.html?ai=1', en: 'Rematch with Fahad (AI)', ar: 'تحدَّ فهد (ذكاء اصطناعي)' }
+      }[id];
+      if (AI_STEP) {
         var tch = document.createElement('a');
         tch.className = 'btn btn-outline g-teacher';
-        tch.href = 'samri.html?perform=1';
+        tch.href = AI_STEP.href;
         tch.innerHTML = '<span></span>' + ARROW;
-        setT(tch.querySelector('span'), 'Perform it with the AI teacher', 'أدِّها مع المعلّم (ذكاء اصطناعي)');
+        setT(tch.querySelector('span'), AI_STEP.en, AI_STEP.ar);
         go.appendChild(tch);
       }
       gh.parentNode.insertBefore(go, gh.nextSibling);

@@ -71,6 +71,10 @@ body.mq .qx-icon-btn, body.mq #lang-toggle { background: rgba(14, 9, 6, 0.42); -
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 .mq-pl .mq-name { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: var(--qx-ink-2); }
+.mq-ai { font-style: normal; font-size: 10px; letter-spacing: 0; color: #16121D; background: #E3C47A; border-radius: 999px; padding: 1px 6px; vertical-align: 1px; }
+.mq-ai-t { margin: 2px 0 4px; font-size: 18px; color: var(--qx-ink); }
+.mq-ai-card .mq-p { margin: 0; }
+.mq-ai-card .qx-btn { width: 100%; margin-top: 12px; }
 .mq-pl b { font-size: 22px; line-height: 1; font-weight: 700; color: var(--qx-ink); }
 .mq-dots-row { grid-column: 1 / -1; display: flex; gap: 3px; flex-wrap: wrap; min-height: 9px; }
 .mq-dots-row i { width: 9px; height: 9px; border-radius: 50%; }

@@ -1,7 +1,7 @@
 // The brain: any OpenAI-compatible chat API. By default Groq's free tier (Qwen first), and it can point at
 // Ollama on our own laptop instead (LLM_BASE_URL=https://<tunnel>/v1, LLM_MODELS=qwen3.5:9b).
-// A small router: each model has its own free rate limit, so when one is busy (429) or down, the next takes
-// the turn, and a busy model rests until its Retry-After has passed.
+// A small router: each model has its own free rate limit (on Groq's free tier about 8K tokens a minute each), so when
+// one is busy (429) or down, the next takes the turn, and a busy model rests until its Retry-After has passed.
 
 export type Msg = {
   role: 'system' | 'user' | 'assistant' | 'tool';
@@ -20,7 +20,7 @@ export function llmConfig() {
   return {
     baseUrl: env('LLM_BASE_URL', 'https://api.groq.com/openai/v1').replace(/\/+$/, ''),
     apiKey: env('LLM_API_KEY') || env('GROQ_API_KEY'),
-    models: env('LLM_MODELS', 'qwen/qwen3.8-27b,openai/gpt-oss-120b,llama-3.3-70b-versatile')
+    models: env('LLM_MODELS', 'qwen/qwen3.8-27b,openai/gpt-oss-120b,openai/gpt-oss-20b,llama-3.3-70b-versatile')
       .split(',').map((s: string) => s.trim()).filter(Boolean),
   };
 }
@@ -31,7 +31,7 @@ const restUntil = new Map<string, number>();
 // what each family needs to answer directly (no long hidden reasoning, which costs time and tokens)
 function extrasFor(model: string): Record<string, unknown> {
   const m = model.toLowerCase();
-  if (m.includes('gpt-oss')) return { reasoning_effort: 'low' };
+  if (m.includes('gpt-oss')) return { reasoning_effort: 'medium' };   // on low it agreed with wrong answers; a little thought checks them against the prompt
   if (m.includes('qwen3') && !m.includes(':')) return { reasoning_effort: 'none' };   // Groq-hosted Qwen in instruct mode; Ollama tags have ':'
   return {};
 }
@@ -54,7 +54,7 @@ export async function chat(
     let extras = extrasFor(model);
     for (let attempt = 0; attempt < 3; attempt++) {
       const body: Record<string, unknown> = {
-        model, messages, temperature: opts.temperature ?? 0.5, max_tokens: opts.max_tokens ?? 450, ...extras,
+        model, messages, temperature: opts.temperature ?? 0.5, max_tokens: (opts.max_tokens ?? 450) + (extras.reasoning_effort === 'medium' ? 500 : 0), ...extras,
       };
       if (tools.length) { body.tools = tools; body.tool_choice = opts.tool_choice ?? 'auto'; }
       let res: Response;
@@ -78,8 +78,12 @@ export async function chat(
       lastErr = model + ' ' + res.status + ': ' + text.slice(0, 300);
       if (res.status === 429 || res.status === 413) {
         const ra = Number(res.headers.get('retry-after')) || 20;
+        // the first model speaks the best Arabic: when its minute frees up in a moment, waiting beats handing the turn over
+        if (res.status === 429 && ra <= 4 && attempt === 0 && model === cfg.models[0]) {
+          tries.push(model + ':wait ' + ra + 's'); await new Promise((r) => setTimeout(r, ra * 1000 + 150)); continue;
+        }
         restUntil.set(model, Date.now() + Math.min(ra, 120) * 1000);
-        tries.push(model + ':busy'); break;
+        tries.push(model + ':busy ' + ra + 's'); break;
       }
       if (res.status >= 500) { tries.push(model + ':' + res.status); break; }
       if (res.status === 400 && Object.keys(extras).length && /reasoning|unsupported|not supported/i.test(text)) {

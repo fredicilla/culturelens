@@ -22,8 +22,30 @@ function isAr() { return window.currentLang === 'ar'; }
 function L(o) { if (o == null) return ''; if (typeof o === 'string') return o; return isAr() ? (o.ar != null ? o.ar : o.en) : o.en; }
 function num(n) { return isAr() ? String(n).replace(/\d/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'[d]; }) : String(n); }
 function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
-// Rawi, the CultureLens agent (rawi.js), plays Fahad: it hears every shot, talks back, and sets how well he shoots (when the page loads rawi.js; for now it does not, so these calls wait unused)
-function rawi(name, data) { (window.rawiQ = window.rawiQ || []).push(['event', name, data]); }
+// Rawi, the CultureLens agent (rawi.js), plays Fahad in the AI rematch (the last step): it hears the learner's shots, his own only
+// when they win the round, and the start and end of the match, talks back, and sets how well he shoots
+function rawi(name, data) {
+  if (!AI.on || !AI.agent) return;
+  if (name === 'shot' && data && data.shooter === 'fahad' && !/hole|knocked/.test(data.result || '')) return;   // fewer turns, so the free model keeps up
+  AI.agent.event(name, data);
+}
+// the AI rematch (the last step, and masaqeel.html?ai=1): rawi.js loads only then, Fahad's lines come from the agent
+// into his own speech bubble, and the agent sets how well he shoots (set_fahad_skill)
+var AI = { on: false, agent: null, starting: false };
+function aiOff() { AI.on = false; S.fahadSkill = null; }
+function startAiMatch(from) {
+  import('./rawi.js').then(function (m) {
+    if (!AI.agent) {
+      AI.agent = m.createRawi({ experience: 'masaqil', speak: false, actions: {
+        set_fahad_skill: function (a) { if (AI.on && a && typeof a.skill === 'number') S.fahadSkill = Math.max(0, Math.min(1, a.skill)); }
+      } });
+      AI.agent.on('reply', function (r) { if (AI.on && r && r.ok && r.say) bubble({ en: r.say, ar: r.say }, Math.min(9000, 2600 + r.say.length * 55), true); });
+    }
+    AI.starting = true; setPart('play'); AI.starting = false;
+    AI.on = true; renderIntro();
+    AI.agent.start({ page: 'masaqil', mode: 'rematch', from: from });
+  }).catch(function (e) { console.error(e); });
+}
 function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
 var ICON = {
@@ -129,7 +151,13 @@ var G_TEXT = {
   start: { en: 'Start', ar: 'يلا نبدأ' },
   topView: { en: 'Top view', ar: 'من فوق' }, behind: { en: 'Behind', ar: 'من ورا' },
   again: { en: 'Play again', ar: 'العب مرة ثانية' }, finish: { en: 'Finish', ar: 'إنهاء' },
-  learned: { en: 'What you learned', ar: 'وش تعلمت' }
+  learned: { en: 'What you learned', ar: 'وش تعلمت' },
+  // the last step: a rematch where Fahad is played by Rawi, the AI agent
+  aiK: { en: 'The last step · AI', ar: 'الخطوة الأخيرة · ذكاء اصطناعي' },
+  aiT: { en: 'Rematch with Fahad', ar: 'تحدَّ فهد مرة ثانية' },
+  aiP: { en: 'This time Fahad is the AI: he talks back after every shot and sharpens or loosens his aim to keep the match close.', ar: 'هالمرة فهد ذكاء اصطناعي: يرد عليك بعد كل رمية، ويشد تصويبه أو يرخيه عشان تبقى المباراة حامية.' },
+  aiGo: { en: 'Rematch him', ar: 'تحدّاه' },
+  aiIntro: { en: 'A rematch against Fahad · AI', ar: 'مباراة ثانية ضد فهد · ذكاء اصطناعي' }
 };
 var SAY = {
   start: { en: 'Go on, you start.', ar: 'يلا، ابدأ أنت.' },
@@ -167,7 +195,6 @@ var MAX_SHOTS = 4, ROUNDS = 3, START_MARBLES = 5;
 // ════════════════════════════════════════════════════════════
 // state
 // ════════════════════════════════════════════════════════════
-(window.rawiQ = window.rawiQ || []).push(['on', 'set_fahad_skill', function (a) { if (a && typeof a.skill === 'number') S.fahadSkill = Math.max(0, Math.min(1, a.skill)); }]);
 var S = {
   part: 'story', ch: 0, how: 0, howState: {}, practice: { tries: 0, made: false },
   game: null, sound: true, arMode: null, inAR: false, arPlaced: false, view: 'behind',
@@ -340,6 +367,7 @@ function renderAR() {
 // ════════════════════════════════════════════════════════════
 function setPart(p) {
   token++;
+  if (!AI.starting) aiOff();
   S.part = p;
   try { history.replaceState(null, '', '#' + p); } catch (e) {}
   document.body.setAttribute('data-part', p);
@@ -598,8 +626,8 @@ function renderIntro() {
   hud.hidden = true;
   panel.className = 'mq-panel qx-enter';
   panel.innerHTML =
-    '<div class="mq-vs">' + fahadFace() + '<div><div class="qx-kicker">' + L(G_TEXT.intro) + '</div><div class="mq-vs-name">' + L(G_TEXT.fahadIs) + '</div></div></div>' +
-    '<p class="mq-p">' + L(G_TEXT.introP) + '</p>';
+    '<div class="mq-vs">' + fahadFace() + '<div><div class="qx-kicker">' + L(AI.on ? G_TEXT.aiIntro : G_TEXT.intro) + '</div><div class="mq-vs-name">' + L(G_TEXT.fahadIs) + '</div></div></div>' +
+    '<p class="mq-p">' + L(AI.on ? G_TEXT.aiP : G_TEXT.introP) + '</p>';
   setBar({ buttons: [{ label: G_TEXT.start, icon: 'next', onClick: function () { sfx('tap'); startRound(); } }] });
 }
 function renderHUD() {
@@ -610,14 +638,15 @@ function renderHUD() {
   hud.innerHTML =
     '<div class="mq-pl me' + (g.turn === 'me' && !g.over ? ' is-turn' : '') + '"><span class="mq-name">' + L(G_TEXT.you) + '</span><b>' + num(g.pocket.me) + '</b><span class="mq-dots-row">' + dots(g.pocket.me) + '</span></div>' +
     '<div class="mq-pot"><small>' + L(G_TEXT.inHole) + '</small><b>' + num(pot) + '</b><small>' + L(G_TEXT.round) + ' ' + num(g.round) + '/' + num(ROUNDS) + '</small></div>' +
-    '<div class="mq-pl fahad' + (g.turn === 'fahad' && !g.over ? ' is-turn' : '') + '"><span class="mq-name">' + L(G_TEXT.fahad) + '</span><b>' + num(g.pocket.fahad) + '</b><span class="mq-dots-row">' + dots(g.pocket.fahad) + '</span></div>';
+    '<div class="mq-pl fahad' + (g.turn === 'fahad' && !g.over ? ' is-turn' : '') + '"><span class="mq-name">' + L(G_TEXT.fahad) + (AI.on ? ' <i class="mq-ai">AI</i>' : '') + '</span><b>' + num(g.pocket.fahad) + '</b><span class="mq-dots-row">' + dots(g.pocket.fahad) + '</span></div>';
 }
-function bubble(o) {
+function bubble(o, ms, fromAgent) {
+  if (AI.on && !fromAgent) return;
   var b = $('#mq-bubble');
   if (!b) { b = document.createElement('div'); b.id = 'mq-bubble'; b.className = 'mq-bubble'; root.appendChild(b); }
   b.innerHTML = fahadFace() + '<span>' + L(o) + '</span>';
   b.classList.remove('show'); void b.offsetWidth; b.classList.add('show');
-  clearTimeout(b._t); b._t = setTimeout(function () { b.classList.remove('show'); }, 2200);
+  clearTimeout(b._t); b._t = setTimeout(function () { b.classList.remove('show'); }, ms || 2200);
 }
 
 function startRound() {
@@ -837,7 +866,11 @@ function renderResults() {
       '<div class="mq-stars">' + [0, 1, 2].map(function (i) { return '<i class="' + (i < stars ? 'on' : '') + '">' + ICON.star + '</i>'; }).join('') + '</div>' +
       '<h2 class="mq-title">' + L(title) + '</h2>' +
       '<p class="mq-p">' + L(line) + '</p>' +
+      '<div class="mq-learn mq-ai-card"><div class="qx-kicker">' + L(G_TEXT.aiK) + '</div><h3 class="mq-ai-t">' + L(G_TEXT.aiT) + '</h3><p class="mq-p">' + L(G_TEXT.aiP) + '</p>' +
+        '<button class="qx-btn qx-btn-solid" id="mq-ai-go" type="button"><span>' + L(G_TEXT.aiGo) + '</span></button></div>' +
       '<div class="mq-learn"><div class="qx-kicker">' + L(G_TEXT.learned) + '</div>' + LEARN.map(function (l) { return '<div class="mq-learn-row">' + ICON.check + '<span>' + L(l) + '</span></div>'; }).join('') + '</div>';
+    var go = $('#mq-ai-go', panel);
+    if (go) go.addEventListener('click', function () { sfx('tap'); startAiMatch('end'); });
     setBar({ buttons: [
       { label: G_TEXT.again, kind: 'line', iconFirst: 'replay', onClick: function () { sfx('tap'); setPart('play'); } },
       { label: G_TEXT.finish, onClick: function () { location.href = 'experience.html?x=masaqil'; } }
@@ -1052,7 +1085,8 @@ async function boot() {
   setTimeout(function () { $('#mq-loading').classList.add('gone'); }, 250);
 
   // handy for testing and for the team
-  window.__mq = { world: world, S: S, setPart: setPart };
+  window.__mq = { world: world, S: S, setPart: setPart, startAiMatch: startAiMatch, AI: AI };
+  if (/[?&]ai=1/.test(location.search)) setTimeout(function () { startAiMatch('page'); }, 400);
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

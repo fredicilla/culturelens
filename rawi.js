@@ -99,6 +99,8 @@ export function speak(text, lang) {
   });
 }
 export function hush() { try { speechSynthesis.cancel(); } catch (e) {} }
+// does this device have a voice for the language (otherwise the line is only shown, not spoken)
+export function hasVoice(lang) { loadVoices(); return !!pickVoice(lang); }
 
 // ── listening: the mic as 16 kHz WAV, for the ear (Whisper) ──
 export function wav16(chunks, rate) {

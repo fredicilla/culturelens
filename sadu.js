@@ -253,7 +253,12 @@ var G = {
   again: { en: 'Play again', ar: 'العب مرة ثانية' }, finish: { en: 'Finish', ar: 'إنهاء' },
   learned: { en: 'What you learned', ar: 'وش تعلمت' },
   score: { en: 'Score', ar: 'النقاط' },
-  readPart: { en: 'Reading the Sadu', ar: 'قراءة السدو' }, racePart: { en: 'The race', ar: 'السباق' }
+  readPart: { en: 'Reading the Sadu', ar: 'قراءة السدو' }, racePart: { en: 'The race', ar: 'السباق' },
+  // the last step: Grandma Haya (Rawi, the AI agent) weaves the learner's own story into a band
+  aiK: { en: 'The last step · AI', ar: 'الخطوة الأخيرة · ذكاء اصطناعي' },
+  aiT: { en: 'Weave your story with Grandma Haya', ar: 'انسج حكايتك مع الجدة هيا' },
+  aiP: { en: 'Sit with her at the loom. She asks you about what you hold dear, then weaves it into a band of real Sadu patterns and tells you what each one means.', ar: 'اجلس معها عند النول. تسألك عن اللي غالي عليك، وبعدين تنسجه لك بنقوش سدو حقيقية وتقول لك وش يعني كل نقش.' },
+  aiGo: { en: 'Sit with her', ar: 'اجلس معها' }
 };
 var R = {
   title: { en: 'Round 2 · The race', ar: 'الجولة ٢ · السباق' },
@@ -332,8 +337,8 @@ var SCALE = [293.7, 311.1, 370, 392, 440, 466.2, 554.4, 587.3];
 // ════════════════════════════════════════════════════════════
 // state
 // ════════════════════════════════════════════════════════════
-// Rawi, the CultureLens agent (rawi.js), plays Grandma Haya: it hears your steps and answers, and can weave your story (when the page loads rawi.js; for now it does not, so these calls wait unused)
-function rawi(name, data) { (window.rawiQ = window.rawiQ || []).push(['event', name, data]); }
+// the agent hears nothing during the experience: Grandma Haya (rawi-session.js) is only the last step, so these page hooks do nothing
+function rawi() {}
 // the band Grandma Haya weaves for you: one to three strips from the real patterns and yarns (the agent's weave_band)
 function showStoryBands(a) {
   if (!a || !Array.isArray(a.bands) || !a.bands.length) return;
@@ -363,7 +368,6 @@ function showStoryBands(a) {
   box.appendChild(card); box.addEventListener('click', function (e) { if (e.target === box) box.remove(); });
   document.body.appendChild(box);
 }
-(window.rawiQ = window.rawiQ || []).push(['on', 'weave_band', showStoryBands]);
 var S = { part: 'story', ch: 0, fiber: null, motif: null, how: 0, hs: {}, howDone: false, game: null, sound: true, arMode: null, inAR: false, arPlaced: false, gest: null, touching: false };
 try { S.sound = localStorage.getItem('cl_sound') !== 'off'; } catch (e) {}
 var world, panel, bar, parts, toastEl, touch, callout, arBtn, root;
@@ -1472,11 +1476,26 @@ function renderResults() {
     '<h2 class="mq-title">' + L(title) + '</h2>' +
     '<p class="mq-p">' + L(G.score) + ': ' + num(total) + ' / ' + num(MAX_SCORE) + '</p>' +
     '<div class="sd-split"><span>' + L(G.readPart) + ' <b>' + num(g.score) + '/' + num(QUESTIONS.length) + '</b></span><span>' + L(G.racePart) + ' <b>' + num(g.racePts) + '/' + num(4) + '</b></span></div>' +
+    '<div class="mq-learn sd-ai"><div class="qx-kicker">' + L(G.aiK) + '</div><h3 class="sd-ai-t">' + L(G.aiT) + '</h3><p class="mq-p">' + L(G.aiP) + '</p>' +
+      '<button class="qx-btn qx-btn-solid" id="sd-ai-go" type="button"><span>' + L(G.aiGo) + '</span></button></div>' +
     '<div class="mq-learn"><div class="qx-kicker">' + L(G.learned) + '</div>' + LEARN.map(function (l) { return '<div class="mq-learn-row">' + ICON.check + '<span>' + L(l) + '</span></div>'; }).join('') + '</div>';
   setBar({ buttons: [
     { label: G.again, kind: 'line', iconFirst: 'replay', onClick: function () { sfx('tap'); setPart('play'); } },
     { label: G.finish, onClick: function () { location.href = 'experience.html?x=sadu'; } }
   ] });
+  var go = $('#sd-ai-go');
+  if (go) go.addEventListener('click', function () { sfx('tap'); openHaya('end'); });
+}
+// Grandma Haya's session (rawi-session.js, loaded only now): she asks, then weaves the story with weave_band
+function openHaya(from) {
+  var g = S.game;
+  import('./rawi-session.js').then(function (m) {
+    m.openSession({
+      experience: 'sadu', title: G.aiT, intro: G.aiP, start: G.aiGo,
+      context: { page: 'sadu', from: from, results: from === 'end' && g ? { reading: g.score + '/' + QUESTIONS.length, race: g.racePts + '/4' } : undefined },
+      actions: { weave_band: showStoryBands }
+    });
+  }).catch(function (e) { console.error(e); toast({ en: 'Grandma Haya could not be reached. Try again.', ar: 'ما قدرنا نوصل للجدة هيا. جرّب مرة ثانية.' }); });
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1637,7 +1656,8 @@ async function boot() {
   world.view(world.rig.mode || 'cover', { snap: true });
   setTimeout(function () { $('#mq-loading').classList.add('gone'); }, 250);
 
-  window.__sd = { world: world, S: S, setPart: setPart, goCh: goCh, HOW: HOW, CTRL: CTRL, stepDone: stepDone, raceInput: raceInput, startStep: startStep, howNext: howNext, RACE: RACE };
+  window.__sd = { world: world, S: S, setPart: setPart, goCh: goCh, HOW: HOW, CTRL: CTRL, stepDone: stepDone, raceInput: raceInput, startStep: startStep, howNext: howNext, RACE: RACE, openHaya: openHaya };
+  if (/[?&]ai=1/.test(location.search)) setTimeout(function () { openHaya('page'); }, 400);
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

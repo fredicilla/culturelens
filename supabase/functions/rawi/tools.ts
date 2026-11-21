@@ -113,7 +113,7 @@ export const TOOLS: Record<string, Tool> = {
             properties: {
               center: { type: 'string', enum: CENTERS }, edge: { type: 'string', enum: EDGES },
               ground: { type: 'string', enum: YARN }, figure: { type: 'string', enum: YARN },
-              meaning: { type: 'string', description: 'what this band says about the learner, one sentence' },
+              meaning: { type: 'string', description: 'what this band says about the learner, one sentence said to them (your ..., never my ...)' },
             },
             required: ['center', 'edge', 'ground', 'figure', 'meaning'],
           },

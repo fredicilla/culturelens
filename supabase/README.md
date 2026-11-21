@@ -1,9 +1,10 @@
 # Rawi, the CultureLens heritage agent
 
 One agent with one memory of each learner, taking a role in each part of the app: the mu'allim who teaches the
-Samri in his row, and Fahad, the Najd guide on the home and experience pages. (Abu Fahad in the coffee majlis,
-Fahad across the Masaqil square and Grandma Haya at the Sadu loom are written too; those pages will load the agent
-once they have a screen of their own for it.)
+Samri in his row, Abu Fahad who has you serve in his majlis, Grandma Haya who weaves your story into a Sadu band,
+Fahad who plays the Masaqil rematch against you, and Fahad the Najd guide on the home and experience pages.
+Each experience's character is its last step (a card on the results screen) and an option on its experience page,
+never something running during the experience itself.
 It runs as one Supabase Edge Function (`functions/rawi`) and costs nothing on free tiers.
 
 ![System overview](../docs/rawi-system-overview.png)
@@ -16,7 +17,8 @@ It runs as one Supabase Edge Function (`functions/rawi`) and costs nothing on fr
    word by word with the expected verse after Arabic normalization (`arabic.ts`).
 3. **Recall**: the learner's memories (from every experience), their recent attempts, and the last four turns
    with the tools it called go into the prompt. What was not measured this time is said plainly.
-4. **Think and act**: Qwen (free on Groq; a router falls back to the next free model on a rate limit) answers
+4. **Think and act**: Qwen (free on Groq; on a rate limit the router waits a moment if that is enough, otherwise it
+   hands the turn to gpt-oss-120b, then gpt-oss-20b, each with its own free minute of about 8K tokens) answers
    in the experience's role and calls tools. Server tools run in the function (`search_heritage` over pgvector,
    `remember`). App tools (`start_drill`, `weave_band`, `guide_step`, `set_fahad_skill`, `show_card`) are
    validated, then sent to the phone; a wrong call goes back to the model as an error to fix, and a call
@@ -27,7 +29,9 @@ It runs as one Supabase Edge Function (`functions/rawi`) and costs nothing on fr
 7. **Trace**: every step is written to `traces`; `rawi-judge.html` streams them live (Supabase Realtime).
 
 Heritage facts come only from `knowledge`: 146 passages, the 107 the team wrote and sourced in the experiences and
-the 39 of the Najd guide, embedded by the function itself with gte-small (built into the Edge Runtime).
+the 39 of the Najd guide, embedded by the function itself with gte-small (built into the Edge Runtime). The three
+session characters carry the few customs they need in their own role (from the same text), so a turn there is one
+model call; the teacher and the guide search the notes.
 
 ## Set up (about 5 minutes)
 
@@ -57,5 +61,8 @@ the 39 of the Najd guide, embedded by the function itself with gte-small (built 
 | `functions/rawi/knowledge.ts` | the heritage passages |
 
 On the phone: `rawi.js` (the agent's client, with no face of its own), `samri-perform.js` (the Samri teacher: the
-last step of the Samri experience, and an option on its experience page), `najd-guide.js` (Fahad, the Najd guide,
-who answers through the agent and falls back to his own notes offline), and `rawi-judge.html` (the live trace).
+last step of the Samri experience, and an option on its experience page), `rawi-session.js` (the same kind of screen
+for Abu Fahad and Grandma Haya: their line out loud, hold to talk or type, finish), the Masaqil rematch inside
+`masaqeel.js` (Fahad's lines come from the agent and it sets how well he shoots), `najd-guide.js` (Fahad, the Najd
+guide, who answers through the agent and falls back to his own notes offline), and `rawi-judge.html` (the live trace).
+Each experience page links to its character with `?ai=1` (`?perform=1` for the Samri teacher).
