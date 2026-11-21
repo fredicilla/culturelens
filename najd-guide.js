@@ -622,7 +622,7 @@
     if (voiceOn) setPhase('speaking');
     mod().then(function (m) {
       if (!m || my !== talkId) return;
-      return m.speak(text, isAr() ? 'ar' : 'en', { voice: 'fahad', onLevel: mouthLevel, onStart: function () { if (my === talkId) stage.classList.add('speaking'); } });
+      return m.speak(text, isAr() ? 'ar' : 'en', { voice: 'fahad', force: true, onLevel: mouthLevel, onStart: function () { if (my === talkId) stage.classList.add('speaking'); } });
     }).catch(function () {}).then(function () {
       if (el) el.classList.remove('talking');
       if (my !== talkId) return;

@@ -103,5 +103,8 @@
   // coming back to the page: the phone may have put the engines to sleep
   document.addEventListener('visibilitychange', function () { if (!document.hidden) all.forEach(function (c) { if (c.state === 'suspended' && c.__clKicked) { try { c.resume(); } catch (e) {} } }); });
 
+  // once per phone: a mute left on from before this fix is lifted (the experiences' sound button still mutes after)
+  try { if (!localStorage.getItem('cl_sound_fix1')) { localStorage.setItem('cl_sound_fix1', '1'); if (localStorage.getItem('cl_sound') === 'off') localStorage.removeItem('cl_sound'); } } catch (e) {}
+
   window.clSound = { prime: prime, ctx: ctx, capturing: capturing, wake: wake, session: session };
 })();

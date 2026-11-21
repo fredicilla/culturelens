@@ -71,7 +71,7 @@ const T = {
 // ── speaking ──
 // Each character has a real Saudi voice from the agent (Groq's Orpheus, through our function, see tts.ts), and the
 // phone's own voice takes over when that one is resting or out of reach. The words are always on the screen too.
-//   speak(text, lang, { voice, onLevel(0..1), onStart })  ->  resolves when the line has been said (or cut off)
+//   speak(text, lang, { voice, onLevel(0..1), onStart, force })  ->  resolves when the line has been said (or cut off)
 export const VOICE = { samri: 'sultan', qahwa: 'abdullah', masaqil: 'fahad', sadu: 'aisha', guide: 'fahad', general: 'abdullah' };
 let voices = [];
 function loadVoices() { try { voices = speechSynthesis.getVoices() || []; } catch (e) { voices = []; } }
@@ -171,7 +171,8 @@ export function speak(text, lang, opts) {
   current = { my, stop: null, ctrl: typeof AbortController !== 'undefined' ? new AbortController() : null };
   const finish = () => { if (current && current.my === my) current = null; };
   return (async () => {
-    if (!text || store('cl_sound') === 'off') return finish();
+    // the experiences' mute button holds for lines that come by themselves; a line the visitor asked to hear (force) plays
+    if (!text || (store('cl_sound') === 'off' && !opts.force)) return finish();
     lang = lang === 'en' ? 'en' : 'ar';
     let left = String(text);
     const s = sound(), ctx = s ? s.ctx() : null;
