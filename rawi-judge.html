@@ -31,7 +31,7 @@ main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 340px); ga
 .k.input { color: var(--green); } .k.ear { color: var(--blue); } .k.model { color: var(--gold); } .k.tool { color: #D9B3FF; } .k.reply { color: var(--ink); } .k.error { color: var(--coral); }
 .v { min-width: 0; overflow-wrap: anywhere; } .v code { font: 12px ui-monospace, Menlo, monospace; color: var(--dim); }
 .ms { font: 12px ui-monospace, Menlo, monospace; color: var(--dim); white-space: nowrap; }
-.say { font-size: 16px; line-height: 1.65; }
+.say { font-size: 16px; line-height: 1.65; unicode-bidi: plaintext; }
 aside .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 12px; }
 aside h2 { margin: 0 0 10px; font-size: 13px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--dim); font-weight: 600; }
 .bar { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 6px 0; } .bar span { width: 90px; color: var(--dim); }
@@ -83,11 +83,13 @@ function render(row) {
   else if (row.kind === 'ear') v = 'heard «' + esc(p.heard || p.text) + '»' + (p.accuracy != null ? ' · <b>' + Math.round(p.accuracy * 100) + '%</b> of «' + esc(p.expected) + '»' : '');
   else if (row.kind === 'model') { v = esc(row.name) + (p.usage ? ' <code>' + (p.usage.total_tokens || '?') + ' tokens</code>' : '') + (p.tries ? ' <code>' + esc(p.tries.join(' → ')) + '</code>' : ''); if (row.ms) modelMs.push(row.ms); tokens += (p.usage && p.usage.total_tokens) || 0; }
   else if (row.kind === 'tool') { v = '<b>' + esc(row.name) + '</b> <code>' + esc(JSON.stringify(p.args)) + '</code> → <code>' + esc(JSON.stringify(p.result)).slice(0, 220) + '</code>'; nTools++; toolmix[row.name] = (toolmix[row.name] || 0) + 1; }
-  else if (row.kind === 'reply') v = '<div class="say">' + esc(p.say) + '</div>';
+  else if (row.kind === 'reply') v = '<div class="say" dir="auto">' + esc(p.say) + '</div>';
   else v = '<code>' + esc(JSON.stringify(p)).slice(0, 300) + '</code>';
-  const s = document.createElement('div'); s.className = 'step';
-  s.innerHTML = '<span class="k ' + esc(row.kind) + '">' + esc(row.kind) + '</span><span class="v">' + v + '</span><span class="ms">' + (row.ms != null ? row.ms + ' ms' : '') + '</span>';
-  t.querySelector('.steps').appendChild(s);
+  const s = document.createElement('div'); s.className = 'step'; s.dataset.step = row.step;
+  s.innerHTML = '<span class="k ' + esc(row.kind) + '">' + esc(row.kind) + '</span><span class="v" dir="auto">' + v + '</span><span class="ms">' + (row.ms != null ? row.ms + ' ms' : '') + '</span>';
+  // the steps of a turn are written in parallel, so they can arrive out of order: keep them in the agent's order
+  const box = t.querySelector('.steps'), after = Array.from(box.children).find((c) => +c.dataset.step > +row.step);
+  box.insertBefore(s, after || null);
   $('#s-tools').textContent = nTools; $('#s-tok').textContent = tokens.toLocaleString();
   $('#s-ms').textContent = modelMs.length ? Math.round(modelMs.reduce((a, b) => a + b, 0) / modelMs.length) + ' ms' : '–';
   bars('#mix', mix); bars('#toolmix', toolmix);

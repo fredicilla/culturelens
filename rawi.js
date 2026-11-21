@@ -135,7 +135,7 @@ export async function recorder(onLevel) {
 
 // ── the face on the page ──
 const CSS = `
-#rawi { position: fixed; z-index: 70; top: calc(env(safe-area-inset-top, 0px) + 118px); inset-inline-end: 12px; display: flex; flex-direction: column; align-items: flex-end;
+#rawi { position: fixed; z-index: 70; top: calc(env(safe-area-inset-top, 0px) + 118px); inset-inline-end: max(12px, calc((100vw - 430px) / 2 + 12px)); display: flex; flex-direction: column; align-items: flex-end;
   font-family: var(--font-ui, 'IBM Plex Sans Arabic', system-ui, sans-serif); color: #F3EEE6; pointer-events: none; }
 html[dir="rtl"] #rawi { align-items: flex-start; }
 #rawi[hidden] { display: none; }

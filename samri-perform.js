@@ -160,7 +160,7 @@ const CSS = `
 .sp-btn.mic.on { background: #FF8A7A; }
 .sp-trace { margin-top: 10px; border-top: 1px dashed rgba(243,238,230,.2); padding-top: 6px; font: 11.5px/1.5 ui-monospace, Menlo, monospace; color: rgba(243,238,230,.7); direction: ltr; text-align: left; }
 .sp-trace div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .sp-trace .k { color: #E3C47A; }
-#sp-entry { position: fixed; z-index: 60; top: calc(env(safe-area-inset-top, 0px) + 118px); inset-inline-start: 16px; display: none; align-items: center; gap: 8px; background: #E3C47A; color: #16121D;
+#sp-entry { position: fixed; z-index: 60; top: calc(env(safe-area-inset-top, 0px) + 118px); inset-inline-start: max(16px, calc((100vw - 430px) / 2 + 16px)); display: none; align-items: center; gap: 8px; background: #E3C47A; color: #16121D;
   border: 0; border-radius: 999px; padding: 11px 18px; font: inherit; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,.35); white-space: nowrap; }
 #sp-entry.show { display: inline-flex; animation: spIn .4s ease-out; }
 #sp-entry svg { width: 18px; height: 18px; } #sp-entry i { font-style: normal; font-size: 11px; background: #16121D; color: #E3C47A; border-radius: 999px; padding: 2px 7px; }
