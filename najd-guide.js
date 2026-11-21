@@ -5,9 +5,10 @@
  * Two ways to use it:
  *   1. Chat  — type a question, get an answer.
  *   2. Talk  — a Najdi man in a white ghutra, black agal and thobe; speak to him (microphone) and he answers out loud.
- * The answers come from a small knowledge base written below (no server, nothing leaves the device apart from the
- * browser's own speech recognition). It answers only what it knows; anything else gets an honest «I do not know» and
- * a few questions it can answer.
+ * The answers come from Rawi, the CultureLens AI agent (the same one as the Samri teacher), playing Fahad: it searches
+ * the team's sourced notes, the ones written below among them, and answers in his voice, out loud in the talk tab.
+ * When it cannot be reached (offline, busy), the notes below still answer by themselves, as they always did: only what
+ * they know, and an honest «I do not know» with a few questions they can answer for anything else.
  * Add ?region=najd&guide=1 to the address to open it straight away (for testing).
  */
 (function () {
@@ -438,6 +439,7 @@
     '.ng-msg a.ng-try{display:inline-flex;margin-top:10px;background:var(--g-acc);color:var(--g-paper);border-radius:var(--g-r);padding:7px 14px;font-size:13.5px;font-weight:700;text-decoration:none}' +
     '.ng-chips{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start}.ng-chips button{background:transparent;color:var(--g-acc);border:1px solid var(--g-acc);border-radius:var(--g-r);padding:6px 11px;font:inherit;font-size:13.5px;font-weight:500;cursor:pointer}' +
     '.ng-chips button:hover{background:var(--g-acc);color:var(--g-paper)}' +
+    '.ng-wait{display:inline-flex;gap:5px;padding:4px 0}.ng-wait i{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.3;animation:ngw 1s infinite}.ng-wait i:nth-child(2){animation-delay:.15s}.ng-wait i:nth-child(3){animation-delay:.3s}@keyframes ngw{50%{opacity:1}}' +
     '.ng-form{display:flex;gap:8px;padding:10px 16px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--g-rule);background:var(--g-paper)}' +
     '.ng-form input{flex:1;min-width:0;background:#FFFDF9;color:var(--g-ink);border:1px solid var(--g-rule);border-radius:var(--g-r);padding:12px 14px;font:inherit;font-size:15.5px}' +
     '.ng-form input:focus{outline:2px solid var(--g-acc);outline-offset:-1px}' +
@@ -521,23 +523,63 @@
     chat.appendChild(c); chat.scrollTop = chat.scrollHeight;
   }
 
+  // ════════════════════════════════════════════════════════════
+  // THE AI — Rawi (rawi.js), loaded when the guide first opens, answers as Fahad from the team's notes
+  // ════════════════════════════════════════════════════════════
+  var agentP = null, askId = 0;
+  function agent() {
+    if (!agentP) agentP = import('./rawi.js').then(function (m) { return m.createRawi({ experience: 'guide', speak: false }); })
+      .catch(function () { agentP = null; return null; });
+    return agentP;
+  }
   function ask(text) {
     text = String(text || '').trim(); if (!text) return;
-    var r = answer(text), reply = L(r.a);
+    var my = ++askId;
     bubble('me', esc(text));
-    var html = esc(reply);
-    if (r.e && r.e.page) html += '<br><a class="ng-try" href="' + r.e.page + '">' + L(TXT.tryIt) + '</a>';
-    bubble('bot', html);
-    if (r.near) chips(r.near); else if (r.starters) chips(STARTERS); else if (r.e && r.e.rel) chips(r.e.rel);
-    if (mode === 'talk') {
-      $('#ng-said', panel).textContent = L(TXT.you) + text;
-      speak(reply);
-    }
+    var wait = bubble('bot', '<span class="ng-wait" aria-label="…"><i></i><i></i><i></i></span>');
+    if (mode === 'talk') { $('#ng-said', panel).textContent = L(TXT.you) + text; hush(); mouth(true); }
+    agent().then(function (a) { return a ? a.say(text) : null; }).catch(function () { return null; }).then(function (r) {
+      if (my !== askId) return;
+      if (r && r.ok && r.say) {
+        var sug = (r.actions || []).filter(function (x) { return x.name === 'suggest_experience' && x.args && x.args.page; })[0];
+        say(wait, r.say, sug ? sug.args.page : null);
+      } else {
+        // the agent could not answer: the notes below do
+        var k = answer(text);
+        say(wait, L(k.a), k.e && k.e.page);
+        if (k.near) chips(k.near); else if (k.starters) chips(STARTERS); else if (k.e && k.e.rel) chips(k.e.rel);
+      }
+    });
+  }
+  function say(el, text, page) {
+    el.innerHTML = esc(text) + (page ? '<br><a class="ng-try" href="' + esc(page) + '">' + L(TXT.tryIt) + '</a>' : '');
+    chat.scrollTop = chat.scrollHeight;
+    if (mode === 'talk') { speak(text); if (!voice(text)) $('#ng-hint', panel).textContent = L(TXT.noVoice); }
   }
 
   // ════════════════════════════════════════════════════════════
-  // HE «SPEAKS» — the answer appears word by word under him while his mouth moves (no sound)
+  // HE SPEAKS — out loud (the device's own voice for the language), while the answer appears word by word under
+  // him and his mouth moves; a device with no voice for the language still shows the words
   // ════════════════════════════════════════════════════════════
+  var voices = [];
+  function loadVoices() { try { voices = speechSynthesis.getVoices() || []; } catch (e) { voices = []; } }
+  if ('speechSynthesis' in window) { loadVoices(); try { speechSynthesis.addEventListener('voiceschanged', loadVoices); } catch (e) {} }
+  function pickVoice() {
+    var want = isAr() ? ['ar-sa', 'ar'] : ['en-us', 'en-gb', 'en'];
+    for (var i = 0; i < want.length; i++) for (var j = 0; j < voices.length; j++) if ((voices[j].lang || '').replace('_', '-').toLowerCase().indexOf(want[i]) === 0) return voices[j];
+    return null;
+  }
+  function voice(text) {
+    if (!('speechSynthesis' in window)) return false;
+    try {
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text), v = pickVoice();
+      u.lang = v ? v.lang : (isAr() ? 'ar-SA' : 'en-US'); if (v) u.voice = v;
+      u.rate = isAr() ? 0.98 : 1.02;
+      speechSynthesis.speak(u);
+      return !!v;
+    } catch (e) { return false; }
+  }
   var flap = 0;
   function mouth(on) {
     clearInterval(flap); man.classList.remove('open', 'half');
@@ -560,7 +602,7 @@
     };
     step();
   }
-  function hush() { talkId++; mouth(false); }
+  function hush() { talkId++; mouth(false); try { speechSynthesis.cancel(); } catch (e) {} }
 
   // ════════════════════════════════════════════════════════════
   // OPEN, CLOSE, MODES
@@ -569,13 +611,14 @@
     mode = m; panel.classList.toggle('talk', m === 'talk');
     $('#ng-t-chat', panel).classList.toggle('on', m === 'chat'); $('#ng-t-talk', panel).classList.toggle('on', m === 'talk');
     if (m === 'talk') {
-      if (!$('#ng-reply', panel).textContent) speak(L(TXT.hello));
+      if (!$('#ng-reply', panel).textContent) { speak(L(TXT.hello)); voice(L(TXT.hello)); }
       setTimeout(function () { input.focus(); }, 200);
     } else { hush(); }
   }
   function open() {
     hidePeek();
     panel.classList.add('open'); panel.setAttribute('aria-hidden', 'false'); btn.classList.remove('show');
+    agent();
     if (!greeted) { greeted = true; bubble('bot', esc(L(TXT.hello))); chips(STARTERS); }
     if (mode === 'chat') setTimeout(function () { input.focus(); }, 300);
   }

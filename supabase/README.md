@@ -1,7 +1,9 @@
 # Rawi, the CultureLens heritage agent
 
-One agent with one memory of each learner, taking a role in every experience: the mu'allim in the Samri,
-Abu Fahad in the coffee majlis, Fahad across the Masaqil square, Grandma Haya at the Sadu loom.
+One agent with one memory of each learner, taking a role in each part of the app: the mu'allim who teaches the
+Samri in his row, and Fahad, the Najd guide on the home and experience pages. (Abu Fahad in the coffee majlis,
+Fahad across the Masaqil square and Grandma Haya at the Sadu loom are written too; those pages will load the agent
+once they have a screen of their own for it.)
 It runs as one Supabase Edge Function (`functions/rawi`) and costs nothing on free tiers.
 
 ![System overview](../docs/rawi-system-overview.png)
@@ -24,8 +26,8 @@ It runs as one Supabase Edge Function (`functions/rawi`) and costs nothing on fr
 6. **Reply**: one to three spoken sentences, read out on the phone in Arabic or English.
 7. **Trace**: every step is written to `traces`; `rawi-judge.html` streams them live (Supabase Realtime).
 
-Heritage facts come only from `knowledge`: the 107 passages the team wrote and sourced in the experiences,
-embedded by the function itself with gte-small (built into the Edge Runtime).
+Heritage facts come only from `knowledge`: 146 passages, the 107 the team wrote and sourced in the experiences and
+the 39 of the Najd guide, embedded by the function itself with gte-small (built into the Edge Runtime).
 
 ## Set up (about 5 minutes)
 
@@ -54,5 +56,6 @@ embedded by the function itself with gte-small (built into the Edge Runtime).
 | `functions/rawi/store.ts` | Postgres access and the self-filling embeddings |
 | `functions/rawi/knowledge.ts` | the heritage passages |
 
-On the phone: `rawi.js` (the agent's face on every experience page), `samri-perform.js` (perform the Samri in
-the row), the event hooks in `qahwa.js`, `masaqeel.js` and `sadu.js`, and `rawi-judge.html` (the live trace).
+On the phone: `rawi.js` (the agent's client, with no face of its own), `samri-perform.js` (the Samri teacher: the
+last step of the Samri experience, and an option on its experience page), `najd-guide.js` (Fahad, the Najd guide,
+who answers through the agent and falls back to his own notes offline), and `rawi-judge.html` (the live trace).

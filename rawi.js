@@ -55,6 +55,7 @@ export const PERSONA = {
   qahwa: { name: { en: 'Abu Fahad', ar: 'أبو فهد' }, face: FACE.qahwa },
   masaqil: { name: { en: 'Fahad', ar: 'فهد' }, face: FACE.masaqil },
   sadu: { name: { en: 'Grandma Haya', ar: 'الجدة هيا' }, face: FACE.sadu },
+  guide: { name: { en: 'Fahad', ar: 'فهد' }, face: FACE.general },   // the Najd guide (najd-guide.js) has his own face
   general: { name: { en: 'Rawi', ar: 'راوي' }, face: FACE.general },
 };
 const PAGES = { 'samri.html': 'samri', 'qahwa.html': 'qahwa', 'masaqeel.html': 'masaqil', 'sadu.html': 'sadu' };

@@ -11,6 +11,7 @@ type Tool = { def: ToolDef; kind: 'server' | 'client'; needsResult: boolean; run
 const POEMS: Record<string, number> = { classic: 2, palm: 4, coffee: 4, rain: 4, falcon: 4, night: 4, homeland: 4 };
 const YARN = ['black', 'white', 'brown', 'beige', 'red', 'orange'];
 const CENTERS = ['tree', 'chain', 'camels'], EDGES = ['teeth', 'grains', 'stripes'];
+const PAGES: Record<string, string> = { samri: 'samri.html', qahwa: 'qahwa.html', sadu: 'sadu.html', masaqil: 'masaqeel.html' };
 const STEPS = ['roast', 'najr', 'boil', 'coffee', 'brew', 'spices', 'settle', 'pour', 'order', 'hand', 'amount', 'read'];
 
 function fn(name: string, description: string, properties: Record<string, unknown>, required: string[]): ToolDef {
@@ -22,10 +23,12 @@ export const TOOLS: Record<string, Tool> = {
   search_heritage: {
     kind: 'server', needsResult: true,
     def: fn('search_heritage', 'Search the CultureLens heritage notes (written and sourced by the team) before stating any heritage fact.',
-      { query: { type: 'string', description: 'what to look up, in English keywords' }, experience: { type: 'string', enum: ['samri', 'qahwa', 'sadu', 'masaqil'], description: 'limit to one experience (optional)' } },
+      { query: { type: 'string', description: 'what to look up, in English keywords' }, experience: { type: 'string', enum: ['samri', 'qahwa', 'sadu', 'masaqil', 'najd'], description: 'limit to one topic (optional); najd is the region: history, places, food, customs' } },
       ['query']),
     async run(a, c) {
-      const hits = await c.store.search(short(a.query, 200), a.experience || (c.experience === 'general' ? null : c.experience), 3);
+      // the guide and the storyteller search everything; an experience searches its own notes unless asked otherwise
+      const scope = a.experience || (c.experience === 'general' || c.experience === 'guide' ? null : c.experience);
+      const hits = await c.store.search(short(a.query, 200), scope, 3);
       if (!hits.length) return { results: [], note: 'nothing in the notes; do not state facts you cannot support' };
       return { results: hits.map((h) => ({ title: h.title, text: short(c.lang === 'ar' && h.content_ar ? h.content_ar : h.content_en, 420), source: h.source })) };
     },
@@ -49,13 +52,23 @@ export const TOOLS: Record<string, Tool> = {
       { title: { type: 'string' }, text: { type: 'string', description: 'two sentences at most' } }, ['title', 'text']),
     async run(a, c) { c.actions.push({ name: 'show_card', args: { title: short(a.title, 60), text: short(a.text, 280) } }); return { ok: true, queued: true }; },
   },
+  suggest_experience: {
+    kind: 'client', needsResult: false,
+    def: fn('suggest_experience', 'Offer the visitor one of the app\'s experiences that fits what they asked, as a link they can open.',
+      { experience: { type: 'string', enum: Object.keys(PAGES) }, why: { type: 'string', description: 'a few words on why it fits' } }, ['experience']),
+    async run(a, c) {
+      if (!(a.experience in PAGES)) return { ok: false, error: 'experience is one of ' + Object.keys(PAGES).join(', ') };
+      c.actions.push({ name: 'suggest_experience', args: { experience: a.experience, page: PAGES[a.experience], why: short(a.why, 120) } });
+      return { ok: true, queued: true };
+    },
+  },
   start_drill: {
     kind: 'client', needsResult: false,
     def: fn('start_drill', 'Start the next Samri drill: the row sings a half-verse and the learner answers it on their tar.',
       {
         poem: { type: 'string', enum: Object.keys(POEMS) },
         half: { type: 'integer', minimum: 0, maximum: 3, description: 'classic has halves 0-1, topic poems 0-3' },
-        level: { type: 'integer', minimum: 1, maximum: 4 },
+        level: { type: 'integer', minimum: 1, maximum: 4, description: '1: the other row answers first, then the learner, words shown; 2: the learner answers right after the call, words shown; 3: from memory, no words shown; 4: the learner leads the call' },
         style: { type: 'string', enum: ['heavy', 'light'] },
         focus: { type: 'string', enum: ['strikes', 'words', 'both'], description: 'what the learner should pay attention to' },
       }, ['poem', 'half', 'level']),

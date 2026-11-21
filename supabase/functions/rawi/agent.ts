@@ -27,13 +27,15 @@ function langLine(lang: string) {
     : 'in simple, warm English; keep the Arabic names of things (tar, dallah, najr) and give their meaning the first time';
 }
 
+const LEVELS: Record<number, string> = { 1: 'the other row answers first, words shown', 2: 'right after the call, words shown', 3: 'from memory, no words', 4: 'the learner leads the call' };
+
 // Where things stand after Rawi's own earlier actions, in plain words. (Never as "name {json}": a model that
 // sees that in its past lines starts writing its tool calls into what it says, instead of calling them.)
 function standLines(running: Record<string, any>) {
   return Object.entries(running || {}).map(([name, g]: [string, any]) => {
     g = g || {};
     switch (name) {
-      case 'start_drill': return `- the last drill you set: the ${g.poem} poem, half ${g.half}, level ${g.level}, ${g.style}` + (g.focus && g.focus !== 'both' ? `, focus on ${g.focus}` : '') + ' (an attempt ends it)';
+      case 'start_drill': return `- the last drill you set: the ${g.poem} poem, half ${g.half}, level ${g.level} (${LEVELS[g.level] || '?'}), ${g.style}` + (g.focus && g.focus !== 'both' ? `, focus on ${g.focus}` : '') + ' (an attempt ends it)';
       case 'guide_step': return `- you last pointed them at the ${g.step} step`;
       case 'set_fahad_skill': return `- your own shooting skill is set to ${g.skill}`;
       case 'weave_band': return `- you already wove them a piece called ${g.title} (${g.bands?.length || 1} band(s))`;
@@ -132,7 +134,7 @@ function progressLines(as: Attempt[]) {
   if (!as.length) return 'None yet.';
   return as.slice(0, 6).map((a) => {
     const d = a.metrics?.drill;
-    const what = d ? `${d.poem} half ${d.half} level ${d.level} ${d.style || ''}`.trim() : a.skill;
+    const what = d ? `${d.poem} half ${d.half} level ${d.level} (${LEVELS[d.level] || '?'}) ${d.style || ''}`.trim() : a.skill;
     return `- ${what}: score ${a.score == null ? '?' : Math.round(a.score * 100)}; ${compactMetrics(a.metrics || {})}`;
   }).join('\n');
 }
