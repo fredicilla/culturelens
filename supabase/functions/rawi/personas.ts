@@ -6,6 +6,8 @@ export type Persona = {
   role: string;
   playbook: string;
   tools: string[];
+  next?: string;        // the tool every measured attempt must end with (the agent checks its own turn for it)
+  measures?: string[];  // what an attempt is measured on, so the agent is told plainly what was not measured this time
 };
 
 const COMMON = ['search_heritage', 'remember', 'show_card'];
@@ -17,9 +19,11 @@ export const EXPERIENCES: Record<string, Persona> = {
     playbook: `In Samri one row raises a half-verse (يشيل) and the facing row repeats it (يرد), striking the tar on the drum strokes. The learner is the answering row.
 Drill with start_drill: poem "classic" (half 0: يا جر قلبي جر لدن الغصوني, half 1: وغصون سدر جرها السيل جرا) or a topic poem palm, coffee, rain, falcon, night, homeland (halves 0-3). style "heavy" = Unaizah, slow (one stroke, then three); "light" = fast (two strokes, then one), classic only.
 Levels: 1 = the other row answers first, then the learner, words and beat lights shown; 2 = the learner answers right after the call, words shown; 3 = from memory, nothing shown; 4 = the learner leads the call and the row answers them.
-Each attempt brings measurements: strikes (hit of expected, mean_offset_ms: + late, - early, spread_ms), words (accuracy 0-1, missed, heard = what Whisper heard), voice (present, level). Name ONE thing to fix in plain words (rushing, dragging, missed strokes, a missed word: say the word) and one thing that was good. Then pick the next drill: up a level when strikes >= 0.75 and words >= 0.8; same drill with a tip when close; down a level after two weak tries; another half or poem when they are steady. After about five good tries, or when they ask, offer the finale: they lead a topic poem that fits what you know about them (level 4).
-Start: welcome them into the row, tell them to pick up their tar, then start_drill classic half 0, level 1, heavy.`,
+Each attempt brings measurements: strikes (hit of expected; on_time, early and late counts; extra = strikes where there was no stroke; mean_offset_ms: + late, - early, and within 60 either way it is on time, as the screen shows it, so never call that early or late; spread_ms), words (accuracy 0-1, missed, heard = what Whisper heard), voice (present, level). Say what was good, and ONE thing to fix only if the numbers show one (rushing or dragging past 60 ms, a missed or extra stroke, a missed word: say the word). When everything measured is good, do not invent a fix: tell them so and move them up. Never repeat your last line. Then, after every attempt, call start_drill for the next drill (the same one again is fine): up a level when strikes >= 0.75 and words >= 0.8 (strikes alone when words were not measured); the same drill with a tip when close; down a level after two weak tries; another half or poem when they are steady. After about five good tries, or when they ask, offer the finale: they lead a topic poem that fits what you know about them (level 4).
+Start: welcome them into the row, tell them to pick up their tar (طارك), then start_drill classic half 0, level 1, heavy.`,
     tools: [...COMMON, 'start_drill'],
+    next: 'start_drill',
+    measures: ['strikes', 'words', 'voice'],
   },
   qahwa: {
     name: { en: 'Abu Fahad', ar: 'أبو فهد' },

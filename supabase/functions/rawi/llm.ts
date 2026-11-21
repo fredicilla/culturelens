@@ -20,7 +20,7 @@ export function llmConfig() {
   return {
     baseUrl: env('LLM_BASE_URL', 'https://api.groq.com/openai/v1').replace(/\/+$/, ''),
     apiKey: env('LLM_API_KEY') || env('GROQ_API_KEY'),
-    models: env('LLM_MODELS', 'qwen/qwen3.8-27b,qwen/qwen3-32b,openai/gpt-oss-120b,llama-3.3-70b-versatile')
+    models: env('LLM_MODELS', 'qwen/qwen3.8-27b,openai/gpt-oss-120b,llama-3.3-70b-versatile')
       .split(',').map((s: string) => s.trim()).filter(Boolean),
   };
 }
@@ -42,7 +42,7 @@ export function stripThink(s: string | null | undefined): string {
 
 export async function chat(
   messages: Msg[], tools: ToolDef[],
-  opts: { temperature?: number; max_tokens?: number; tool_choice?: 'auto' | 'none'; fetchImpl?: typeof fetch } = {},
+  opts: { temperature?: number; max_tokens?: number; tool_choice?: 'auto' | 'none' | 'required' | { type: 'function'; function: { name: string } }; fetchImpl?: typeof fetch } = {},
 ): Promise<ChatOut> {
   const cfg = llmConfig();
   const f = opts.fetchImpl ?? fetch;
@@ -88,7 +88,10 @@ export async function chat(
       if (res.status === 400 && /tool_use_failed|failed to call a function|tool call validation/i.test(text) && attempt < 2) {
         tries.push(model + ':badtool'); continue;                  // the model wrote a broken tool call: one more go
       }
-      if (res.status === 404 || /model_not_found|does not exist|decommissioned/i.test(text)) { tries.push(model + ':gone'); break; }
+      if (res.status === 404 || /model_not_found|does not exist|decommissioned/i.test(text)) {
+        restUntil.set(model, Date.now() + 3600e3);              // retired by the provider: stop asking for an hour
+        tries.push(model + ':gone'); break;
+      }
       tries.push(model + ':' + res.status); break;
     }
   }

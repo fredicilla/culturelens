@@ -12,7 +12,7 @@
  *                                          (window.rawiQ = window.rawiQ || []).push(['on', 'guide_step', fn])
  * Add ?judge=1 to the address to see each step the agent took (model, tools, timings) under its line.
  */
-import { RAWI_SUPABASE_URL, RAWI_ANON_KEY } from './rawi-config.js';
+import { RAWI_SUPABASE_URL, RAWI_ANON_KEY, RAWI_REGION } from './rawi-config.js';
 
 const isAr = () => window.currentLang === 'ar';
 const L = (o) => (o == null ? '' : typeof o === 'string' ? o : isAr() ? (o.ar ?? o.en) : o.en);
@@ -24,9 +24,14 @@ export function endpoint() {
   const q = (n) => { const m = location.search.match(new RegExp('[?&]' + n + '=([^&]+)')); return m ? decodeURIComponent(m[1]) : null; };
   if (q('rawi')) { store('cl_rawi_url', q('rawi') === 'off' ? null : q('rawi')); }
   if (q('rawikey')) store('cl_rawi_key', q('rawikey'));
-  const url = (store('cl_rawi_url') || RAWI_SUPABASE_URL || '').replace(/\/+$/, '');
+  const own = store('cl_rawi_url');
+  const url = (own || RAWI_SUPABASE_URL || '').replace(/\/+$/, '');
   const key = store('cl_rawi_key') || RAWI_ANON_KEY || '';
-  return url ? { url: url + '/functions/v1/rawi', key } : null;
+  // run next to the database (a query parameter, so no extra CORS header is needed)
+  const region = !own && RAWI_REGION ? '?forceFunctionRegion=' + RAWI_REGION : '';
+  // our own agent checks no token (it limits each device itself), so a turn can be a plain request with no
+  // preflight; another project may want its key sent
+  return url ? { url: url + '/functions/v1/rawi' + region, key, plain: !own } : null;
 }
 export function deviceKey() {
   let k = store('cl_rawi_device');
@@ -263,12 +268,15 @@ export function createRawi(opts) {
   const ui = opts.ui === false ? null : mountUI(exp, api);
   api.ui = ui;
   if (ui && !endpoint()) { ui.off(true); ui.show(L(T.off)); }
+  // wake the agent while the page is still loading, so the first real turn does not pay for a cold start
+  { const ep = endpoint(); if (ep) fetch(ep.url, { method: 'GET' }).catch(() => {}); }
 
   async function post(input) {
     const ep = endpoint(); if (!ep) return { ok: false, error: 'off' };
     const body = JSON.stringify({ action: 'turn', device: deviceKey(), lang: isAr() ? 'ar' : 'en', experience: exp, session_id: session, input });
     for (let k = 0; k < 3; k++) {
-      const res = await fetch(ep.url, { method: 'POST', headers: { 'content-type': 'application/json', ...(ep.key ? { authorization: 'Bearer ' + ep.key, apikey: ep.key } : {}) }, body });
+      const headers = ep.plain ? { 'content-type': 'text/plain;charset=UTF-8' } : { 'content-type': 'application/json', ...(ep.key ? { authorization: 'Bearer ' + ep.key, apikey: ep.key } : {}) };
+      const res = await fetch(ep.url, { method: 'POST', headers, body });
       const j = await res.json().catch(() => ({ ok: false, error: 'bad reply' }));
       if (j.error === 'slow down' && j.retry_ms) { await new Promise((r) => setTimeout(r, j.retry_ms + 50)); continue; }
       return j;

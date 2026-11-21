@@ -12,13 +12,17 @@ It runs as one Supabase Edge Function (`functions/rawi`) and costs nothing on fr
    AudioWorklet against the drum clock, plus the sung answer as audio), or something the learner said.
 2. **Hear**: a sung or spoken answer goes to Whisper (large-v3-turbo, free on Groq); the transcript is aligned
    word by word with the expected verse after Arabic normalization (`arabic.ts`).
-3. **Recall**: the learner's memories (from every experience) and recent attempts go into the prompt.
+3. **Recall**: the learner's memories (from every experience), their recent attempts, and the last four turns
+   with the tools it called go into the prompt. What was not measured this time is said plainly.
 4. **Think and act**: Qwen (free on Groq; a router falls back to the next free model on a rate limit) answers
    in the experience's role and calls tools. Server tools run in the function (`search_heritage` over pgvector,
    `remember`). App tools (`start_drill`, `weave_band`, `guide_step`, `set_fahad_skill`, `show_card`) are
-   validated, then sent to the phone; a wrong call goes back to the model as an error to fix.
-5. **Reply**: one or two spoken sentences, read out on the phone in Arabic or English.
-6. **Trace**: every step is written to `traces`; `rawi-judge.html` streams them live (Supabase Realtime).
+   validated, then sent to the phone; a wrong call goes back to the model as an error to fix, and a call
+   written into the text by mistake is turned back into a real one.
+5. **Check**: after a measured Samri attempt, if it has not set the next drill, it is asked once more with only
+   `start_drill` on offer (which drill is still its choice).
+6. **Reply**: one to three spoken sentences, read out on the phone in Arabic or English.
+7. **Trace**: every step is written to `traces`; `rawi-judge.html` streams them live (Supabase Realtime).
 
 Heritage facts come only from `knowledge`: the 107 passages the team wrote and sourced in the experiences,
 embedded by the function itself with gte-small (built into the Edge Runtime).
@@ -33,13 +37,15 @@ embedded by the function itself with gte-small (built into the Edge Runtime).
    - `GROQ_API_KEY`: free at console.groq.com
    - optional `LLM_BASE_URL` and `LLM_MODELS` to use another OpenAI-compatible brain, for example Ollama on
      our own laptop: `LLM_BASE_URL=https://<tunnel>/v1`, `LLM_MODELS=qwen3.5:9b`
-5. Put the project URL and its anon (publishable) key in `rawi-config.js` at the root of the app.
+5. Put the project URL, its anon (publishable) key and the database's region in `rawi-config.js` at the root
+   of the app. The phone runs the function in that region: a turn makes several database calls, and pinning
+   it next to the database took a turn from about 4.5 s to under 2 s.
 
 ## Files
 
 | file | what it does |
 |---|---|
-| `functions/rawi/index.ts` | the HTTP entry: turn, health, seed |
+| `functions/rawi/index.ts` | the HTTP entry: a turn, and a health check that also wakes it |
 | `functions/rawi/agent.ts` | one agent turn: perceive, hear, recall, think with tools, reply, trace |
 | `functions/rawi/personas.ts` | who Rawi is in each experience, its playbook and its tools |
 | `functions/rawi/tools.ts` | the tools and their checks |

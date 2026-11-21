@@ -5,23 +5,26 @@
 // The heritage notes load themselves on the first turns (store.ts): from rawi-knowledge.json, embedded with gte-small.
 // Optional: LLM_BASE_URL, LLM_MODELS, ASR_MODEL, RAWI_DAILY_TURNS.
 import { handleTurn } from './agent.ts';
-import { supabaseStore } from './store.ts';
+import { supabaseStore, later } from './store.ts';
 import { llmConfig } from './llm.ts';
 
 const CORS = {
   'access-control-allow-origin': '*',
   'access-control-allow-headers': 'authorization, x-client-info, apikey, content-type',
   'access-control-allow-methods': 'GET, POST, OPTIONS',
+  'access-control-max-age': '7200',     // the phone asks once, not before every turn
 };
 const json = (b: unknown, status = 200) => new Response(JSON.stringify(b), { status, headers: { ...CORS, 'content-type': 'application/json' } });
 const env = (k: string) => Deno.env.get(k) ?? '';
 let storeP: ReturnType<typeof supabaseStore> | null = null;
-const store = () => (storeP ??= supabaseStore());
+const store = () => (storeP ??= supabaseStore().catch((e) => { storeP = null; throw e; }));
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   try {
     if (req.method === 'GET') {
+      // a page that opens pings this, so the database client is loaded before the first turn
+      later(store().catch(() => {}));
       const c = llmConfig();
       return json({ ok: true, agent: 'rawi', brain: { base: c.baseUrl.replace(/^https?:\/\//, '').split('/')[0], models: c.models, key: !!c.apiKey }, ear: env('ASR_MODEL') || 'whisper-large-v3-turbo' });
     }
