@@ -24,7 +24,7 @@ export const TOOLS: Record<string, Tool> = {
   search_heritage: {
     kind: 'server', needsResult: true,
     def: fn('search_heritage', 'Search the CultureLens heritage notes (written and sourced by the team) before stating any heritage fact.',
-      { query: { type: 'string', description: 'what to look up, in English keywords' }, experience: { type: 'string', enum: ['samri', 'qahwa', 'sadu', 'masaqil', 'najd'], description: 'limit to one topic (optional); najd is the region: history, places, food, customs' } },
+      { query: { type: 'string', description: 'what to look up, in English keywords' }, experience: { type: 'string', enum: ['samri', 'qahwa', 'sadu', 'masaqil', 'najd', 'saudi'], description: 'limit to one topic (optional); najd is the central region (history, places, food, customs); saudi is the rest of the Kingdom (its regions, cities, heritage sites, food, dress, arts and festivals)' } },
       ['query']),
     async run(a, c) {
       // the guide and the storyteller search everything; an experience searches its own notes unless asked otherwise

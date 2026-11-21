@@ -2,7 +2,7 @@
 // diacritics, one alef, ya/alef maqsura, ta marbuta/ha), then the two word lists are aligned with an edit
 // distance where near-misses (a letter or two off, the way Najdi speech spells out) count as partly right.
 
-const DIAC = /[ؐ-ًؚ-ٰٟۖ-ۭـ]/g;
+const DIAC = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g;
 
 export function norm(s: string): string {
   return (s || '')

@@ -31,15 +31,28 @@ function rawi(name, data) {
 }
 // the AI rematch (the last step, and masaqeel.html?ai=1): rawi.js loads only then, Fahad's lines come from the agent
 // into his own speech bubble, and the agent sets how well he shoots (set_fahad_skill)
-var AI = { on: false, agent: null, starting: false };
-function aiOff() { AI.on = false; S.fahadSkill = null; }
+var AI = { on: false, agent: null, starting: false, mod: null };
+function aiOff() { AI.on = false; S.fahadSkill = null; if (AI.mod) AI.mod.hush(); }
+// Fahad's line: in the intro card while it is up, in his speech bubble during the match, and out loud in his voice
+function fahadSays(text) {
+  var q = panel && $('.mq-ai-quote', panel);
+  if (hud.hidden && q) { q.textContent = text; q.hidden = false; }
+  else bubble({ en: text, ar: text }, Math.min(12000, 2800 + text.length * 60), true);
+  if (!S.sound || !AI.mod) return;
+  AI.mod.speak(text, isAr() ? 'ar' : 'en', { voice: 'fahad', onLevel: function (v) {
+    var b = $('#mq-bubble'), face = b && b.classList.contains('show') ? b : q;
+    if (face) face.classList.toggle('talk', v > 0.12);
+  } });
+}
 function startAiMatch(from) {
+  if (window.clSound) window.clSound.prime();     // the tap that started it lets his voice play later (iPhones)
   import('./rawi.js').then(function (m) {
+    AI.mod = m;
     if (!AI.agent) {
       AI.agent = m.createRawi({ experience: 'masaqil', speak: false, actions: {
         set_fahad_skill: function (a) { if (AI.on && a && typeof a.skill === 'number') S.fahadSkill = Math.max(0, Math.min(1, a.skill)); }
       } });
-      AI.agent.on('reply', function (r) { if (AI.on && r && r.ok && r.say) bubble({ en: r.say, ar: r.say }, Math.min(9000, 2600 + r.say.length * 55), true); });
+      AI.agent.on('reply', function (r) { if (AI.on && r && r.ok && r.say) fahadSays(r.say); });
     }
     AI.starting = true; setPart('play'); AI.starting = false;
     AI.on = true; renderIntro();
@@ -157,7 +170,10 @@ var G_TEXT = {
   aiT: { en: 'Rematch with Fahad', ar: 'تحدَّ فهد مرة ثانية' },
   aiP: { en: 'This time Fahad is the AI: he talks back after every shot and sharpens or loosens his aim to keep the match close.', ar: 'هالمرة فهد ذكاء اصطناعي: يرد عليك بعد كل رمية، ويشد تصويبه أو يرخيه عشان تبقى المباراة حامية.' },
   aiGo: { en: 'Rematch him', ar: 'تحدّاه' },
-  aiIntro: { en: 'A rematch against Fahad · AI', ar: 'مباراة ثانية ضد فهد · ذكاء اصطناعي' }
+  aiIntro: { en: 'A rematch against Fahad · AI', ar: 'مباراة ثانية ضد فهد · ذكاء اصطناعي' },
+  // after a rematch with the AI
+  aiT2: { en: 'One more against Fahad?', ar: 'تبي جولة ثانية مع فهد؟' },
+  aiP2: { en: 'He remembers this match, and he talks back out loud. Show him you were not just lucky.', ar: 'فهد يتذكر هالمباراة، ويرد عليك بصوته. وريه إنها مو ضربة حظ.' }
 };
 var SAY = {
   start: { en: 'Go on, you start.', ar: 'يلا، ابدأ أنت.' },
@@ -627,7 +643,8 @@ function renderIntro() {
   panel.className = 'mq-panel qx-enter';
   panel.innerHTML =
     '<div class="mq-vs">' + fahadFace() + '<div><div class="qx-kicker">' + L(AI.on ? G_TEXT.aiIntro : G_TEXT.intro) + '</div><div class="mq-vs-name">' + L(G_TEXT.fahadIs) + '</div></div></div>' +
-    '<p class="mq-p">' + L(AI.on ? G_TEXT.aiP : G_TEXT.introP) + '</p>';
+    '<p class="mq-p">' + L(AI.on ? G_TEXT.aiP : G_TEXT.introP) + '</p>' +
+    (AI.on ? '<p class="mq-ai-quote" dir="auto" hidden></p>' : '');
   setBar({ buttons: [{ label: G_TEXT.start, icon: 'next', onClick: function () { sfx('tap'); startRound(); } }] });
 }
 function renderHUD() {
@@ -644,8 +661,8 @@ function bubble(o, ms, fromAgent) {
   if (AI.on && !fromAgent) return;
   var b = $('#mq-bubble');
   if (!b) { b = document.createElement('div'); b.id = 'mq-bubble'; b.className = 'mq-bubble'; root.appendChild(b); }
-  b.innerHTML = fahadFace() + '<span>' + L(o) + '</span>';
-  b.classList.remove('show'); void b.offsetWidth; b.classList.add('show');
+  b.innerHTML = fahadFace() + '<span dir="auto"></span>'; b.lastChild.textContent = L(o);
+  b.classList.remove('show', 'dim', 'talk'); void b.offsetWidth; b.classList.add('show');
   clearTimeout(b._t); b._t = setTimeout(function () { b.classList.remove('show'); }, ms || 2200);
 }
 
@@ -866,7 +883,7 @@ function renderResults() {
       '<div class="mq-stars">' + [0, 1, 2].map(function (i) { return '<i class="' + (i < stars ? 'on' : '') + '">' + ICON.star + '</i>'; }).join('') + '</div>' +
       '<h2 class="mq-title">' + L(title) + '</h2>' +
       '<p class="mq-p">' + L(line) + '</p>' +
-      '<div class="mq-learn mq-ai-card"><div class="qx-kicker">' + L(G_TEXT.aiK) + '</div><h3 class="mq-ai-t">' + L(G_TEXT.aiT) + '</h3><p class="mq-p">' + L(G_TEXT.aiP) + '</p>' +
+      '<div class="mq-learn mq-ai-card"><div class="qx-kicker">' + L(G_TEXT.aiK) + '</div><h3 class="mq-ai-t">' + L(AI.on ? G_TEXT.aiT2 : G_TEXT.aiT) + '</h3><p class="mq-p">' + L(AI.on ? G_TEXT.aiP2 : G_TEXT.aiP) + '</p>' +
         '<button class="qx-btn qx-btn-solid" id="mq-ai-go" type="button"><span>' + L(G_TEXT.aiGo) + '</span></button></div>' +
       '<div class="mq-learn"><div class="qx-kicker">' + L(G_TEXT.learned) + '</div>' + LEARN.map(function (l) { return '<div class="mq-learn-row">' + ICON.check + '<span>' + L(l) + '</span></div>'; }).join('') + '</div>';
     var go = $('#mq-ai-go', panel);
@@ -901,6 +918,7 @@ function wireTouch() {
 }
 function startAim(e) {
   var m = S.aimCtx.m; if (!m || m.state !== 'rest') return;
+  var bb = $('#mq-bubble'); if (bb) bb.classList.add('dim');
   try { touch.setPointerCapture(e.pointerId); } catch (x) {}
   S.aim = { sx: e.clientX, sy: e.clientY, power: 0, dir: null };
   aimRing.hidden = false;
@@ -1036,7 +1054,7 @@ async function boot() {
   $('#qx-sound').addEventListener('click', function () {
     S.sound = !S.sound;
     try { localStorage.setItem('cl_sound', S.sound ? 'on' : 'off'); } catch (e) {}
-    if (!S.sound) { setLoop('roll', 0); setLoop('scrape', 0); } else sfx('tap');
+    if (!S.sound) { setLoop('roll', 0); setLoop('scrape', 0); if (AI.mod) AI.mod.hush(); } else sfx('tap');
     renderSound();
   });
   if (window.ThemeManager && !window.ThemeManager.current()) window.ThemeManager.applyRegionTheme('najd');

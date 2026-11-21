@@ -99,18 +99,28 @@ body.mq .qx-icon-btn, body.mq #lang-toggle { background: rgba(14, 9, 6, 0.42); -
   position: fixed; z-index: 45;
   top: calc(var(--qx-top) + var(--qx-parts) + env(safe-area-inset-top, 0px) + 84px);
   inset-inline-end: max(12px, calc(50vw - 203px));
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 14px 6px 6px;
-  border-radius: 999px;
-  background: rgba(232, 244, 255, 0.95); color: #0F2A40;
-  font-size: 14px; font-weight: 700;
+  /* under Fahad's card, and never over the AR button on the other side */
+  max-width: min(290px, calc(100vw - 24px - 118px));
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 7px 14px 8px 7px;
+  border-radius: 18px;
+  background: rgba(232, 244, 255, 0.96); color: #0F2A40;
+  font-size: 14px; font-weight: 700; line-height: 1.55;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
   opacity: 0; transform: translateY(-8px) scale(0.92); transition: opacity 0.25s, transform 0.3s var(--qx-ease);
   pointer-events: none;
 }
-[dir="rtl"] .mq-bubble { padding: 6px 6px 6px 14px; }
+.mq-bubble::before { content: ''; position: absolute; top: -5px; inset-inline-end: 30px; width: 11px; height: 11px; background: inherit; border-radius: 2px; transform: rotate(45deg); }
+.mq-bubble span { padding-top: 4px; }
+[dir="rtl"] .mq-bubble { padding: 7px 7px 8px 14px; }
 .mq-bubble.show { opacity: 1; transform: none; }
-.mq-bubble .mq-face { width: 30px; height: 30px; border-radius: 50%; }
+.mq-bubble.show.dim { opacity: 0.28; }
+.mq-bubble .mq-face { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; transition: transform 0.1s; }
+.mq-bubble.talk .mq-face { transform: scale(1.12); }
+.mq-ai-quote.talk { box-shadow: 0 0 0 2px rgba(127, 196, 255, 0.6); }
+/* his greeting, in the rematch's intro card */
+.mq-ai-quote { position: relative; margin: 10px 0 0; padding: 10px 14px; border-radius: 16px; background: rgba(232, 244, 255, 0.96); color: #0F2A40; font-size: 14.5px; font-weight: 700; line-height: 1.6; }
+.mq-ai-quote::before { content: ''; position: absolute; top: -5px; inset-inline-start: 22px; width: 11px; height: 11px; background: inherit; border-radius: 2px; transform: rotate(45deg); }
 
 .mq-callout {
   position: fixed; z-index: 45; left: 0; right: 0; top: 34%;

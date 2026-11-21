@@ -31,28 +31,28 @@ export async function embed(text: string): Promise<number[] | null> {
   return Array.from(v as ArrayLike<number>);
 }
 
-// The heritage notes: when the table is empty, the function loads them from the app's own repository
-// (rawi-knowledge.json, the text the team wrote and sourced in each experience), then embeds them with gte-small,
-// a few at a time after replies have gone out, so the knowledge base fills itself with no manual step.
+// The heritage notes: the function loads them from the app's own repository (rawi-knowledge.json, the text the team
+// wrote and sourced in each experience): all of them when the table is empty, and a whole topic the table does not
+// have yet when one is added to the file (only new rows are added, nothing is changed or removed). Then it embeds
+// them with gte-small, a few at a time after replies have gone out, so the knowledge base fills itself.
 let backfilling = false, backfilled = false, lastTry = 0;
 async function backfill(db: any) {
   if (backfilling || backfilled || Date.now() - lastTry < 60000) return;
   backfilling = true; lastTry = Date.now();
   try {
-    const c = await db.from('knowledge').select('id', { count: 'exact', head: true });
-    if (c.error) return;
-    if (!c.count) {
+    const have = await db.from('knowledge').select('experience');
+    if (have.error) return;
+    const topics = new Set((have.data || []).map((r: any) => r.experience));
+    try {
       const url = env('RAWI_KNOWLEDGE_URL', 'https://raw.githubusercontent.com/fredicilla/culturelens/main/rawi-knowledge.json');
       const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
-      if (!res.ok) return;
-      const rows = await res.json();
-      if (!Array.isArray(rows) || !rows.length) return;
-      const clean = rows.slice(0, 400).map((k: any) => ({
+      const rows = res.ok ? await res.json() : [];
+      const clean = (Array.isArray(rows) ? rows : []).slice(0, 600).map((k: any) => ({
         experience: String(k.experience || 'general').slice(0, 24), title: String(k.title || '').slice(0, 200),
         content_en: String(k.content_en || '').slice(0, 2000), content_ar: String(k.content_ar || '').slice(0, 2000), source: String(k.source || '').slice(0, 300),
-      })).filter((k: any) => k.content_en);
-      if ((await db.from('knowledge').insert(clean)).error) return;
-    }
+      })).filter((k: any) => k.content_en && !topics.has(k.experience));
+      if (clean.length) await db.from('knowledge').insert(clean);
+    } catch (_) { /* the repository is out of reach: embed what is there */ }
     for (let round = 0; round < 15; round++) {
       const r = await db.from('knowledge').select('id, title, content_en').is('embedding', null).limit(10);
       if (r.error) return;

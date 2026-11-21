@@ -1,13 +1,14 @@
 /**
  * najd-guide.js — «دليل نجد», a guide for the Najd region.
  *
- * When the visitor is in Najd (body[data-region="najd"], map closed), a button on the side opens the guide.
- * Two ways to use it:
- *   1. Chat  — type a question, get an answer.
- *   2. Talk  — a Najdi man in a white ghutra, black agal and thobe; speak to him (microphone) and he answers out loud.
- * The answers come from Rawi, the CultureLens AI agent (the same one as the Samri teacher), playing Fahad: it searches
- * the team's sourced notes, the ones written below among them, and answers in his voice, out loud in the talk tab.
- * When it cannot be reached (offline, busy), the notes below still answer by themselves, as they always did: only what
+ * When the visitor is in Najd (body[data-region="najd"], map closed), a button on the side opens the guide: one panel,
+ * one conversation with Fahad, a Najdi man in a white ghutra, black agal and thobe.
+ *   - Type a question, or tap the mic and say it.
+ *   - The voice-chat button brings Fahad out: he answers out loud in a Saudi voice, his mouth moving with it, and
+ *     listens again when he is done (when you stop talking, what you said goes to him).
+ * The answers come from Rawi, the CultureLens AI agent, playing Fahad: it searches the team's sourced notes (Najd
+ * first, then the rest of the Kingdom), hears the visitor's voice (Whisper) and speaks (rawi.js speak).
+ * When it cannot be reached (offline, busy), the notes below still answer typed questions by themselves: only what
  * they know, and an honest «I do not know» with a few questions they can answer for anything else.
  * Add ?region=najd&guide=1 to the address to open it straight away (for testing).
  */
@@ -407,6 +408,8 @@
   // ════════════════════════════════════════════════════════════
   // LOOK
   // ════════════════════════════════════════════════════════════
+  var MIC_I = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+  var PLAY_I = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
   var CSS = '' +
     // the site's tokens (app.css), with fallbacks; --acc is the region's colour (Najd: clay brown)
     '#ng-btn,#ng-panel,#ng-peek{--g-paper:var(--paper,#F4EEE4);--g-ink:var(--ink,#16121D);--g-night:var(--night,#0E0B1A);--g-gold:var(--logo-gold,#E3C47A);--g-cream:var(--logo-cream,#F3EADB);' +
@@ -420,74 +423,102 @@
     '#ng-btn .ng-dot{position:absolute;bottom:2px;inset-inline-end:2px;width:14px;height:14px;border-radius:50%;background:#3E8E5A;border:2.5px solid var(--g-paper)}' +
     '#ng-btn::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--g-gold);opacity:0;animation:ngRing 3.2s 1.2s infinite}' +
     '@keyframes ngRing{0%{transform:scale(.9);opacity:.7}70%,100%{transform:scale(1.25);opacity:0}}' +
-    '.ng-head .ng-face svg{width:100%;height:100%;transform:scale(1.5) translateY(9%)}' +
+    '.ng-head .ng-face svg,.ng-call .ng-face svg{width:100%;height:100%;transform:scale(1.5) translateY(9%)}' +
     '#ng-panel{position:fixed;z-index:2147482000;top:0;bottom:0;inset-inline-end:0;width:min(420px,100vw);background:var(--g-paper);color:var(--g-ink);display:flex;flex-direction:column;' +
     'transform:translateX(105%);transition:transform .32s var(--ease,cubic-bezier(.22,1,.36,1));box-shadow:-14px 0 40px rgba(14,11,26,.25)}' +
     'html[dir="rtl"] #ng-panel{transform:translateX(-105%)}#ng-panel.open{transform:none!important}#ng-panel *{box-sizing:border-box}' +
-    '.ng-head{display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;background:var(--g-night);color:var(--g-cream);min-height:var(--hdr,56px)}' +
+    '.ng-head{display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;background:var(--g-night);color:var(--g-cream);min-height:var(--hdr,56px);flex:none}' +
     '.ng-head .ng-face{width:42px;height:42px;border-radius:var(--g-r);background:#2A2235;overflow:hidden;flex:none;border:1px solid rgba(227,196,122,.35)}' +
     '.ng-head b{display:block;font-size:16px;font-weight:700}.ng-head small{color:var(--g-gold);font-size:12.5px}' +
-    '.ng-head .ng-x{margin-inline-start:auto;background:transparent;border:1px solid rgba(243,234,219,.24);color:var(--g-cream);border-radius:var(--g-r);width:38px;height:38px;font-size:15px;cursor:pointer}' +
-    '.ng-band{height:10px;background:var(--region-motif-tone,none) var(--g-acc);background-size:auto 10px;opacity:.9}' +
-    '.ng-tabs{display:flex;padding:0 16px;border-bottom:1px solid var(--g-rule)}' +
-    '.ng-tabs button{flex:1;background:transparent;color:var(--g-ink);opacity:.6;border:0;border-bottom:2px solid transparent;padding:13px 4px 11px;font:inherit;font-weight:700;font-size:14.5px;cursor:pointer;margin-bottom:-1px}' +
-    '.ng-tabs button.on{opacity:1;border-bottom-color:var(--g-acc);color:var(--g-acc)}' +
-    '.ng-chat{flex:1;overflow-y:auto;padding:14px 16px 10px;display:flex;flex-direction:column;gap:10px}' +
-    '.ng-msg{max-width:90%;padding:11px 14px;border-radius:var(--g-r);line-height:1.8;font-size:15.5px;white-space:pre-wrap}' +
-    '.ng-msg.bot{background:#FFFDF9;border:1px solid var(--g-rule);border-inline-start:3px solid var(--g-acc);align-self:flex-start}' +
-    '.ng-msg.me{background:var(--g-ink);color:var(--g-paper);align-self:flex-end;font-weight:500}' +
-    '.ng-msg a.ng-try{display:inline-flex;margin-top:10px;background:var(--g-acc);color:var(--g-paper);border-radius:var(--g-r);padding:7px 14px;font-size:13.5px;font-weight:700;text-decoration:none}' +
-    '.ng-chips{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start}.ng-chips button{background:transparent;color:var(--g-acc);border:1px solid var(--g-acc);border-radius:var(--g-r);padding:6px 11px;font:inherit;font-size:13.5px;font-weight:500;cursor:pointer}' +
-    '.ng-chips button:hover{background:var(--g-acc);color:var(--g-paper)}' +
-    '.ng-wait{display:inline-flex;gap:5px;padding:4px 0}.ng-wait i{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.3;animation:ngw 1s infinite}.ng-wait i:nth-child(2){animation-delay:.15s}.ng-wait i:nth-child(3){animation-delay:.3s}@keyframes ngw{50%{opacity:1}}' +
-    '.ng-form{display:flex;gap:8px;padding:10px 16px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--g-rule);background:var(--g-paper)}' +
-    '.ng-form input{flex:1;min-width:0;background:#FFFDF9;color:var(--g-ink);border:1px solid var(--g-rule);border-radius:var(--g-r);padding:12px 14px;font:inherit;font-size:15.5px}' +
-    '.ng-form input:focus{outline:2px solid var(--g-acc);outline-offset:-1px}' +
-    '.ng-form button{background:var(--g-acc);color:var(--g-paper);border:0;border-radius:var(--g-r);padding:0 18px;font:inherit;font-weight:700;cursor:pointer}' +
-    '.ng-talk{flex:1;display:none;flex-direction:column;align-items:center;justify-content:flex-start;padding:16px 18px 10px;overflow-y:auto;text-align:center}' +
-    '#ng-panel.talk .ng-talk{display:flex}#ng-panel.talk .ng-chat{display:none}' +
-    '.ng-stage{width:min(240px,60vw);aspect-ratio:240/280;border-radius:var(--g-r);background:radial-gradient(circle at 50% 36%,#3A2E46,var(--g-night) 72%);overflow:hidden;flex:none;position:relative;transition:box-shadow .2s}' +
+    '.ng-head .ng-x{margin-inline-start:auto;background:transparent;border:1px solid rgba(243,234,219,.24);color:var(--g-cream);border-radius:var(--g-r);width:38px;height:38px;font-size:15px;cursor:pointer;flex:none}' +
+    '.ng-band{height:10px;background:var(--region-motif-tone,none) var(--g-acc);background-size:auto 10px;opacity:.9;flex:none}' +
+    // the voice-chat button: the way to bring Fahad out
+    '.ng-call{flex:none;margin:12px 16px 2px;display:flex;align-items:center;gap:12px;background:var(--g-night);color:var(--g-cream);border:1px solid rgba(227,196,122,.5);border-radius:var(--g-r);padding:9px 14px 9px 10px;font:inherit;cursor:pointer;text-align:start}' +
+    'html[dir="rtl"] .ng-call{padding:9px 10px 9px 14px}' +
+    '.ng-call .ng-face{width:38px;height:38px;border-radius:50%;overflow:hidden;background:#2A2235;flex:none;border:1.5px solid var(--g-gold)}' +
+    '.ng-call b{display:block;font-size:14.5px;font-weight:700}.ng-call small{display:block;font-size:12px;color:rgba(243,234,219,.7)}' +
+    '.ng-call .ng-call-i{margin-inline-start:auto;width:36px;height:36px;border-radius:50%;background:var(--g-gold);color:var(--g-night);display:grid;place-items:center;flex:none}.ng-call .ng-call-i svg{width:18px;height:18px}' +
+    '#ng-panel.voice .ng-call{display:none}' +
+    // the stage: Fahad comes out, talks, and listens
+    '.ng-stagewrap{flex:none;display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--ease,cubic-bezier(.22,1,.36,1))}' +
+    '#ng-panel.voice .ng-stagewrap{grid-template-rows:1fr}.ng-stagewrap>div{overflow:hidden;min-height:0}' +
+    '.ng-stagebox{position:relative;display:flex;flex-direction:column;align-items:center;padding:10px 16px 14px;background:radial-gradient(circle at 50% 30%,#3A2E46,var(--g-night) 72%);color:var(--g-cream)}' +
+    '.ng-stage{width:min(176px,42vw,calc(27vh * .857));aspect-ratio:240/280;border-radius:var(--g-r);overflow:hidden;transform:translateY(45%) scale(.85);opacity:0;transition:transform .7s cubic-bezier(.2,1.25,.35,1) .12s,opacity .35s .12s,filter .2s}' +
+    '#ng-panel.voice .ng-stage{transform:none;opacity:1}' +
     '.ng-stage svg{width:100%;height:100%;display:block}' +
+    '.ng-stage.speaking{filter:drop-shadow(0 0 14px rgba(227,196,122,.45))}' +
     '.ng-man .ng-mouth-o{opacity:0}.ng-man.open .ng-mouth-o{opacity:1}.ng-man.open .ng-mouth-c{opacity:0}' +
     '.ng-man.half .ng-mouth-o{opacity:1;transform:scaleY(.5);transform-box:fill-box;transform-origin:center}.ng-man.half .ng-mouth-c{opacity:0}' +
     '.ng-man .ng-eyes{transform-box:fill-box;transform-origin:center;animation:ngBlink 4.6s infinite}' +
     '@keyframes ngBlink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.08)}}' +
-    '.ng-stage.speaking{box-shadow:0 0 0 3px var(--g-gold)}.ng-stage.listening{box-shadow:0 0 0 3px #3E8E5A}' +
-    '.ng-said{min-height:1.6em;margin:14px 0 4px;color:rgba(22,18,29,.6);font-size:14px}' +
-    '.ng-reply{font-size:16.5px;line-height:1.85;margin:2px 0 14px;font-weight:500;background:#FFFDF9;border:1px solid var(--g-rule);border-inline-start:3px solid var(--g-acc);border-radius:var(--g-r);padding:12px 14px;text-align:start;width:100%}' +
-    '.ng-reply:empty{display:none}' +
+    '.ng-status{margin-top:8px;font-size:14px;line-height:1.6;color:rgba(243,234,219,.9);min-height:1.6em;text-align:center}' +
+    '.ng-bigmic{--lv:0;margin-top:8px;width:66px;height:66px;border-radius:50%;border:0;background:var(--g-gold);color:var(--g-night);display:grid;place-items:center;cursor:pointer;' +
+    'box-shadow:0 0 0 calc(var(--lv) * 12px) rgba(227,196,122,.22);transition:background .2s,opacity .2s;touch-action:manipulation;-webkit-tap-highlight-color:transparent}' +
+    '.ng-bigmic svg{width:28px;height:28px}' +
+    '.ng-bigmic.on{background:#E2685C;color:#fff;box-shadow:0 0 0 calc(4px + var(--lv) * 12px) rgba(226,104,92,.3)}' +
+    '.ng-bigmic.busy{opacity:.5}' +
+    '.ng-end{position:absolute;top:10px;inset-inline-end:12px;background:transparent;border:1px solid rgba(243,234,219,.3);color:var(--g-cream);border-radius:999px;padding:5px 12px;font:inherit;font-size:12.5px;cursor:pointer}' +
+    // the conversation
+    '.ng-chat{flex:1;min-height:0;overflow-y:auto;padding:14px 16px 10px;display:flex;flex-direction:column;gap:10px}' +
+    '.ng-msg{max-width:90%;padding:11px 14px;border-radius:var(--g-r);line-height:1.8;font-size:15.5px;white-space:pre-wrap;position:relative}' +
+    '.ng-msg.bot{background:#FFFDF9;border:1px solid var(--g-rule);border-inline-start:3px solid var(--g-acc);align-self:flex-start}' +
+    '.ng-msg.bot.talking{box-shadow:0 0 0 2px rgba(227,196,122,.55)}' +
+    '.ng-msg.me{background:var(--g-ink);color:var(--g-paper);align-self:flex-end;font-weight:500}' +
+    '.ng-msg.me .ng-heard{opacity:.65;font-size:13px}' +
+    '.ng-msg a.ng-try{display:inline-flex;margin-top:10px;background:var(--g-acc);color:var(--g-paper);border-radius:var(--g-r);padding:7px 14px;font-size:13.5px;font-weight:700;text-decoration:none}' +
+    '.ng-listen{display:inline-flex;align-items:center;gap:5px;margin-top:8px;margin-inline-end:8px;background:transparent;border:1px solid var(--g-rule);color:var(--g-acc);border-radius:999px;padding:3px 10px 3px 8px;font:inherit;font-size:12.5px;cursor:pointer;vertical-align:middle}' +
+    '.ng-listen svg{width:14px;height:14px}' +
+    '.ng-chips{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start}.ng-chips button{background:transparent;color:var(--g-acc);border:1px solid var(--g-acc);border-radius:var(--g-r);padding:6px 11px;font:inherit;font-size:13.5px;font-weight:500;cursor:pointer}' +
+    '.ng-chips button:hover{background:var(--g-acc);color:var(--g-paper)}' +
+    '.ng-wait{display:inline-flex;gap:5px;padding:4px 0}.ng-wait i{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.3;animation:ngw 1s infinite}.ng-wait i:nth-child(2){animation-delay:.15s}.ng-wait i:nth-child(3){animation-delay:.3s}@keyframes ngw{50%{opacity:1}}' +
+    '.ng-form{flex:none;display:flex;gap:8px;padding:10px 16px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--g-rule);background:var(--g-paper)}' +
+    '.ng-form input{flex:1;min-width:0;background:#FFFDF9;color:var(--g-ink);border:1px solid var(--g-rule);border-radius:var(--g-r);padding:12px 14px;font:inherit;font-size:16px}' +
+    '.ng-form input:focus{outline:2px solid var(--g-acc);outline-offset:-1px}' +
+    '.ng-form button{background:var(--g-acc);color:var(--g-paper);border:0;border-radius:var(--g-r);padding:0 18px;font:inherit;font-weight:700;cursor:pointer}' +
+    '.ng-form .ng-mic{background:transparent;color:var(--g-acc);border:1px solid var(--g-acc);padding:0;width:46px;flex:none;display:grid;place-items:center}.ng-form .ng-mic svg{width:20px;height:20px}' +
+    '#ng-panel.voice .ng-form .ng-mic{display:none}' +
     '#ng-peek{position:fixed;z-index:151;inset-inline-start:16px;bottom:calc(var(--nav,62px) + 92px + env(safe-area-inset-bottom,0px));max-width:min(260px,72vw);background:var(--g-paper);color:var(--g-ink);' +
     'border:1px solid var(--g-rule);border-inline-start:3px solid var(--g-acc);border-radius:var(--g-r);padding:10px 34px 10px 14px;font-size:14.5px;font-weight:500;line-height:1.6;box-shadow:0 10px 26px rgba(14,11,26,.22);' +
     'opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;pointer-events:none;cursor:pointer}' +
     'html[dir="rtl"] #ng-peek{padding:10px 14px 10px 34px}#ng-peek.show{opacity:1;transform:none;pointer-events:auto}' +
     '#ng-peek button{position:absolute;top:6px;inset-inline-end:6px;width:22px;height:22px;border:0;background:transparent;color:var(--g-ink);opacity:.55;font-size:13px;cursor:pointer}' +
-    '.ng-hint{color:rgba(22,18,29,.55);font-size:13px;margin-top:10px;line-height:1.6}';
+    '@media (prefers-reduced-motion:reduce){.ng-stage,.ng-stagewrap{transition:none}}';
 
   var PANEL = '<div class="ng-head"><span class="ng-face">' + MANsvg() + '</span><div><b id="ng-title"></b><small id="ng-sub"></small></div>' +
     '<button class="ng-x" id="ng-x" type="button" aria-label="Close">✕</button></div>' +
-    '<div class="ng-band" aria-hidden="true"></div><div class="ng-tabs"><button type="button" id="ng-t-chat" class="on"></button><button type="button" id="ng-t-talk"></button></div>' +
+    '<div class="ng-band" aria-hidden="true"></div>' +
+    '<button class="ng-call" id="ng-call" type="button"><span class="ng-face">' + MANsvg() + '</span><span><b id="ng-call-t"></b><small id="ng-call-s"></small></span><span class="ng-call-i">' + MIC_I + '</span></button>' +
+    '<div class="ng-stagewrap"><div><div class="ng-stagebox">' +
+      '<button class="ng-end" id="ng-end" type="button"></button>' +
+      '<div class="ng-stage" id="ng-stage">' + MANsvg() + '</div>' +
+      '<div class="ng-status" id="ng-status" aria-live="polite"></div>' +
+      '<button class="ng-bigmic" id="ng-bigmic" type="button">' + MIC_I + '</button>' +
+    '</div></div></div>' +
     '<div class="ng-chat" id="ng-chat" aria-live="polite"></div>' +
-    '<div class="ng-talk"><div class="ng-stage" id="ng-stage">' + MANsvg() + '</div>' +
-    '<div class="ng-said" id="ng-said"></div><div class="ng-reply" id="ng-reply"></div>' +
-    '<div class="ng-hint" id="ng-hint"></div></div>' +
-    '<form class="ng-form" id="ng-form"><input id="ng-in" autocomplete="off"><button type="submit" id="ng-send"></button></form>';
+    '<form class="ng-form" id="ng-form"><button type="button" class="ng-mic" id="ng-mic">' + MIC_I + '</button><input id="ng-in" autocomplete="off" enterkeyhint="send"><button type="submit" id="ng-send"></button></form>';
 
   var TXT = {
-    btn: { ar: 'اسأل دليل نجد', en: 'Ask about Najd' },
     title: { ar: 'فهد · دليلك في نجد', en: 'Fahad · your Najd guide' },
-    sub: { ar: 'سم، أنا بالخدمة', en: 'Ask me about its history, people and food' },
-    chat: { ar: 'اكتب له', en: 'Chat' },
-    talk: { ar: 'تكلّم مع فهد', en: 'Talk with Fahad' },
-    ph: { ar: 'سم، وش تبي تعرف عن نجد؟', en: 'Ask anything about Najd…' },
+    sub: { ar: 'نجد أولًا، والمملكة كلها', en: 'Najd first, and all of Saudi Arabia' },
+    call: { ar: 'كلّم فهد بصوتك', en: 'Talk to Fahad' },
+    callSub: { ar: 'يطلع لك ويرد عليك بصوته', en: 'He comes out and answers out loud' },
+    end: { ar: 'إنهاء المكالمة', en: 'End the call' },
+    ph: { ar: 'اكتب سؤالك لفهد…', en: 'Ask Fahad anything…' },
     send: { ar: 'إرسال', en: 'Send' },
-    hello: { ar: 'هلا والله وغلا، وحيّاك الله في نجد! أنا فهد، دليلك فيها وبالخدمة. سم، وش تبي تعرف؟ اسألني عن تاريخها، أكلها، قهوتها، فنونها، أو قل لي وين تبي تروح.', en: 'Welcome to Najd! I am Fahad, your guide here. Ask me about its history, food, coffee, folk arts, or where to go.' },
-    typeBelow: { ar: 'اكتب سؤالك تحت، وفهد يرد عليك.', en: 'Type your question below and Fahad will answer.' },
-    tapMic: { ar: 'اضغط الميكروفون وتكلّم، أو اكتب تحت', en: 'Tap the microphone and speak, or type below' },
-    listening: { ar: 'أسمعك… تكلّم', en: 'Listening… go ahead' },
-    noMic: { ar: 'متصفحك ما يدعم الكلام. اكتب سؤالك تحت ويرد عليك بصوته.', en: 'Your browser does not support speech input. Type your question below and he will answer out loud.' },
-    noVoice: { ar: 'جهازك ما فيه صوت عربي للقراءة، فالرد مكتوب فوق. (على الآيفون والماك وكروم أندرويد الصوت العربي موجود عادة)', en: 'Your device has no voice for this language, so the answer is written above.' },
-    micDenied: { ar: 'ما قدرت أسمعك. اسمح للمتصفح يستخدم الميكروفون، أو اكتب سؤالك تحت.', en: 'I could not hear you. Allow microphone access, or type your question below.' },
-    you: { ar: 'سألت: ', en: 'You asked: ' },
+    mic: { ar: 'تكلّم', en: 'Talk' },
+    listen: { ar: 'اسمعها', en: 'Listen' },
+    hello: { ar: 'هلا والله وغلا، وحيّاك الله! أنا فهد، دليلك في نجد وفي المملكة كلها. اسألني عن تاريخها وأكلها وقهوتها وفنونها، أو قل لي وين تبي تروح. وتقدر تكلمني بصوتك من زر المايك.', en: 'Welcome! I am Fahad, your guide to Najd and the whole of Saudi Arabia. Ask me about its history, food, coffee, folk arts, or where to go. You can also talk to me with the mic button.' },
+    callHello: { ar: 'هلا والله! أنا فهد. اسألني عن نجد أو عن أي مكان في المملكة، أنا أسمعك.', en: 'Hello! I am Fahad. Ask me about Najd or anywhere in Saudi Arabia, I am listening.' },
+    idle: { ar: 'اضغط المايك وتكلّم', en: 'Tap the mic and talk' },
+    listening: { ar: 'أسمعك… تكلّم، ولما تسكت أرسله لفهد', en: 'Listening… when you stop, it goes to Fahad' },
+    tapSend: { ar: 'أسمعك… اضغط المايك إذا خلصت', en: 'Listening… tap the mic when you are done' },
+    thinking: { ar: 'فهد يفكّر…', en: 'Fahad is thinking…' },
+    speaking: { ar: 'فهد يتكلّم… اضغط المايك وقاطعه', en: 'Fahad is talking… tap the mic to cut in' },
+    notHeard: { ar: 'ما سمعتك زين، اضغط المايك وجرّب مرة ثانية', en: 'I did not catch that, tap the mic and try again' },
+    micDenied: { ar: 'ما قدرت أسمعك. اسمح للمتصفح يستخدم المايك، أو اكتب سؤالك تحت.', en: 'I could not hear you. Allow the microphone, or type your question below.' },
+    noMic: { ar: 'متصفحك ما يدعم المايك، اكتب سؤالك تحت ويرد عليك بصوته.', en: 'Your browser has no microphone access here. Type below and he will answer out loud.' },
+    offline: { ar: 'ما قدرت أوصل لفهد الحين، اكتب سؤالك تحت وأرد عليك من دفتري.', en: 'I cannot reach Fahad right now. Type your question below and I will answer from my notes.' },
+    voiceQ: { ar: '🎙 …', en: '🎙 …' },
     peek: { ar: 'حيّاك الله، أنا فهد! كيف أقدر أخدمك؟', en: 'Welcome, I am Fahad! How can I help you?' },
     tryIt: { ar: 'جرّبها بنفسك ←', en: 'Try it yourself →' }
   };
@@ -500,16 +531,20 @@
   var peek = document.createElement('div'); peek.id = 'ng-peek'; peek.setAttribute('role', 'status'); document.body.appendChild(peek);
   var panel = document.createElement('aside'); panel.id = 'ng-panel'; panel.setAttribute('aria-hidden', 'true'); panel.innerHTML = PANEL; document.body.appendChild(panel);
   var chat = $('#ng-chat', panel), input = $('#ng-in', panel), stage = $('#ng-stage', panel), man = $('.ng-man', stage);
-  var mode = 'chat', greeted = false;
+  var bigmic = $('#ng-bigmic', panel), statusEl = $('#ng-status', panel), micBtn = $('#ng-mic', panel);
+  var greeted = false, voiceOn = false, phase = 'idle';
 
   function labels() {
     btn.innerHTML = '<span class="ng-face">' + MANsvg() + '</span><span class="ng-dot" aria-hidden="true"></span>';
     btn.setAttribute('aria-label', L(TXT.peek));
     $('#ng-title', panel).textContent = L(TXT.title); $('#ng-sub', panel).textContent = L(TXT.sub);
-    $('#ng-t-chat', panel).textContent = L(TXT.chat); $('#ng-t-talk', panel).textContent = L(TXT.talk);
+    $('#ng-call-t', panel).textContent = L(TXT.call); $('#ng-call-s', panel).textContent = L(TXT.callSub);
+    $('#ng-end', panel).textContent = L(TXT.end);
     input.placeholder = L(TXT.ph); $('#ng-send', panel).textContent = L(TXT.send);
-    $('#ng-hint', panel).textContent = L(TXT.typeBelow);
+    micBtn.setAttribute('aria-label', L(TXT.mic)); bigmic.setAttribute('aria-label', L(TXT.mic));
+    setPhase(phase);
   }
+  function prime() { try { if (window.clSound) window.clSound.prime(); } catch (e) {} }
 
   function bubble(cls, html) { var d = document.createElement('div'); d.className = 'ng-msg ' + cls; d.innerHTML = html; chat.appendChild(d); chat.scrollTop = chat.scrollHeight; return d; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -518,117 +553,176 @@
     ids.forEach(function (id) {
       var e = KB.filter(function (x) { return x.id === id; })[0]; if (!e) return;
       var b = document.createElement('button'); b.type = 'button'; b.textContent = L(e.title);
-      b.onclick = function () { ask(L(e.title)); }; c.appendChild(b);
+      b.onclick = function () { prime(); ask(L(e.title)); }; c.appendChild(b);
     });
     chat.appendChild(c); chat.scrollTop = chat.scrollHeight;
   }
 
   // ════════════════════════════════════════════════════════════
   // THE AI — Rawi (rawi.js), loaded when the guide first opens, answers as Fahad from the team's notes
+  // (Najd first, and the rest of the Kingdom), hears the visitor's voice, and speaks in a Saudi voice
   // ════════════════════════════════════════════════════════════
-  var agentP = null, askId = 0;
+  var modP = null, agentP = null, askId = 0;
+  function mod() {
+    if (!modP) modP = import('./rawi.js').catch(function () { modP = null; return null; });
+    return modP;
+  }
   function agent() {
-    if (!agentP) agentP = import('./rawi.js').then(function (m) { return m.createRawi({ experience: 'guide', speak: false }); })
+    if (!agentP) agentP = mod().then(function (m) { return m ? m.createRawi({ experience: 'guide', speak: false }) : null; })
       .catch(function () { agentP = null; return null; });
     return agentP;
   }
-  function ask(text) {
-    text = String(text || '').trim(); if (!text) return;
+  // typed (text) or spoken (audio: the recording, sent to the agent's ear)
+  function ask(text, audio) {
+    text = String(text || '').trim(); if (!text && !audio) return;
     var my = ++askId;
-    bubble('me', esc(text));
+    hush();
+    var me = bubble('me', audio ? '<span class="ng-heard">' + esc(L(TXT.voiceQ)) + '</span>' : esc(text));
     var wait = bubble('bot', '<span class="ng-wait" aria-label="…"><i></i><i></i><i></i></span>');
-    if (mode === 'talk') { $('#ng-said', panel).textContent = L(TXT.you) + text; hush(); mouth(true); }
-    agent().then(function (a) { return a ? a.say(text) : null; }).catch(function () { return null; }).then(function (r) {
-      if (my !== askId) return;
-      if (r && r.ok && r.say) {
-        var sug = (r.actions || []).filter(function (x) { return x.name === 'suggest_experience' && x.args && x.args.page; })[0];
-        say(wait, r.say, sug ? sug.args.page : null);
-      } else {
-        // the agent could not answer: the notes below do
-        var k = answer(text);
-        say(wait, L(k.a), k.e && k.e.page);
-        if (k.near) chips(k.near); else if (k.starters) chips(STARTERS); else if (k.e && k.e.rel) chips(k.e.rel);
-      }
+    if (voiceOn) setPhase('thinking');
+    agent().then(function (a) { return a ? a.turn({ type: 'say', text: audio ? undefined : text, audio: audio || undefined }) : null; })
+      .catch(function () { return null; }).then(function (r) {
+        if (my !== askId) return;
+        if (audio && r && r.heard && r.heard.text) me.textContent = r.heard.text;
+        if (r && r.ok && r.say) {
+          var sug = (r.actions || []).filter(function (x) { return x.name === 'suggest_experience' && x.args && x.args.page; })[0];
+          reply(wait, r.say, sug ? sug.args.page : null, !!audio);
+        } else if (audio) {
+          // nothing came back for the voice: say so, and he listens again only when asked
+          me.remove(); wait.remove();
+          setPhase('idle', L(r && r.error === 'nothing heard' ? TXT.notHeard : TXT.offline));
+        } else {
+          // the agent could not answer: the notes below do
+          var k = answer(text);
+          reply(wait, L(k.a), k.e && k.e.page, false);
+          if (k.near) chips(k.near); else if (k.starters) chips(STARTERS); else if (k.e && k.e.rel) chips(k.e.rel);
+        }
+      });
+  }
+  function reply(el, text, page, byVoice) {
+    el.innerHTML = esc(text) + '<br><button class="ng-listen" type="button">' + PLAY_I + '<span>' + esc(L(TXT.listen)) + '</span></button>' +
+      (page ? '<a class="ng-try" href="' + esc(page) + '">' + L(TXT.tryIt) + '</a>' : '');
+    $('.ng-listen', el).addEventListener('click', function () { prime(); talk(text, el, false); });
+    chat.scrollTop = chat.scrollHeight;
+    if (voiceOn) talk(text, el, byVoice);   // in a voice call he says it, then listens again if they talked to him
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // HE SPEAKS — in a Saudi voice (rawi.js speak: the agent's voice, or the phone's own), his mouth moving with it
+  // ════════════════════════════════════════════════════════════
+  var talkId = 0;
+  function mouthLevel(v) {
+    man.classList.remove('open', 'half');
+    if (v > 0.32) man.classList.add('open'); else if (v > 0.1) man.classList.add('half');
+  }
+  function talk(text, el, thenListen) {
+    var my = ++talkId;
+    stopListening(true);
+    if (el) el.classList.add('talking');
+    if (voiceOn) setPhase('speaking');
+    mod().then(function (m) {
+      if (!m || my !== talkId) return;
+      return m.speak(text, isAr() ? 'ar' : 'en', { voice: 'fahad', onLevel: mouthLevel, onStart: function () { if (my === talkId) stage.classList.add('speaking'); } });
+    }).catch(function () {}).then(function () {
+      if (el) el.classList.remove('talking');
+      if (my !== talkId) return;
+      stage.classList.remove('speaking'); mouthLevel(0);
+      if (!voiceOn) return;
+      if (thenListen) listen(true); else setPhase('idle');
     });
   }
-  function say(el, text, page) {
-    el.innerHTML = esc(text) + (page ? '<br><a class="ng-try" href="' + esc(page) + '">' + L(TXT.tryIt) + '</a>' : '');
-    chat.scrollTop = chat.scrollHeight;
-    if (mode === 'talk') { speak(text); if (!voice(text)) $('#ng-hint', panel).textContent = L(TXT.noVoice); }
+  function hush() {
+    talkId++;
+    stage.classList.remove('speaking'); mouthLevel(0);
+    chat.querySelectorAll('.ng-msg.talking').forEach(function (x) { x.classList.remove('talking'); });
+    mod().then(function (m) { if (m) m.hush(); });
   }
 
   // ════════════════════════════════════════════════════════════
-  // HE SPEAKS — out loud (the device's own voice for the language), while the answer appears word by word under
-  // him and his mouth moves; a device with no voice for the language still shows the words
+  // HE LISTENS — tap the mic and talk; when you stop talking it goes to him (or tap again to send now)
   // ════════════════════════════════════════════════════════════
-  var voices = [];
-  function loadVoices() { try { voices = speechSynthesis.getVoices() || []; } catch (e) { voices = []; } }
-  if ('speechSynthesis' in window) { loadVoices(); try { speechSynthesis.addEventListener('voiceschanged', loadVoices); } catch (e) {} }
-  function pickVoice() {
-    var want = isAr() ? ['ar-sa', 'ar'] : ['en-us', 'en-gb', 'en'];
-    for (var i = 0; i < want.length; i++) for (var j = 0; j < voices.length; j++) if ((voices[j].lang || '').replace('_', '-').toLowerCase().indexOf(want[i]) === 0) return voices[j];
-    return null;
+  var rec = null, recId = 0, vad = null;
+  function setPhase(p, msg) {
+    phase = p;
+    bigmic.classList.toggle('on', p === 'listening');
+    bigmic.classList.toggle('busy', p === 'thinking');
+    if (p !== 'listening') bigmic.style.setProperty('--lv', 0);
+    statusEl.textContent = msg || L(p === 'listening' ? (vad && vad.auto ? TXT.listening : TXT.tapSend) : p === 'thinking' ? TXT.thinking : p === 'speaking' ? TXT.speaking : TXT.idle);
   }
-  function voice(text) {
-    if (!('speechSynthesis' in window)) return false;
-    try {
-      speechSynthesis.cancel();
-      var u = new SpeechSynthesisUtterance(text), v = pickVoice();
-      u.lang = v ? v.lang : (isAr() ? 'ar-SA' : 'en-US'); if (v) u.voice = v;
-      u.rate = isAr() ? 0.98 : 1.02;
-      speechSynthesis.speak(u);
-      return !!v;
-    } catch (e) { return false; }
+  function canRecord() { return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia); }
+  function listen(auto) {
+    if (rec || !voiceOn) return;
+    if (!canRecord()) { setPhase('idle', L(TXT.noMic)); return; }
+    hush();
+    var my = ++recId;
+    vad = { auto: true, t0: performance.now(), voiced: 0, quiet: 0, heard: false, floor: 0.02, wasAuto: !!auto };
+    setPhase('listening');
+    mod().then(function (m) {
+      if (my !== recId) return null;
+      if (!m) { setPhase('idle', L(TXT.offline)); return null; }
+      return m.recorder(function (lv) {
+        if (my !== recId) return;
+        bigmic.style.setProperty('--lv', Math.min(1, lv * 1.6).toFixed(2));
+        // a simple ear for when they start and stop talking (each reading is about a tenth of a second)
+        var now = performance.now(), loud = lv > Math.max(0.07, vad.floor * 3);
+        if (!vad.heard) { vad.floor = vad.floor * 0.9 + Math.min(lv, 0.1) * 0.1; if (loud) { if (++vad.voiced >= 2) vad.heard = true; } else vad.voiced = 0; }
+        else if (loud) vad.quiet = now; else if (now - vad.quiet > 1300) finish(my);
+        if (!vad.heard && now - vad.t0 > (vad.wasAuto ? 7000 : 10000)) finish(my);
+        if (now - vad.t0 > 20000) finish(my);
+      }).then(function (r) {
+        if (my !== recId) { try { r.stop(); } catch (e) {} return; }
+        rec = r; vad.quiet = performance.now();
+      });
+    }).catch(function () { if (my === recId) { rec = null; setPhase('idle', L(TXT.micDenied)); } });
   }
-  var flap = 0;
-  function mouth(on) {
-    clearInterval(flap); man.classList.remove('open', 'half');
-    stage.classList.toggle('speaking', !!on);
-    if (!on) return;
-    flap = setInterval(function () {
-      var r = Math.random(); man.classList.remove('open', 'half');
-      if (r > 0.55) man.classList.add('open'); else if (r > 0.2) man.classList.add('half');
-    }, 120);
+  function finish(my) {
+    if (my !== recId || !rec) return;
+    var r = rec, heard = vad && vad.heard; rec = null; recId++;
+    var audio = r.stop();
+    if (!heard || audio.secs < 0.5) { setPhase('idle', vad && vad.wasAuto ? undefined : L(TXT.notHeard)); return; }
+    ask('', audio);
   }
-  var talkId = 0;
-  function speak(text) {
-    var my = ++talkId, box = $('#ng-reply', panel), words = String(text).split(' '), i = 0;
-    box.textContent = ''; mouth(true);
-    var step = function () {
-      if (my !== talkId) return;
-      if (i >= words.length) { mouth(false); return; }
-      box.textContent += (i ? ' ' : '') + words[i++];
-      setTimeout(step, 70 + Math.min(120, words[i - 1].length * 12));
-    };
-    step();
+  function stopListening(silent) {
+    recId++;
+    if (rec) { try { rec.stop(); } catch (e) {} rec = null; }
+    if (!silent && voiceOn) setPhase('idle');
   }
-  function hush() { talkId++; mouth(false); try { speechSynthesis.cancel(); } catch (e) {} }
+  bigmic.addEventListener('click', function () {
+    prime();
+    if (phase === 'listening') { if (rec) { if (vad) vad.heard = true; finish(recId); } else stopListening(); return; }
+    if (phase === 'thinking') return;
+    listen(false);
+  });
 
   // ════════════════════════════════════════════════════════════
-  // OPEN, CLOSE, MODES
+  // OPEN, CLOSE, THE VOICE CALL
   // ════════════════════════════════════════════════════════════
-  function setMode(m) {
-    mode = m; panel.classList.toggle('talk', m === 'talk');
-    $('#ng-t-chat', panel).classList.toggle('on', m === 'chat'); $('#ng-t-talk', panel).classList.toggle('on', m === 'talk');
-    if (m === 'talk') {
-      if (!$('#ng-reply', panel).textContent) { speak(L(TXT.hello)); voice(L(TXT.hello)); }
-      setTimeout(function () { input.focus(); }, 200);
-    } else { hush(); }
+  function call(on, listenNow) {
+    if (on === voiceOn) { if (on && listenNow) listen(false); return; }
+    voiceOn = on; panel.classList.toggle('voice', on);
+    setTimeout(function () { chat.scrollTop = chat.scrollHeight; }, 480);    // after Fahad's stage has opened or closed
+    if (!on) { stopListening(true); hush(); setPhase('idle'); return; }
+    setPhase('idle');
+    if (listenNow) { listen(false); return; }
+    // he comes out, says hello, and listens
+    var hi = bubble('bot', esc(L(TXT.callHello)));
+    setTimeout(function () { if (voiceOn) talk(L(TXT.callHello), hi, true); }, 450);
   }
+  function setMode(m) { call(m === 'talk' || m === 'voice'); }    // kept for older links (?talk=1)
   function open() {
-    hidePeek();
+    hidePeek(); prime();
     panel.classList.add('open'); panel.setAttribute('aria-hidden', 'false'); btn.classList.remove('show');
     agent();
     if (!greeted) { greeted = true; bubble('bot', esc(L(TXT.hello))); chips(STARTERS); }
-    if (mode === 'chat') setTimeout(function () { input.focus(); }, 300);
   }
-  function close() { panel.classList.remove('open'); panel.setAttribute('aria-hidden', 'true'); hush(); }
+  function close() { panel.classList.remove('open'); panel.setAttribute('aria-hidden', 'true'); call(false); }
 
   btn.addEventListener('click', open);
   $('#ng-x', panel).addEventListener('click', close);
-  $('#ng-t-chat', panel).addEventListener('click', function () { setMode('chat'); });
-  $('#ng-t-talk', panel).addEventListener('click', function () { setMode('talk'); });
-  $('#ng-form', panel).addEventListener('submit', function (e) { e.preventDefault(); var t = input.value; input.value = ''; ask(t); });
+  $('#ng-call', panel).addEventListener('click', function () { prime(); call(true); });
+  $('#ng-end', panel).addEventListener('click', function () { call(false); });
+  micBtn.addEventListener('click', function () { prime(); call(true, true); });
+  $('#ng-form', panel).addEventListener('submit', function (e) { e.preventDefault(); prime(); var t = input.value; input.value = ''; ask(t); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && panel.classList.contains('open')) close(); });
 
   // the button shows only in Najd, when the map is closed
@@ -675,7 +769,7 @@
   // a direct link (?guide=1) goes straight to Najd with the guide open, e.g. to share it for testing
   if (/[?&]guide=1/.test(location.search)) setTimeout(function () {
     if (!inNajd() && window.ThemeManager && window.ThemeManager.selectRegion) window.ThemeManager.selectRegion('najd');
-    setTimeout(function () { if (inNajd()) { open(); if (/[?&]talk=1/.test(location.search)) setMode('talk'); } }, 300);
+    setTimeout(function () { if (inNajd()) { open(); if (/[?&]talk=1/.test(location.search)) call(true); } }, 300);
   }, 700);
-  window.__najdGuide = { open: open, close: close, ask: ask, answer: answer, setMode: setMode, KB: KB };
+  window.__najdGuide = { open: open, close: close, ask: ask, answer: answer, setMode: setMode, call: call, KB: KB };
 })();

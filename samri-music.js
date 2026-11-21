@@ -173,7 +173,8 @@ export class Music {
       try { var b = ctx.createBuffer(1, 1, 22050), s = ctx.createBufferSource(); s.buffer = b; s.connect(ctx.destination); s.start(0); this.kicked = true; } catch (e) {}
     }
     // iPhones mute this kind of sound when the silent switch is on, unless the page says it is playing media
-    try { if (navigator.audioSession && navigator.audioSession.type !== 'playback') navigator.audioSession.type = 'playback'; } catch (e2) {}
+    // (while a microphone is open the page stays play-and-record, or the phone could not hear: cl-sound.js)
+    try { if (navigator.audioSession && navigator.audioSession.type !== 'playback' && !(window.clSound && window.clSound.capturing())) navigator.audioSession.type = 'playback'; } catch (e2) {}
     if (!navigator.audioSession && /iPhone|iPad|iPod/.test(navigator.userAgent || '') && (!this.keep || this.keep.paused)) {
       try {
         var a = this.keep;

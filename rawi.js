@@ -69,6 +69,10 @@ const T = {
 };
 
 // ── speaking ──
+// Each character has a real Saudi voice from the agent (Groq's Orpheus, through our function, see tts.ts), and the
+// phone's own voice takes over when that one is resting or out of reach. The words are always on the screen too.
+//   speak(text, lang, { voice, onLevel(0..1), onStart })  ->  resolves when the line has been said (or cut off)
+export const VOICE = { samri: 'sultan', qahwa: 'abdullah', masaqil: 'fahad', sadu: 'aisha', guide: 'fahad', general: 'abdullah' };
 let voices = [];
 function loadVoices() { try { voices = speechSynthesis.getVoices() || []; } catch (e) { voices = []; } }
 if ('speechSynthesis' in window) { loadVoices(); try { speechSynthesis.addEventListener('voiceschanged', loadVoices); } catch (e) {} }
@@ -77,30 +81,133 @@ function pickVoice(lang) {
   for (const w of want) { const v = voices.find((x) => (x.lang || '').replace('_', '-').toLowerCase().startsWith(w.toLowerCase())); if (v) return v; }
   return null;
 }
-let unlocked = false;
-function unlockSpeech() {   // iPhones only speak after a first tap has spoken once
-  if (unlocked || !('speechSynthesis' in window)) return; unlocked = true;
-  try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
+const sound = () => window.clSound || null;
+// a tap anywhere lets the phone's voice speak later (iPhones need it); cl-sound.js does this on every page that loads it
+document.addEventListener('touchend', () => { const s = sound(); if (s) s.prime(); }, { capture: true, passive: true, once: true });
+document.addEventListener('click', () => { const s = sound(); if (s) s.prime(); }, { capture: true, passive: true, once: true });
+
+// the line in pieces the voice can take (at most 190 characters), joined into as few requests as possible
+export function voicePieces(text) {
+  const out = [];
+  let rest = String(text || '').replace(/\s+/g, ' ').trim();
+  while (rest.length > 190) {
+    const head = rest.slice(0, 191);
+    let cut = -1;
+    for (const re of [/[.!?؟]\s/g, /[،,;؛:]\s/g, /\s/g]) {
+      let m, last = -1;
+      while ((m = re.exec(head))) last = m.index + 1;
+      if (last > 57) { cut = last; break; }
+    }
+    if (cut < 0) cut = 190;
+    out.push(rest.slice(0, cut).trim()); rest = rest.slice(cut).trim();
+  }
+  if (rest) out.push(rest);
+  return out;
 }
-document.addEventListener('pointerdown', unlockSpeech, { capture: true, passive: true });
-export function speak(text, lang) {
+// the agent's voice for a language is resting (its daily share is spent, or not open on this account): the phone
+// speaks that language until then
+let restingTill = {};
+try { restingTill = JSON.parse(sessionStorage.getItem('cl_voice_rest') || '{}') || {}; } catch (e) {}
+function restVoice(lang, ms) { restingTill[lang] = Date.now() + ms; try { sessionStorage.setItem('cl_voice_rest', JSON.stringify(restingTill)); } catch (e) {} }
+async function fetchVoice(text, lang, voice, signal) {
+  const ep = endpoint(); if (!ep) throw new Error('off');
+  const headers = ep.plain ? { 'content-type': 'text/plain;charset=UTF-8' } : { 'content-type': 'application/json', ...(ep.key ? { authorization: 'Bearer ' + ep.key, apikey: ep.key } : {}) };
+  const res = await fetch(ep.url, { method: 'POST', headers, body: JSON.stringify({ action: 'tts', text, lang, voice, device: deviceKey() }), signal });
+  if (!res.ok || !/audio/.test(res.headers.get('content-type') || '')) {
+    const j = await res.json().catch(() => ({}));
+    const e = new Error(j.error || 'voice ' + res.status); e.retry = j.retry_ms || (res.status === 429 ? 10 * 60e3 : 0); e.hard = res.status === 400; throw e;
+  }
+  return res.arrayBuffer();
+}
+function decode(ctx, buf) {
+  return new Promise((ok, bad) => { try { const p = ctx.decodeAudioData(buf, ok, bad); if (p && p.then) p.then(ok, bad); } catch (e) { bad(e); } });
+}
+const later = (ms) => new Promise((r) => setTimeout(r, ms));
+function timeout(p, ms) { return Promise.race([p, later(ms).then(() => { throw new Error('slow'); })]); }
+
+let talk = 0, current = null;
+function playBuffer(ctx, ab, onLevel, my) {
   return new Promise((res) => {
-    if (!text || !('speechSynthesis' in window) || store('cl_sound') === 'off') return res();
+    if (my !== talk) return res();
+    const src = ctx.createBufferSource(); src.buffer = ab;
+    const an = ctx.createAnalyser(); an.fftSize = 512;
+    src.connect(an); an.connect(ctx.destination);
+    const data = new Uint8Array(an.fftSize); let raf = 0, done = false;
+    const end = () => { if (done) return; done = true; cancelAnimationFrame(raf); clearTimeout(guard); if (onLevel) onLevel(0); try { src.disconnect(); an.disconnect(); } catch (e) {} res(); };
+    const tick = () => {
+      an.getByteTimeDomainData(data); let s = 0;
+      for (let i = 0; i < data.length; i++) { const v = (data[i] - 128) / 128; s += v * v; }
+      onLevel(Math.min(1, Math.sqrt(s / data.length) * 3.4)); raf = requestAnimationFrame(tick);
+    };
+    if (onLevel) raf = requestAnimationFrame(tick);
+    src.onended = end;
+    const guard = setTimeout(end, ab.duration * 1000 + 1500);      // a phone that never says "ended"
+    if (current) current.stop = () => { try { src.stop(); } catch (e) {} end(); };
+    try { src.start(); } catch (e) { end(); }
+  });
+}
+function deviceSpeak(text, lang, opts, my) {
+  return new Promise((res) => {
+    if (!text || !('speechSynthesis' in window) || my !== talk) return res();
+    let flap = 0;
+    const done = () => { clearTimeout(tm); clearInterval(flap); if (opts.onLevel) opts.onLevel(0); res(); };
+    const tm = setTimeout(done, 1500 + text.length * 95);
     try {
       speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text), v = pickVoice(lang);
       u.lang = v ? v.lang : lang === 'ar' ? 'ar-SA' : 'en-US'; if (v) u.voice = v;
       u.rate = lang === 'ar' ? 0.98 : 1.02;
-      const done = () => { clearTimeout(tm); res(); };
-      const tm = setTimeout(done, 1500 + text.length * 95);
+      u.onstart = () => { if (opts.onStart) opts.onStart(); if (opts.onLevel) flap = setInterval(() => opts.onLevel(Math.random() * 0.8), 110); };
       u.onend = done; u.onerror = done;
+      if (current) current.stop = () => { try { speechSynthesis.cancel(); } catch (e) {} done(); };
       speechSynthesis.speak(u);
-    } catch (e) { res(); }
+    } catch (e) { done(); }
   });
 }
-export function hush() { try { speechSynthesis.cancel(); } catch (e) {} }
+export function speak(text, lang, opts) {
+  opts = opts || {};
+  hush();
+  const my = ++talk;
+  current = { my, stop: null, ctrl: typeof AbortController !== 'undefined' ? new AbortController() : null };
+  const finish = () => { if (current && current.my === my) current = null; };
+  return (async () => {
+    if (!text || store('cl_sound') === 'off') return finish();
+    lang = lang === 'en' ? 'en' : 'ar';
+    let left = String(text);
+    const s = sound(), ctx = s ? s.ctx() : null;
+    if (ctx && ctx.state !== 'running') { try { await timeout(ctx.resume(), 400); } catch (e) {} }
+    if (opts.voice !== false && ctx && ctx.state === 'running' && endpoint() && Date.now() > (restingTill[lang] || 0) && store('cl_voice') !== 'device') {
+      const parts = voicePieces(text), got = [];
+      const get = (i) => (got[i] = got[i] || fetchVoice(parts[i], lang, opts.voice || 'fahad', current && current.ctrl ? current.ctrl.signal : undefined).then((b) => decode(ctx, b)));
+      let i = 0;
+      try {
+        for (; i < parts.length; i++) {
+          const p = get(i); if (i + 1 < parts.length) get(i + 1).catch(() => {});
+          const ab = await timeout(p, i === 0 ? 9000 : 15000);
+          if (my !== talk) return finish();
+          if (i === 0 && opts.onStart) opts.onStart();
+          await playBuffer(ctx, ab, opts.onLevel, my);
+          if (my !== talk) return finish();
+        }
+        return finish();
+      } catch (e) {
+        if (my !== talk) return finish();
+        if (e && e.retry) restVoice(lang, Math.min(e.retry, 6 * 3600e3)); else if (e && e.hard) restVoice(lang, 30 * 60e3);
+        left = parts.slice(i).join(' ');     // the rest of the line, in the phone's own voice
+      }
+    }
+    await deviceSpeak(left, lang, opts, my);
+    finish();
+  })();
+}
+export function hush() {
+  talk++;
+  const c = current; current = null;
+  if (c) { try { c.ctrl && c.ctrl.abort(); } catch (e) {} try { c.stop && c.stop(); } catch (e) {} }
+  try { speechSynthesis.cancel(); } catch (e) {}
+}
 // does this device have a voice for the language (otherwise the line is only shown, not spoken)
-export function hasVoice(lang) { loadVoices(); return !!pickVoice(lang); }
+export function hasVoice(lang) { loadVoices(); return !!pickVoice(lang) || !!(sound() && endpoint()); }
 
 // ── listening: the mic as 16 kHz WAV, for the ear (Whisper) ──
 export function wav16(chunks, rate) {
@@ -122,19 +229,25 @@ export function wav16(chunks, rate) {
   return { b64: btoa(bin), mime: 'audio/wav', secs: m / 16000 };
 }
 export async function recorder(onLevel) {
+  hush();
   const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
-  const C = window.AudioContext || window.webkitAudioContext, ctx = new C();
-  const src = ctx.createMediaStreamSource(stream), proc = ctx.createScriptProcessor(4096, 1, 1), chunks = [];
+  // the shared audio engine (cl-sound.js) is already awake from a tap; a new one made now might stay asleep on iPhones
+  const s = sound(), shared = s ? s.ctx() : null;
+  const C = window.AudioContext || window.webkitAudioContext, ctx = shared || new C();
+  if (ctx.state !== 'running') { try { await timeout(ctx.resume(), 600); } catch (e) {} }
+  const src = ctx.createMediaStreamSource(stream), proc = ctx.createScriptProcessor(4096, 1, 1), sink = ctx.createGain(), chunks = [];
+  sink.gain.value = 0;
   proc.onaudioprocess = (e) => {
     const d = e.inputBuffer.getChannelData(0); chunks.push(new Float32Array(d));
-    if (onLevel) { let s = 0; for (let i = 0; i < d.length; i += 16) s += d[i] * d[i]; onLevel(Math.min(1, Math.sqrt(s / (d.length / 16)) * 4)); }
+    if (onLevel) { let q = 0; for (let i = 0; i < d.length; i += 16) q += d[i] * d[i]; onLevel(Math.min(1, Math.sqrt(q / (d.length / 16)) * 4)); }
   };
-  src.connect(proc); proc.connect(ctx.destination);
+  src.connect(proc); proc.connect(sink); sink.connect(ctx.destination);
   return {
+    running: () => ctx.state === 'running',
     stop() {
-      try { proc.disconnect(); src.disconnect(); } catch (e) {}
+      try { proc.onaudioprocess = null; proc.disconnect(); src.disconnect(); sink.disconnect(); } catch (e) {}
       stream.getTracks().forEach((t) => t.stop());
-      const rate = ctx.sampleRate; try { ctx.close(); } catch (e) {}
+      const rate = ctx.sampleRate; if (!shared) { try { ctx.close(); } catch (e) {} }
       return wav16(chunks, rate);
     },
   };
@@ -298,7 +411,7 @@ export function createRawi(opts) {
     session = r.session_id; try { sessionStorage.setItem('cl_rawi_s_' + exp, session); } catch (e) {}
     if (ui) { ui.reply(r.say, input.type === 'say' ? r.heard : null); ui.trace(r.trace); }
     listeners.reply.forEach((f) => { try { f(r); } catch (e) {} });
-    const spoken = opts.speak === false ? Promise.resolve() : speak(r.say, isAr() ? 'ar' : 'en');
+    const spoken = opts.speak === false ? Promise.resolve() : speak(r.say, isAr() ? 'ar' : 'en', { voice: VOICE[exp] });
     (r.actions || []).forEach((a) => { const f = handlers[a.name]; if (f) { try { f(a.args, spoken); } catch (e) { console.warn('rawi action', a.name, e); } } });
     if (pendingEvent) { const ev = pendingEvent; pendingEvent = null; setTimeout(() => api.turn(ev), 0); }
     return r;
