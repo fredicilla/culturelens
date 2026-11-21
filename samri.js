@@ -308,7 +308,12 @@ var G = {
   again: { en: 'Play again', ar: 'العب مرة ثانية' }, finish: { en: 'Finish', ar: 'إنهاء' },
   learned: { en: 'What you learned', ar: 'وش تعلمت' },
   score: { en: 'Score', ar: 'النقاط' },
-  quizPart: { en: 'Questions', ar: 'الأسئلة' }, rowPart: { en: 'Seats moved up', ar: 'الأماكن اللي تقدمتها' }
+  quizPart: { en: 'Questions', ar: 'الأسئلة' }, rowPart: { en: 'Seats moved up', ar: 'الأماكن اللي تقدمتها' },
+  // the last step of the experience: perform it for real in the mu'allim's row (samri-perform.js, with the AI teacher)
+  teacherK: { en: 'The last step · AI teacher', ar: 'الخطوة الأخيرة · معلّم بالذكاء الاصطناعي' },
+  teacherT: { en: 'Perform it with the mu\'allim', ar: 'أدِّها مع المعلّم' },
+  teacherP: { en: 'Kneel in his row with something as your tar. He raises the line, you strike and sing it back, and he listens and teaches you.', ar: 'اجلس بصفّه وخذ شي يكون طارك. هو يشيل البيت، وأنت تضرب وترد، وهو يسمعك ويعلّمك.' },
+  teacherGo: { en: 'Join his row', ar: 'ادخل صفّه' }
 };
 var RW = {
   intro: { en: 'Sit at the end and follow the row. Keep up with a passage and I will call you one seat closer.', ar: 'اجلس بالطرف وامشِ مع الصف. وإذا ضبطت الطلعة، قرّبتك مكان.' },
@@ -1569,11 +1574,15 @@ function renderResults() {
     '<h2 class="mq-title">' + L(title) + '</h2>' +
     '<p class="mq-p">' + L(G.score) + ': ' + num(total) + ' / ' + num(MAX_SCORE) + '</p>' +
     '<div class="sm-split"><span>' + L(G.quizPart) + ' <b>' + num(g.score) + '/' + num(QUESTIONS.length) + '</b></span><span>' + L(G.rowPart) + ' <b>' + num(g.seatsBest) + '/' + num(4) + '</b></span></div>' +
+    (window.__perform ? '<div class="mq-learn sm-teacher"><div class="qx-kicker">' + L(G.teacherK) + '</div><h3 class="sm-teacher-t">' + L(G.teacherT) + '</h3><p class="mq-p">' + L(G.teacherP) + '</p>' +
+      '<button class="qx-btn qx-btn-solid" id="sm-teacher-go" type="button"><span>' + L(G.teacherGo) + '</span></button></div>' : '') +
     '<div class="mq-learn"><div class="qx-kicker">' + L(G.learned) + '</div>' + LEARN.map(function (l) { return '<div class="mq-learn-row">' + ICON.check + '<span>' + L(l) + '</span></div>'; }).join('') + '</div>';
   setBar({ buttons: [
     { label: G.again, kind: 'line', iconFirst: 'replay', onClick: function () { sfx('tap'); setPart('play'); } },
     { label: G.finish, onClick: function () { location.href = 'experience.html?x=samri'; } }
   ] });
+  var tg = $('#sm-teacher-go', panel);
+  if (tg) tg.addEventListener('click', function () { sfx('tap'); if (window.__perform) window.__perform.open(); });
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1821,7 +1830,7 @@ async function boot() {
   setTimeout(function () { $('#mq-loading').classList.add('gone'); }, 250);
 
   watchCoach();
-  window.__sm = { world: world, music: music, S: S, setPart: setPart, goCh: goCh, HOW: HOW, CTRL: CTRL, stepDone: stepDone, startStep: startStep, howNext: howNext, rowInput: rowInput, SECS: SECS, startRow: startRow, listen: listenCallAnswer, pickTopic: pickTopic, askTopic: askTopic, ai: function () { return S.ai; } };
+  window.__sm = { world: world, music: music, S: S, setPart: setPart, goCh: goCh, HOW: HOW, CTRL: CTRL, stepDone: stepDone, startStep: startStep, howNext: howNext, rowInput: rowInput, SECS: SECS, startRow: startRow, listen: listenCallAnswer, pickTopic: pickTopic, askTopic: askTopic, ai: function () { return S.ai; }, ambient: ambient, resume: resume };
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

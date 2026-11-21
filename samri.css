@@ -128,6 +128,9 @@ body.sm .qx-feedback { margin-top: 12px; }
 .sm-stats b { font-size: 19px; }
 .sm-split { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px; font-size: 13px; color: var(--qx-ink-3); }
 .sm-split b { color: var(--qx-ink); }
+.sm-teacher-t { margin: 2px 0 4px; font-size: 18px; color: var(--qx-ink); }
+.sm-teacher .mq-p { margin: 0; }
+.sm-teacher .qx-btn { width: 100%; margin-top: 12px; }
 
 /* ── How it's performed ── */
 .qx-btn.sm-hintpill[disabled] { opacity: 1; border-style: dashed; border-color: rgba(255, 214, 140, 0.45); color: var(--qx-ink-2); font-size: 14.5px; font-weight: 600; }

@@ -16,6 +16,8 @@
  *     next drill (start_drill): the same line again, a level up, a level down, another half or poem.
  * Levels: 1 the second row answers first, then you; 2 you answer right after the call; 3 from memory;
  * 4 you lead the call and the row answers you.
+ * It opens at the end of the Samri experience (the results) and from the Samri experience page
+ * (samri.html?perform=1); nothing of it floats on the page itself.
  * Add ?sim=1 to the address to run it with a simulated player (strikes and voice), for testing.
  */
 import { Music, STYLES, SUNG } from './samri-music.js';
@@ -31,7 +33,6 @@ const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&':
 const $ = (s) => document.querySelector(s);
 
 const T = {
-  entry: { en: 'Perform with the mu\'allim', ar: 'أدِّ السامري مع المعلّم' },
   title: { en: 'In the row', ar: 'في الصف' },
   intro: { en: 'Kneel in the answering row and pick up something to be your tar: a plate, a pot lid or a hardcover book. When the first row has sung its line, strike your tar with the strokes and sing the line back. The mu\'allim listens and teaches you.', ar: 'اجلس بالصف اللي يرد، وخذ شي يكون طارك: صحن، غطا قدر، أو كتاب جلد. لما يشيل الصف الأول بيته، اضرب طارك مع الضربات ورد البيت بصوتك. والمعلّم يسمعك ويعلّمك.' },
   privacy: { en: 'Your strikes are timed on this phone. Only your sung answers are sent to the agent\'s ear, to check the words.', ar: 'ضرباتك تنحسب على جوالك. بس ردّك بصوتك يروح لأذن الوكيل عشان يتأكد من الكلمات.' },
@@ -160,13 +161,8 @@ const CSS = `
 .sp-btn.mic.on { background: #FF8A7A; }
 .sp-trace { margin-top: 10px; border-top: 1px dashed rgba(243,238,230,.2); padding-top: 6px; font: 11.5px/1.5 ui-monospace, Menlo, monospace; color: rgba(243,238,230,.7); direction: ltr; text-align: left; }
 .sp-trace div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .sp-trace .k { color: #E3C47A; }
-#sp-entry { position: fixed; z-index: 60; top: calc(env(safe-area-inset-top, 0px) + 118px); inset-inline-start: max(16px, calc((100vw - 430px) / 2 + 16px)); display: none; align-items: center; gap: 8px; background: #E3C47A; color: #16121D;
-  border: 0; border-radius: 999px; padding: 11px 18px; font: inherit; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,.35); white-space: nowrap; }
-#sp-entry.show { display: inline-flex; animation: spIn .4s ease-out; }
-#sp-entry svg { width: 18px; height: 18px; } #sp-entry i { font-style: normal; font-size: 11px; background: #16121D; color: #E3C47A; border-radius: 999px; padding: 2px 7px; }
 @keyframes spIn { from { transform: scale(.85); opacity: 0; } to { transform: none; opacity: 1; } }
 `;
-const TAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5" stroke-dasharray="2 2"/></svg>';
 
 // ── state ──
 const S = { open: false, phase: 'intro', drill: null, run: null, hits: [], levels: [], last: null, sm: null, music: null, own: false, mic: null, node: null, rec: null, askRec: false, raf: 0 };
@@ -181,17 +177,12 @@ function build() {
     '<section class="sp-card"><div class="sp-agent"><span class="sp-face">' + PERSONA.samri.face + '</span><div><b id="sp-name"></b><small id="sp-tag"></small></div><span class="sp-lvl" id="sp-lvl" hidden></span></div>' +
     '<div class="sp-say" id="sp-say" aria-live="polite"></div><div class="sp-heard" id="sp-heard"></div><div class="sp-btns" id="sp-btns"></div>' + (JUDGE ? '<div class="sp-trace" id="sp-trace"></div>' : '') + '</section>';
   document.body.appendChild(ov);
-  const en = document.createElement('button'); en.id = 'sp-entry'; en.type = 'button'; document.body.appendChild(en);
-  en.addEventListener('click', () => open());
   $('#sp-close').addEventListener('click', close);
   $('#sp-lang').addEventListener('click', () => { if (typeof window.toggleLanguage === 'function') window.toggleLanguage(); });
   document.addEventListener('languageChanged', labels);
   labels();
-  // the button shows once the page is ready, when no round of the page's own game is being played
-  setInterval(() => { en.classList.toggle('show', document.body.classList.contains('mq-ready') && !document.body.classList.contains('sm-playing') && !S.open); }, 400);
 }
 function labels() {
-  $('#sp-entry').innerHTML = TAR + '<span>' + L(T.entry) + '</span><i>AI</i>';
   $('#sp-title').textContent = L(T.title); $('#sp-lang').textContent = isAr() ? 'English' : 'العربية';
   $('#sp-name').textContent = L(PERSONA.samri.name); $('#sp-tag').textContent = L(T.agent);
   if (S.open && S.phase === 'intro') intro();
@@ -225,7 +216,6 @@ function open() {
   if (S.sm) { S.music = S.sm.music; S.own = false; S.sm.S.coach = true; S.music.stop(); S.music.plan = null; if (S.sm.world) S.sm.world.asleep = true; }
   else if (!S.music) { S.music = new Music(); S.music.preload(); S.own = true; }
   S.music.unlock();
-  if (rawi && rawi.ui) rawi.ui.hide(true);
   intro();
 }
 function close() {
@@ -234,8 +224,12 @@ function close() {
   $('#sp-ov').classList.remove('open');
   stopMic();
   if (S.music) { S.music.rests = []; S.music.stop(); S.music.plan = null; S.music.drumVol = 1; }
-  if (S.sm) { S.sm.S.coach = false; if (S.sm.world) S.sm.world.asleep = false; }
-  if (rawi && rawi.ui) rawi.ui.hide(false);
+  if (S.sm) {
+    S.sm.S.coach = false; if (S.sm.world) S.sm.world.asleep = false;
+    // the page gets its own music back: the soft drums behind the story and the results, or the part it was on
+    if (S.sm.S.ambient && S.sm.ambient) S.sm.ambient(S.sm.S.part === 'story' ? 0.5 : 0.35);
+    else if (S.sm.resume) S.sm.resume();
+  }
 }
 function intro() {
   who(null); lvl(null); $('#sp-line').innerHTML = ''; $('#sp-result').innerHTML = ''; dots(0);
@@ -479,7 +473,7 @@ function boot() {
   build();
   rawi.on('start_drill', (args, spoken) => queueDrill(args, spoken));
   rawi.on('reply', onReply);
-  if (SIM && /[?&]perform=1/.test(location.search)) setTimeout(open, 600);
+  if (/[?&]perform=1/.test(location.search)) setTimeout(open, 600);
   window.__perform = { S, open, close, runDrill, measure, halfOf };
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

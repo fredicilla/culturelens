@@ -653,6 +653,15 @@
       go.className = 'g-go';
       go.innerHTML = '<a class="btn btn-solid" href="' + it.page + '"><span></span>' + ARROW + '</a>';
       setT(go.querySelector('span'), progress()[id] ? 'Play again' : 'Start the experience', progress()[id] ? 'العبها مرة ثانية' : 'ابدأ التجربة');
+      if (id === 'samri') {
+        // the AI teacher, as an option right here (it also waits at the end of the experience): perform it in his row
+        var tch = document.createElement('a');
+        tch.className = 'btn btn-outline g-teacher';
+        tch.href = 'samri.html?perform=1';
+        tch.innerHTML = '<span></span>' + ARROW;
+        setT(tch.querySelector('span'), 'Perform it with the AI teacher', 'أدِّها مع المعلّم (ذكاء اصطناعي)');
+        go.appendChild(tch);
+      }
       gh.parentNode.insertBefore(go, gh.nextSibling);
       var played = !!progress()[id];
       var path = document.createElement('div');

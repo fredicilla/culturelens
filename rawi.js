@@ -2,17 +2,16 @@
  * rawi.js: Rawi, the CultureLens heritage agent, on the phone.
  *
  * Rawi is one agent with one memory of each learner (it runs on Supabase, see supabase/functions/rawi),
- * and it takes a role in each experience: the mu'allim in the Samri, Abu Fahad in the coffee majlis,
- * Fahad across the Masaqil square, Grandma Haya at the Sadu loom. This file is its face on the page:
+ * and it takes a role in each experience. This file is the agent's client, with no face of its own on the page:
  *   - it sends the agent what happened (events, measured attempts, what the learner said or sang)
  *   - it runs the actions the agent chose (each page registers handlers for its own)
- *   - it speaks the agent's line out loud, in Arabic or English, and shows it
- *   - hold the mic to ask it anything by voice
- * Pages talk to it without importing it:   (window.rawiQ = window.rawiQ || []).push(['event', 'shot', {...}])
- *                                          (window.rawiQ = window.rawiQ || []).push(['on', 'guide_step', fn])
- * Add ?judge=1 to the address to see each step the agent took (model, tools, timings) under its line.
+ *   - it speaks the agent's line out loud, in Arabic or English
+ * A page creates its agent with pageRawi(experience) where it has a screen for it: the Samri teacher
+ * (samri-perform.js) opens at the end of the Samri experience and from its experience page.
+ * Scripts that are not modules talk to it with   (window.rawiQ = window.rawiQ || []).push(['event', 'shot', {...}])
  */
-import { RAWI_SUPABASE_URL, RAWI_ANON_KEY, RAWI_REGION } from './rawi-config.js';
+// read as a namespace, so a phone holding an older cached rawi-config.js still loads (a missing named import would not)
+import * as CFG from './rawi-config.js';
 
 const isAr = () => window.currentLang === 'ar';
 const L = (o) => (o == null ? '' : typeof o === 'string' ? o : isAr() ? (o.ar ?? o.en) : o.en);
@@ -25,10 +24,10 @@ export function endpoint() {
   if (q('rawi')) { store('cl_rawi_url', q('rawi') === 'off' ? null : q('rawi')); }
   if (q('rawikey')) store('cl_rawi_key', q('rawikey'));
   const own = store('cl_rawi_url');
-  const url = (own || RAWI_SUPABASE_URL || '').replace(/\/+$/, '');
-  const key = store('cl_rawi_key') || RAWI_ANON_KEY || '';
+  const url = (own || CFG.RAWI_SUPABASE_URL || '').replace(/\/+$/, '');
+  const key = store('cl_rawi_key') || CFG.RAWI_ANON_KEY || '';
   // run next to the database (a query parameter, so no extra CORS header is needed)
-  const region = !own && RAWI_REGION ? '?forceFunctionRegion=' + RAWI_REGION : '';
+  const region = !own && CFG.RAWI_REGION ? '?forceFunctionRegion=' + CFG.RAWI_REGION : '';
   // our own agent checks no token (it limits each device itself), so a turn can be a plain request with no
   // preflight; another project may want its key sent
   return url ? { url: url + '/functions/v1/rawi' + region, key, plain: !own } : null;
@@ -265,7 +264,7 @@ export function createRawi(opts) {
     speak, hush,
     get session() { return session; },
   };
-  const ui = opts.ui === false ? null : mountUI(exp, api);
+  const ui = opts.ui === true ? mountUI(exp, api) : null;
   api.ui = ui;
   if (ui && !endpoint()) { ui.off(true); ui.show(L(T.off)); }
   // wake the agent while the page is still loading, so the first real turn does not pay for a cold start
@@ -316,6 +315,4 @@ export function pageRawi(exp, opts) {
   window.rawiQ = { push: run };
   return page;
 }
-const auto = document.body && document.body.getAttribute('data-rawi');
-const file = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
-if (auto !== 'manual') pageRawi(auto || PAGES[file] || 'general');
+// nothing starts by itself: a page creates its agent (pageRawi) where it has a screen for it, like the Samri teacher

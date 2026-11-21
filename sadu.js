@@ -332,7 +332,7 @@ var SCALE = [293.7, 311.1, 370, 392, 440, 466.2, 554.4, 587.3];
 // ════════════════════════════════════════════════════════════
 // state
 // ════════════════════════════════════════════════════════════
-// Rawi, the CultureLens agent (rawi.js), plays Grandma Haya: it hears your steps and answers, and can weave your story
+// Rawi, the CultureLens agent (rawi.js), plays Grandma Haya: it hears your steps and answers, and can weave your story (when the page loads rawi.js; for now it does not, so these calls wait unused)
 function rawi(name, data) { (window.rawiQ = window.rawiQ || []).push(['event', name, data]); }
 // the band Grandma Haya weaves for you: one to three strips from the real patterns and yarns (the agent's weave_band)
 function showStoryBands(a) {

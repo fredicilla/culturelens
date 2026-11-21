@@ -26,7 +26,7 @@
   function num(n) { return isAr() ? String(n).replace(/\d/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'[d]; }) : String(n); }
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   function pct(v) { return num(Math.round(v * 100)) + (isAr() ? '٪' : '%'); }
-  // Rawi, the CultureLens agent (rawi.js), plays Abu Fahad: it hears what happens here and answers as the host
+  // Rawi, the CultureLens agent (rawi.js), plays Abu Fahad: it hears what happens here and answers as the host (when the page loads rawi.js; for now it does not, so these calls wait unused)
   function rawi(name, data) { (window.rawiQ = window.rawiQ || []).push(['event', name, data]); }
   (window.rawiQ = window.rawiQ || []).push(['on', 'guide_step', function (a) { if (a && a.tip) toast({ en: a.tip, ar: a.tip }); }]);
 

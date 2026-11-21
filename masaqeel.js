@@ -22,7 +22,7 @@ function isAr() { return window.currentLang === 'ar'; }
 function L(o) { if (o == null) return ''; if (typeof o === 'string') return o; return isAr() ? (o.ar != null ? o.ar : o.en) : o.en; }
 function num(n) { return isAr() ? String(n).replace(/\d/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'[d]; }) : String(n); }
 function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
-// Rawi, the CultureLens agent (rawi.js), plays Fahad: it hears every shot, talks back, and sets how well he shoots
+// Rawi, the CultureLens agent (rawi.js), plays Fahad: it hears every shot, talks back, and sets how well he shoots (when the page loads rawi.js; for now it does not, so these calls wait unused)
 function rawi(name, data) { (window.rawiQ = window.rawiQ || []).push(['event', name, data]); }
 function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
