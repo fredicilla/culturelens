@@ -134,6 +134,8 @@
   function motifSize(key, scale) { return P ? P.size(key, scale) : 'auto'; }
   function paint(el, key, mode, scale) {
     if (!el || !REGIONS[key]) return;
+    // the app's own pages are light now: their patterns use the bright palettes from the Figma
+    if (mode === 'full' && document.body && document.body.classList.contains('cl-app')) mode = 'bright';
     el.style.backgroundImage = motif(key, mode);
     el.style.backgroundSize = motifSize(key, scale);
   }
@@ -194,7 +196,7 @@
     // the app's own pages keep the logo's ink strip on top; the experiences take the region's dark
     var meta = document.querySelector('meta[name="theme-color"]');
     if (!meta) { meta = document.createElement('meta'); meta.name = 'theme-color'; document.head.appendChild(meta); }
-    meta.content = b.classList.contains('cl-app') ? '#0E0B1A' : c.bg;
+    meta.content = b.classList.contains('cl-app') ? '#FFF8F3' : c.bg;
 
     updateRegionUI(key);
   }
@@ -274,42 +276,60 @@
   var screen = null;
   var entering = null;
 
+  // A tap on the mosaic picks a region: its tiles stay lit, the rest fade, the camera moves in, and the card
+  // under the map shows the region with its Start button. Start opens the region.
+  var picked = null;
   function markPicked(key) {
     if (!screen) return;
-    screen.classList.toggle('has-pick', !!key);
-    screen.querySelectorAll('.rm-region').forEach(function (p) {
-      var on = p.getAttribute('data-region-key') === key;
-      p.classList.toggle('picked', on);
-      p.setAttribute('aria-pressed', on ? 'true' : 'false');
-    });
+    picked = REGIONS[key] ? key : null;
+    var map = screen.querySelector('.rm-map'), layer = screen.querySelector('.rm-layer');
+    if (map) map.classList.toggle('has-pick', !!picked);
+    screen.querySelectorAll('.rm-tile,.rm-label').forEach(function (t) { t.classList.toggle('on', t.getAttribute('data-region-key') === picked); });
+    screen.querySelectorAll('.rm-region').forEach(function (p) { p.setAttribute('aria-pressed', p.getAttribute('data-region-key') === picked ? 'true' : 'false'); });
+    // the camera: the picked region's tiles fill most of the map
+    if (layer) {
+      var box = picked && TILEBOX[picked];
+      if (box) {
+        var s = Math.min(2.4, Math.max(1.15, 0.62 / Math.max(box.w, box.h * 0.82)));
+        var cx = box.x + box.w / 2, cy = box.y + box.h / 2;
+        layer.style.transform = 'translate(' + ((0.5 - cx * s) * 100).toFixed(2) + '%,' + ((0.47 - cy * s) * 100).toFixed(2) + '%) scale(' + s.toFixed(3) + ')';
+        layer.style.setProperty('--s', s.toFixed(3));
+      } else { layer.style.transform = ''; layer.style.setProperty('--s', '1'); }
+    }
+    // the card
+    var card = screen.querySelector('.rm-pick'), go = screen.querySelector('.rm-go');
+    if (card) {
+      var txt = card.querySelector('.rm-pick-text');
+      if (picked) {
+        var r = REGIONS[picked];
+        var n = Object.keys(CATALOG).filter(function (id) { return CATALOG[id].page && inRegion(CATALOG[id], picked); }).length;
+        var ar = lang() === 'ar';
+        var count = n ? (ar ? (n === 1 ? 'تجربة كاملة' : n === 2 ? 'تجربتين كاملة' : arNum(n) + ' تجارب كاملة') : (n === 1 ? '1 full experience' : n + ' full experiences')) : (ar ? 'قصص وأدلة' : 'Stories and guides');
+        txt.innerHTML = '<b></b><small><span class="rm-area"></span><span class="rm-n"></span></small>';
+        txt.querySelector('b').textContent = ar ? r.nameAr : r.nameEn;
+        txt.querySelector('.rm-area').textContent = ar ? r.areaAr : r.areaEn;
+        txt.querySelector('.rm-n').textContent = count;
+        card.style.setProperty('--pick-motif', motif(picked, 'bright'));
+        card.style.setProperty('--pick-size', motifSize(picked, 0.6));
+      } else {
+        txt.innerHTML = '<b class="translatable" data-en="Pick a region" data-ar="اختر منطقة"></b><small class="translatable" data-en="Every region has its own pattern and colors" data-ar="كل منطقة لها نقشها وألوانها"></small>';
+        txt.querySelectorAll('.translatable').forEach(function (el) { el.textContent = el.getAttribute('data-' + lang()); });
+        card.style.removeProperty('--pick-motif');
+      }
+    }
+    if (go) go.disabled = !picked;
   }
 
-  // Tap a region: it lights up for a moment, then the app opens on it.
+  // Start: the region opens
   function enterRegion(key) {
     if (!REGIONS[key] || entering) return;
     entering = key;
     activeKey = key;
     applyTheme(key);
     applyDialect();
-    markPicked(key);
-    // the camera moves in on the region, then the region's home opens
+    if (picked !== key) markPicked(key);
     var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var path = screen && screen.querySelector('.rm-region[data-region-key="' + key + '"]');
-    var svg = screen && screen.querySelector('.rm-map svg');
-    if (path && svg && !still) {
-      try {
-        var bb = path.getBBox(), vb = svg.viewBox.baseVal;
-        svg.style.setProperty('--zx', ((bb.x + bb.width / 2 - vb.x) / vb.width * 100).toFixed(1) + '%');
-        svg.style.setProperty('--zy', ((bb.y + bb.height / 2 - vb.y) / vb.height * 100).toFixed(1) + '%');
-      } catch (e) {}
-      screen.classList.add('is-zooming');
-      setTimeout(function () { screen.classList.add('is-leaving'); }, 250);
-    }
-    setTimeout(function () {
-      entering = null;
-      selectRegion(key);
-      if (screen) { screen.classList.remove('is-zooming', 'is-leaving'); }
-    }, still ? 300 : 820);
+    setTimeout(function () { entering = null; selectRegion(key); }, still ? 0 : 180);
   }
 
   function selectRegion(key) {
@@ -339,58 +359,91 @@
     if (window.location.hash === '#map') history.replaceState(null, '', window.location.pathname);
   }
 
-  // Each region on the map: its own color, with its pattern drawn faintly over it in cream
-  var MAP_INK = { najd: '#8F5427', hejaz: '#1E6E61', eastern: '#2B6688', southern: '#8A5C0C', northern: '#9B392E' };
-  function paintMap() {
-    var svg = screen && screen.querySelector('svg');
-    if (!svg || !P) return;
-    var NS = 'http://www.w3.org/2000/svg';
-    var defs = svg.querySelector('defs') || svg.insertBefore(document.createElementNS(NS, 'defs'), svg.firstChild);
-    Object.keys(REGIONS).forEach(function (key) {
-      var tile = P.tile(key), k = 1.5, w = tile[0] * k, h = tile[1] * k;
-      var pat = document.createElementNS(NS, 'pattern');
-      pat.setAttribute('id', 'motif-' + key);
-      pat.setAttribute('patternUnits', 'userSpaceOnUse');
-      pat.setAttribute('width', w);
-      pat.setAttribute('height', h);
-      var bg = document.createElementNS(NS, 'rect');
-      bg.setAttribute('width', w); bg.setAttribute('height', h); bg.setAttribute('fill', MAP_INK[key]);
-      var img = document.createElementNS(NS, 'image');
-      img.setAttribute('href', 'data:image/svg+xml,' + encodeURIComponent(P.svg(key, 'tone', '#F3EADB')));
-      img.setAttribute('width', w);
-      img.setAttribute('height', h);
-      img.setAttribute('opacity', '0.42');
-      pat.appendChild(bg);
-      pat.appendChild(img);
-      defs.appendChild(pat);
-      var path = svg.querySelector('.rm-region[data-region-key="' + key + '"]');
-      if (path) path.setAttribute('fill', 'url(#motif-' + key + ')');
+  // The map is a mosaic: the country cut into rounded tiles, each tile in its region's pattern (the bright
+  // palettes in patterns.js). The tiles come from the outline in the hidden SVG, worked out once when the map opens.
+  var TILEBOX = {};
+  var LABEL_AT = { northern: [191.8, 153.8], hejaz: [201, 356.2], najd: [370.7, 351.3], eastern: [538.5, 369.2], southern: [334, 526.6] };
+  function buildMosaic() {
+    var layer = screen && screen.querySelector('.rm-layer');
+    var svg = screen && screen.querySelector('.rm-map svg');
+    if (!layer || !svg || layer.childNodes.length) return;
+    var VX = -6, VY = -6, VW = 742, VH = 612, CELL = 60, N = 5;
+    var paths = {};
+    screen.querySelectorAll('.rm-region').forEach(function (p) {
+      try { paths[p.getAttribute('data-region-key')] = new Path2D(p.getAttribute('d')); } catch (e) {}
+    });
+    var cv = document.createElement('canvas'), g = cv.getContext && cv.getContext('2d');
+    if (!g) return;
+    var keys = Object.keys(paths), html = [], first = {};
+    var cols = Math.ceil(VW / CELL), rows = Math.ceil(VH / CELL);
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        var x0 = VX + c * CELL, y0 = VY + r * CELL, votes = {}, land = 0;
+        for (var i = 0; i < N; i++) for (var j = 0; j < N; j++) {
+          var px = x0 + (i + 0.5) * CELL / N, py = y0 + (j + 0.5) * CELL / N;
+          for (var k = 0; k < keys.length; k++) if (g.isPointInPath(paths[keys[k]], px, py)) { votes[keys[k]] = (votes[keys[k]] || 0) + 1; land++; break; }
+        }
+        if (land < N * N * 0.34) continue;
+        var best = keys.reduce(function (a, b) { return (votes[b] || 0) > (votes[a] || 0) ? b : a; });
+        var gap = CELL * 0.07;
+        var L = (x0 + gap - VX) / VW, T = (y0 + gap - VY) / VH, W = (CELL - 2 * gap) / VW, H = (CELL - 2 * gap) / VH;
+        var bx = TILEBOX[best] || (TILEBOX[best] = { x0: 1, y0: 1, x1: 0, y1: 0 });
+        bx.x0 = Math.min(bx.x0, L); bx.y0 = Math.min(bx.y0, T); bx.x1 = Math.max(bx.x1, L + W); bx.y1 = Math.max(bx.y1, T + H);
+        var r0 = REGIONS[best], lead = !first[best];
+        first[best] = true;
+        html.push('<div class="rm-tile" data-region-key="' + best + '"' + (lead ? ' role="button" tabindex="0" aria-label="' + r0.nameEn + ' / ' + r0.nameAr + '"' : '') +
+          ' style="left:' + (L * 100).toFixed(3) + '%;top:' + (T * 100).toFixed(3) + '%;width:' + (W * 100).toFixed(3) + '%;height:' + (H * 100).toFixed(3) + '%;background-image:' + motif(best, 'bright').replace(/"/g, '&quot;') + ';background-size:' + motifSize(best, 0.42) + ';background-position:' + (-(c * 37) % 60) + 'px ' + (-(r * 23) % 60) + 'px"></div>');
+      }
+    }
+    Object.keys(TILEBOX).forEach(function (k) { var b = TILEBOX[k]; b.x = b.x0; b.y = b.y0; b.w = b.x1 - b.x0; b.h = b.y1 - b.y0; });
+    Object.keys(LABEL_AT).forEach(function (k) {
+      var at = LABEL_AT[k], r0 = REGIONS[k];
+      html.push('<span class="rm-label translatable" data-region-key="' + k + '" data-en="' + r0.nameEn.replace(' Region', '') + '" data-ar="' + ({ northern: 'الشمال', hejaz: 'الحجاز', najd: 'نجد', eastern: 'الشرقية', southern: 'الجنوب' })[k] + '" style="left:' + ((at[0] - VX) / VW * 100).toFixed(2) + '%;top:' + ((at[1] - VY) / VH * 100).toFixed(2) + '%"></span>');
+    });
+    layer.innerHTML = html.join('');
+    layer.querySelectorAll('.rm-label').forEach(function (el) { el.textContent = el.getAttribute('data-' + lang()); });
+    layer.addEventListener('click', function (e) {
+      var t = e.target.closest('.rm-tile');
+      if (!t) return;
+      var key = t.getAttribute('data-region-key');
+      if (picked === key) enterRegion(key); else markPicked(key);
+    });
+    layer.addEventListener('keydown', function (e) {
+      var t = e.target.closest('.rm-tile');
+      if (t && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); markPicked(t.getAttribute('data-region-key')); }
     });
   }
 
   function initMap() {
     screen = document.getElementById('region-map-screen');
     if (!screen) return;
-    paintMap();
-    screen.querySelectorAll('.rm-region').forEach(function (p) {
+    buildMosaic();
+    var go = screen.querySelector('.rm-go');
+    if (go) go.addEventListener('click', function () { if (picked) enterRegion(picked); });
+    var whole = screen.querySelector('.rm-whole');
+    if (whole) whole.addEventListener('click', function () { markPicked(null); });
+    // the hidden outline and the old list still work for keyboards and tests
+    screen.querySelectorAll('.rm-region, .rm-legend [data-region-key]').forEach(function (p) {
       var key = p.getAttribute('data-region-key');
       p.addEventListener('click', function () { enterRegion(key); });
-      p.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterRegion(key); }
+    });
+    // the four categories under the map: open in the picked region (or ask for one first)
+    screen.querySelectorAll('.cat-card[data-category]').forEach(function (b) {
+      var cat = b.getAttribute('data-category');
+      var n = Object.keys(CATALOG).filter(function (id) { return CATALOG[id].cat === cat; }).length;
+      var num = b.querySelector('.cc-num');
+      if (num) num.textContent = lang() === 'ar' ? arNum(n) : String(n);
+      b.addEventListener('click', function () {
+        var key = picked || activeKey;
+        if (!key) { toast('Pick a region on the map first', 'اختر منطقة من الخريطة أول'); return; }
+        remember(key);
+        window.location.href = b.getAttribute('data-href');
       });
     });
-    // the list under the map: same as tapping the region
-    screen.querySelectorAll('.rm-legend [data-region-key]').forEach(function (b) {
-      var key = b.getAttribute('data-region-key');
-      paint(b.querySelector('.sw'), key, 'full', 0.75);
-      b.addEventListener('click', function () { enterRegion(key); });
-      var n = Object.keys(CATALOG).filter(function (id) { return CATALOG[id].page && inRegion(CATALOG[id], key); }).length;
-      if (n && !b.querySelector('.rm-count')) {
-        var c = document.createElement('span'); c.className = 'rm-count';
-        var chev = b.querySelector('.chev');
-        b.insertBefore(c, chev);
-        setT(c, n === 1 ? '1 full experience' : n + ' full experiences', n === 1 ? 'تجربة كاملة' : (n === 2 ? 'تجربتين كاملة' : arNum(n) + ' تجارب كاملة'));
-      }
+    document.addEventListener('languageChanged', function () {
+      if (!screen) return;
+      screen.querySelectorAll('.cat-card .cc-num').forEach(function (el) { el.textContent = lang() === 'ar' ? arNum(el.textContent.replace(/[٠-٩]/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'.indexOf(d); })) : el.textContent.replace(/[٠-٩]/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'.indexOf(d); }); });
+      markPicked(picked);
     });
     if (!pickedThisVisit() || window.location.hash === '#map') openMap();
   }
@@ -760,7 +813,6 @@
       '</div>';
     paint(g.querySelector('.gate-art'), homeKey, 'full', 1.5);
     var go = g.querySelector('.gate-go');
-    go.style.background = MAP_INK[homeKey] || home.colors.accent;
     go.style.color = '#F4EEE4';
     go.addEventListener('click', function () {
       remember(homeKey);

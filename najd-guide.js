@@ -482,7 +482,36 @@
     'opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;pointer-events:none;cursor:pointer}' +
     'html[dir="rtl"] #ng-peek{padding:10px 14px 10px 34px}#ng-peek.show{opacity:1;transform:none;pointer-events:auto}' +
     '#ng-peek button{position:absolute;top:6px;inset-inline-end:6px;width:22px;height:22px;border:0;background:transparent;color:var(--g-ink);opacity:.55;font-size:13px;cursor:pointer}' +
-    '@media (prefers-reduced-motion:reduce){.ng-stage,.ng-stagewrap{transition:none}}';
+    '@media (prefers-reduced-motion:reduce){.ng-stage,.ng-stagewrap{transition:none}}' +
+    // the Figma look (Nov 2026): a full page, cream, navy and orange, round bubbles; opened from the header's «المساعد»
+    '#ng-btn,#ng-peek{display:none!important}' +
+    '#ng-panel{--g-acc:var(--acc,#EB5A3C);--g-ink:#0F2837;inset:0;width:auto;max-width:430px;margin:0 auto;background:#FFF8F3;transform:translateY(100%);box-shadow:none}' +
+    'html[dir="rtl"] #ng-panel{transform:translateY(100%)}#ng-panel:not(.open){visibility:hidden;transition:transform .32s,visibility 0s .32s}' +
+    '.ng-head{background:#FFF8F3;color:#0F2837;border-bottom:1px solid rgba(15,40,55,.08)}' +
+    '.ng-head .ng-face{width:44px;height:44px;border-radius:50%;background:#0F2837;border:0}' +
+    '.ng-head b{font-size:17px}.ng-head small{color:#8C99A1;font-size:12.5px}' +
+    '.ng-head .ng-x{border:0;background:#FBEFE7;color:#0F2837;border-radius:50%;width:38px;height:38px}' +
+    '.ng-band{display:none}' +
+    '.ng-call{background:#fff;color:#0F2837;border:0;border-radius:18px;box-shadow:0 4px 16px rgba(15,40,55,.08);padding:10px 12px}' +
+    'html[dir="rtl"] .ng-call{padding:10px 12px}' +
+    '.ng-call .ng-face{background:#0F2837;border:0}.ng-call small{color:#4B5E69}' +
+    '.ng-call .ng-call-i{background:var(--g-acc);color:#fff}' +
+    '.ng-stagebox{background:radial-gradient(circle at 50% 30%,#1F4357,#0F2837 72%)}' +
+    '.ng-bigmic{background:var(--g-acc);color:#fff;box-shadow:0 0 0 calc(var(--lv) * 12px) rgba(235,90,60,.25)}' +
+    '.ng-end{border-color:rgba(255,255,255,.35)}' +
+    '.ng-msg{border-radius:18px;font-size:15px;line-height:1.75;padding:11px 15px}' +
+    '.ng-msg.bot{background:#fff;border:0;box-shadow:0 2px 10px rgba(15,40,55,.06);border-start-start-radius:6px}' +
+    '.ng-msg.bot.talking{box-shadow:0 0 0 2px rgba(235,90,60,.45)}' +
+    '.ng-msg.me{background:#0F2837;color:#fff;border-start-end-radius:6px}' +
+    '.ng-msg a.ng-try{border-radius:999px;color:#fff;padding:8px 16px}' +
+    '.ng-listen{border-color:rgba(15,40,55,.12);border-radius:999px}' +
+    '.ng-chips button{border-radius:999px;background:#fff;border:1px solid rgba(15,40,55,.12);color:#0F2837;padding:7px 13px}' +
+    '.ng-chips button:hover{background:#0F2837;color:#fff}' +
+    '.ng-form{background:#fff;border-top:0;box-shadow:0 -4px 16px rgba(15,40,55,.06);align-items:center}' +
+    '.ng-form input{background:#F7F1EC;border:0;border-radius:999px;padding:13px 18px}' +
+    '.ng-form button#ng-send{width:48px;height:48px;padding:0;border-radius:50%;flex:none;display:grid;place-items:center}' +
+    '.ng-form button#ng-send svg{width:20px;height:20px}html[dir="rtl"] .ng-form button#ng-send svg{transform:scaleX(-1)}' +
+    '.ng-form .ng-mic{height:48px;width:48px;border-radius:50%;border-color:rgba(15,40,55,.15);color:#0F2837}';
 
   var PANEL = '<div class="ng-head"><span class="ng-face">' + MANsvg() + '</span><div><b id="ng-title"></b><small id="ng-sub"></small></div>' +
     '<button class="ng-x" id="ng-x" type="button" aria-label="Close">✕</button></div>' +
@@ -498,8 +527,8 @@
     '<form class="ng-form" id="ng-form"><button type="button" class="ng-mic" id="ng-mic">' + MIC_I + '</button><input id="ng-in" autocomplete="off" enterkeyhint="send"><button type="submit" id="ng-send"></button></form>';
 
   var TXT = {
-    title: { ar: 'فهد · دليلك في نجد', en: 'Fahad · your Najd guide' },
-    sub: { ar: 'نجد أولًا، والمملكة كلها', en: 'Najd first, and all of Saudi Arabia' },
+    title: { ar: 'مساعد عدسة', en: 'CultureLens Assistant' },
+    sub: { ar: 'فهد يجاوبك عن نجد والمملكة كلها', en: 'Fahad answers about Najd and all of Saudi Arabia' },
     call: { ar: 'كلّم فهد بصوتك', en: 'Talk to Fahad' },
     callSub: { ar: 'يطلع لك ويرد عليك بصوته', en: 'He comes out and answers out loud' },
     end: { ar: 'إنهاء المكالمة', en: 'End the call' },
@@ -507,7 +536,7 @@
     send: { ar: 'إرسال', en: 'Send' },
     mic: { ar: 'تكلّم', en: 'Talk' },
     listen: { ar: 'اسمعها', en: 'Listen' },
-    hello: { ar: 'هلا والله وغلا، وحيّاك الله! أنا فهد، دليلك في نجد وفي المملكة كلها. اسألني عن تاريخها وأكلها وقهوتها وفنونها، أو قل لي وين تبي تروح. وتقدر تكلمني بصوتك من زر المايك.', en: 'Welcome! I am Fahad, your guide to Najd and the whole of Saudi Arabia. Ask me about its history, food, coffee, folk arts, or where to go. You can also talk to me with the mic button.' },
+    hello: { ar: 'هلا والله وغلا، وحيّاك الله! أنا فهد، مساعد عدسة ثقافية، دليلك في نجد وفي المملكة كلها. اسألني عن تاريخها وأكلها وقهوتها وفنونها، أو قل لي وين تبي تروح. وتقدر تكلمني بصوتك من زر المايك.', en: 'Welcome! I am Fahad, the CultureLens assistant, your guide to Najd and the whole of Saudi Arabia. Ask me about its history, food, coffee, folk arts, or where to go. You can also talk to me with the mic button.' },
     callHello: { ar: 'هلا والله! أنا فهد. اسألني عن نجد أو عن أي مكان في المملكة، أنا أسمعك.', en: 'Hello! I am Fahad. Ask me about Najd or anywhere in Saudi Arabia, I am listening.' },
     idle: { ar: 'اضغط المايك وتكلّم', en: 'Tap the mic and talk' },
     listening: { ar: 'أسمعك… تكلّم، ولما تسكت أرسله لفهد', en: 'Listening… when you stop, it goes to Fahad' },
@@ -540,7 +569,7 @@
     $('#ng-title', panel).textContent = L(TXT.title); $('#ng-sub', panel).textContent = L(TXT.sub);
     $('#ng-call-t', panel).textContent = L(TXT.call); $('#ng-call-s', panel).textContent = L(TXT.callSub);
     $('#ng-end', panel).textContent = L(TXT.end);
-    input.placeholder = L(TXT.ph); $('#ng-send', panel).textContent = L(TXT.send);
+    input.placeholder = L(TXT.ph); var sb = $('#ng-send', panel); sb.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'; sb.setAttribute('aria-label', L(TXT.send));
     micBtn.setAttribute('aria-label', L(TXT.mic)); bigmic.setAttribute('aria-label', L(TXT.mic));
     setPhase(phase);
   }
@@ -756,20 +785,14 @@
   btn.addEventListener('blur', function () { hoverTimer = setTimeout(hidePeek, 500); });
   peek.addEventListener('mouseenter', function () { clearTimeout(hoverTimer); });
   peek.addEventListener('mouseleave', function () { hoverTimer = setTimeout(hidePeek, 500); });
-  function refresh() {
-    var ok = inNajd();
-    if (!ok || panel.classList.contains('open')) hidePeek();
-    else if (!seenPeek()) setTimeout(function () { if (inNajd() && !panel.classList.contains('open')) showPeek(); }, 1200);
-    btn.classList.toggle('show', ok && !panel.classList.contains('open'));
-    if (!ok && panel.classList.contains('open')) close();
-  }
+  function refresh() { hidePeek(); btn.classList.remove('show'); }     // opened from the header now, on every page
   new MutationObserver(refresh).observe(document.body, { attributes: true, attributeFilter: ['data-region', 'class'] });
   document.addEventListener('languageChanged', function () { labels(); });
   labels(); refresh();
   // a direct link (?guide=1) goes straight to Najd with the guide open, e.g. to share it for testing
   if (/[?&]guide=1/.test(location.search)) setTimeout(function () {
     if (!inNajd() && window.ThemeManager && window.ThemeManager.selectRegion) window.ThemeManager.selectRegion('najd');
-    setTimeout(function () { if (inNajd()) { open(); if (/[?&]talk=1/.test(location.search)) call(true); } }, 300);
+    setTimeout(function () { { open(); if (/[?&]talk=1/.test(location.search)) call(true); } }, 300);
   }, 700);
   window.__najdGuide = { open: open, close: close, ask: ask, answer: answer, setMode: setMode, call: call, KB: KB };
 })();

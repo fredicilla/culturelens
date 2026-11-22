@@ -1,7 +1,10 @@
 // language.js
 // Manage Bilingual English / Saudi Arabic State
 
-window.currentLang = localStorage.getItem('cultureLensLang') || 'en';
+// Arabic first: a new visitor gets Arabic, and can switch to English from the header
+window.currentLang = localStorage.getItem('cultureLensLang') || 'ar';
+document.documentElement.dir = window.currentLang === 'ar' ? 'rtl' : 'ltr';
+document.documentElement.lang = window.currentLang;
 
 function toggleLanguage() {
   window.currentLang = window.currentLang === 'en' ? 'ar' : 'en';
@@ -36,7 +39,7 @@ function applyLanguage() {
   // 3. Update toggle button label (if it exists on new page)
   const btnLabel = document.getElementById('lang-label');
   if (btnLabel) {
-    btnLabel.textContent = isAr ? 'English' : 'العربية';
+    btnLabel.textContent = isAr ? 'EN' : 'ع';
   }
   
   // 4. Handle body classes for generic CSS targetting

@@ -7,27 +7,27 @@
 
   // ── styles ──
   var css = [
-    'body { padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px)); }',
+    'body { padding-bottom: calc(66px + env(safe-area-inset-bottom, 0px)); }',
     '.cl-bottom-nav {',
     '  position: fixed; z-index: 140; left: 0; right: 0; bottom: 0;',
     '  max-width: 430px; margin: 0 auto;',
-    '  height: calc(62px + env(safe-area-inset-bottom, 0px)); padding: 0 8px env(safe-area-inset-bottom, 0px);',
+    '  height: calc(66px + env(safe-area-inset-bottom, 0px)); padding: 0 8px env(safe-area-inset-bottom, 0px);',
     '  display: flex; justify-content: space-around; align-items: stretch;',
-    '  background: #F4EEE4; border-top: 1px solid rgba(22, 18, 29, 0.14);',
+    '  background: #FFFFFF; box-shadow: 0 -1px 0 rgba(15, 40, 55, 0.08), 0 -6px 20px rgba(15, 40, 55, 0.05);',
     '}',
     '.cl-nav-item {',
     '  position: relative; flex: 1;',
     '  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;',
-    '  text-decoration: none; color: #7C7382;',
-    '  font-family: var(--f, inherit); font-size: 11.5px; font-weight: 600;',
+    '  text-decoration: none; color: #8C99A1;',
+    '  font-family: var(--f, inherit); font-size: 12px; font-weight: 600;',
     '  -webkit-tap-highlight-color: transparent;',
     '}',
-    '.cl-nav-item .cl-nav-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }',
-    '.cl-nav-item .cl-nav-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }',
-    '.cl-nav-item.active { color: #16121D; }',
+    '.cl-nav-item .cl-nav-icon { width: 23px; height: 23px; display: flex; align-items: center; justify-content: center; }',
+    '.cl-nav-item .cl-nav-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }',
+    '.cl-nav-item.active { color: #EB5A3C; font-weight: 700; }',
     '.cl-nav-item.active::before {',
-    '  content: ""; position: absolute; top: -1px; left: 50%; width: 30px; height: 2px; margin-left: -15px;',
-    '  background: var(--acc, #16121D);',
+    '  content: ""; position: absolute; top: 0; left: 50%; width: 34px; height: 3px; margin-left: -17px; border-radius: 0 0 3px 3px;',
+    '  background: #EB5A3C;',
     '}'
   ].join('\n');
 
@@ -55,9 +55,9 @@
   };
 
   var items = [
-    { key: 'explore',   href: 'index.html',     en: 'Explore',   ar: 'استكشاف' },
+    { key: 'explore',   href: 'index.html',     en: 'Explore',   ar: 'استكشف' },
     { key: 'community', href: 'community.html', en: 'Community', ar: 'المجتمع' },
-    { key: 'account',   href: 'account.html',   en: 'Account',   ar: 'الحساب' }
+    { key: 'account',   href: 'account.html',   en: 'Account',   ar: 'حسابي' }
   ];
 
   var nav = document.createElement('nav');
@@ -75,7 +75,27 @@
       '</a>';
   }).join('');
 
+  // the header (Figma): the logo with its name on one side; the assistant and the language on the other
+  function header() {
+    var brand = document.querySelector('.cl-header .brand');
+    if (brand && !brand.querySelector('.brand-mark')) {
+      brand.insertAdjacentHTML('beforeend', '<img class="brand-mark" src="logo-mark.svg" alt=""><span class="brand-name translatable" data-en="CultureLens" data-ar="عدسة ثقافية">' + (window.currentLang === 'en' ? 'CultureLens' : 'عدسة ثقافية') + '</span>');
+    }
+    var actions = document.querySelector('.cl-header .hdr-actions');
+    if (actions && !document.getElementById('cl-ask')) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.id = 'cl-ask'; b.className = 'cl-ask';
+      b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l1.6 4.4 4.4 1.6-4.4 1.6L12 15.5l-1.6-4.4L6 9.5l4.4-1.6z"/><path d="M18.5 15.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/></svg><span class="translatable" data-en="Assistant" data-ar="المساعد">' + (window.currentLang === 'en' ? 'Assistant' : 'المساعد') + '</span>';
+      b.addEventListener('click', function () {
+        if (window.clSound) window.clSound.prime();
+        if (window.__najdGuide) window.__najdGuide.open();
+      });
+      actions.insertBefore(b, actions.firstChild);
+    }
+  }
+
   function mount() {
+    header();
     document.body.appendChild(nav);
     // re-translate freshly injected nodes (through ThemeManager so region dialect applies)
     if (window.ThemeManager && typeof window.ThemeManager.applyDialect === 'function') window.ThemeManager.applyDialect();

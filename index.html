@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#0E0B1A">
+  <meta name="theme-color" content="#FFF8F3">
   <title>CultureLens</title>
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -77,8 +77,8 @@
   <!-- REGION MAP: opening screen. Tap a region to enter it. -->
   <section id="region-map-screen" aria-hidden="true" aria-labelledby="rm-title">
     <div class="kicker translatable" data-en="CultureLens" data-ar="عدسة ثقافية">CultureLens</div>
-    <h1 class="rm-title translatable" id="rm-title" data-en="Where do you want to start?" data-ar="من وين تبي تبدأ؟">Where do you want to start?</h1>
-    <p class="rm-sub translatable" data-en="Pick a region. The app takes on its patterns, its colors, and the way people there speak." data-ar="اختر منطقة، والتطبيق ياخذ نقوشها وألوانها وطريقة كلام أهلها.">Pick a region. The app takes on its patterns, its colors, and the way people there speak.</p>
+    <h1 class="rm-title translatable" id="rm-title" data-en="Where do you want to start?" data-ar="من أين تريد أن تبدأ؟">من أين تريد أن تبدأ؟</h1>
+    <p class="rm-sub translatable" data-en="Pick a region. The app takes on its patterns, its colors, and the way people there speak." data-ar="اختر منطقة، والتطبيق ياخذ نقوشها وألوانها وطريقة كلام أهلها.">اختر منطقة، والتطبيق ياخذ نقوشها وألوانها وطريقة كلام أهلها.</p>
     <div class="rm-map">
       <svg viewBox="-6 -6 742 612" role="group" aria-label="Map of Saudi Arabia by region">
         <g>
@@ -96,6 +96,23 @@
           <text class="rm-label translatable" x="334.0" y="526.6" data-en="Southern" data-ar="الجنوب">Southern</text>
         </g>
       </svg>
+      <div class="rm-mosaic"><div class="rm-layer"></div></div>
+      <button type="button" class="rm-whole"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg><span class="translatable" data-en="Whole map" data-ar="الخريطة كاملة">الخريطة كاملة</span></button>
+      <div class="rm-hint translatable" data-en="Tap a region to get closer" data-ar="اضغط على منطقة لتقترب منها">اضغط على منطقة لتقترب منها</div>
+    </div>
+    <div class="rm-pick" aria-live="polite">
+      <div class="rm-pick-text"><b class="translatable" data-en="Pick a region" data-ar="اختر منطقة">اختر منطقة</b><small class="translatable" data-en="Every region has its own pattern and colors" data-ar="كل منطقة لها نقشها وألوانها">كل منطقة لها نقشها وألوانها</small></div>
+      <button type="button" class="rm-go" disabled><span class="translatable" data-en="Start" data-ar="ابدأ">ابدأ</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    </div>
+    <div class="rm-explore">
+      <span class="sec-kicker translatable" data-en="Start here" data-ar="ابدأ من هنا">ابدأ من هنا</span>
+      <h2 class="sec-label translatable" data-en="Explore" data-ar="استكشف">استكشف</h2>
+      <div class="cat-grid">
+        <button type="button" class="cat-card" data-category="food" data-href="food.html"><span class="cc-pic"><img src="cover-qahwa.jpg" alt="" loading="lazy"><span class="cc-num"></span></span><span class="cc-t translatable" data-en="Food &amp; Drinks" data-ar="المأكولات والمشروبات">المأكولات والمشروبات</span><span class="cc-s translatable" data-en="Dishes, drinks, and their customs" data-ar="أكلات ومشروبات وسلومها">أكلات ومشروبات وسلومها</span></button>
+        <button type="button" class="cat-card" data-category="music" data-href="music.html"><span class="cc-pic"><img src="cover-samri.jpg" alt="" loading="lazy"><span class="cc-num"></span></span><span class="cc-t translatable" data-en="Music &amp; Performances" data-ar="الفنون والعروض">الفنون والعروض</span><span class="cc-s translatable" data-en="Folk arts and their instruments" data-ar="الفنون الشعبية وآلاتها">الفنون الشعبية وآلاتها</span></button>
+        <button type="button" class="cat-card" data-category="games" data-href="games.html"><span class="cc-pic"><img src="cover-masaqil.jpg" alt="" loading="lazy"><span class="cc-num"></span></span><span class="cc-t translatable" data-en="Traditional Games" data-ar="الألعاب القديمة">الألعاب القديمة</span><span class="cc-s translatable" data-en="Games of the old neighborhoods" data-ar="ألعاب الحواري القديمة">ألعاب الحواري القديمة</span></button>
+        <button type="button" class="cat-card" data-category="clothing" data-href="clothing.html"><span class="cc-pic"><img src="cover-sadu.jpg" alt="" loading="lazy"><span class="cc-num"></span></span><span class="cc-t translatable" data-en="Fabrics &amp; Clothing" data-ar="الأزياء والثياب">الأزياء والثياب</span><span class="cc-s translatable" data-en="What we wear and where it comes from" data-ar="وش نلبس ومن وين جا">وش نلبس ومن وين جا</span></button>
+      </div>
     </div>
     <div class="rm-legend">
         <button type="button" data-region-key="najd"><span class="sw" aria-hidden="true"></span><span><b class="translatable" data-en="Najd" data-ar="نجد">Najd</b><small class="translatable" data-en="Riyadh and Al-Qassim" data-ar="الرياض والقصيم">Riyadh and Al-Qassim</small></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>

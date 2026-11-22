@@ -13,7 +13,7 @@
  * CLPatterns.svg(region, mode)  -> SVG string for one tile
  * CLPatterns.url(region, mode)  -> CSS url("data:...") for background-image
  * CLPatterns.size(region)       -> CSS background-size for one tile
- *   mode 'full' = traditional colors, 'tone' = one accent color on transparent (for quiet backgrounds)
+ *   mode 'full' = traditional colors, 'bright' = the map tiles' colors, 'tone' = one accent color on transparent (for quiet backgrounds)
  */
 (function () {
   var PALETTES = {
@@ -22,6 +22,15 @@
     eastern:  { bg: '#C9BBA2', a: '#ECE4D6', b: '#A89A82', c: '#7F735F', d: '#DDD2BF' },
     southern: { bg: '#EEE6D5', a: '#B9392E', b: '#D9A339', c: '#3F7D4D', d: '#2E5788', k: '#1B1714' },
     northern: { bg: '#1D1713', a: '#9E2C24', b: '#ECE2CE', c: '#6E4B33', d: '#C9893B', k: '#120E0B' }
+  };
+
+  // brighter versions for the map's tiles (the new look): Najd orange, Hejaz plum, Eastern mint, South peach, North ink
+  var BRIGHT = {
+    najd:     { bg: '#EB5A3C', a: '#B83A22', b: '#F7A27F', c: '#FFF1E6', d: '#8E2A17' },
+    hejaz:    { bg: '#6E2C4F', a: '#D9663F', b: '#F08A5D', c: '#F6C9A8', d: '#4A1C35' },
+    eastern:  { bg: '#D3E3E1', a: '#F6FBFA', b: '#9CC3BE', c: '#5E9E97', d: '#BFD8D4' },
+    southern: { bg: '#FBE3D2', a: '#EB5A3C', b: '#F6A983', c: '#3E8E87', d: '#7A2E5A', k: '#3A2A2A' },
+    northern: { bg: '#383138', a: '#C0392B', b: '#F4E9DE', c: '#8E3B2F', d: '#EB8A3C', k: '#1E1A1E' }
   };
 
   var TILE = { najd: [48, 48], hejaz: [24, 24], eastern: [48, 48], southern: [48, 64], northern: [48, 56] };
@@ -144,7 +153,7 @@
   function svg(region, mode, accent) {
     var t = TILE[region];
     if (!t) return '';
-    var p = mode === 'tone' ? tonePalette(accent || '#C9A84C') : PALETTES[region];
+    var p = mode === 'tone' ? tonePalette(accent || '#C9A84C') : mode === 'bright' ? BRIGHT[region] : PALETTES[region];
     var bg = p.bg && p.bg !== 'none' ? rect(0, 0, t[0], t[1], p.bg) : '';
     return "<svg xmlns='http://www.w3.org/2000/svg' width='" + t[0] + "' height='" + t[1] + "' viewBox='0 0 " + t[0] + ' ' + t[1] + "' shape-rendering='geometricPrecision'>" + bg + DRAW[region](p) + '</svg>';
   }
